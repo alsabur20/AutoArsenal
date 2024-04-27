@@ -28,7 +28,7 @@ namespace AutoArsenal_App.Controllers
                             {
                                 Location location1 = new Location
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     StreetAddress = reader.GetString(reader.GetOrdinal("StreetAddress")),
                                     Country = reader.GetString(reader.GetOrdinal("Country")),
                                     City = reader.GetString(reader.GetOrdinal("City")),

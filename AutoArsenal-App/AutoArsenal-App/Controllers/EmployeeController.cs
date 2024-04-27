@@ -28,7 +28,7 @@ namespace AutoArsenal_App.Controllers
                             {
                                 Employee employee1 = new Employee
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     JoiningDate = reader.GetDateTime(reader.GetOrdinal("JoiningDate")),
                                     Role = reader.GetInt32(reader.GetOrdinal("Role")),
                                     CredentialsId = reader.IsDBNull(reader.GetOrdinal("CredentialsId")) ? -1 : reader.GetInt32(reader.GetOrdinal("CredentialsId")),
@@ -53,7 +53,6 @@ namespace AutoArsenal_App.Controllers
         //add employee to db
         public async static Task AddEmployee(Employee employee)
         {
-            //add employee to db
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
@@ -62,7 +61,7 @@ namespace AutoArsenal_App.Controllers
                     string query = "INSERT INTO Employee (Id, JoiningDate, Role, Salary) VALUES (@Id, @JoiningDate, @Role, @Salary)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", employee.Id);
+                        command.Parameters.AddWithValue("@Id", employee.ID);
                         command.Parameters.AddWithValue("@JoiningDate", employee.JoiningDate);
                         command.Parameters.AddWithValue("@Role", employee.Role);
                         //command.Parameters.AddWithValue("@CredentialsId", employee.CredentialsId);

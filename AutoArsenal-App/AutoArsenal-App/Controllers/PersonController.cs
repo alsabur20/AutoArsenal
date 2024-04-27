@@ -28,7 +28,7 @@ namespace AutoArsenal_App.Controllers
                             {
                                 Person person1 = new Person
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                     LastName = reader.GetString(reader.GetOrdinal("LastName")),
                                     Contact = reader.GetString(reader.GetOrdinal("Contact")),
