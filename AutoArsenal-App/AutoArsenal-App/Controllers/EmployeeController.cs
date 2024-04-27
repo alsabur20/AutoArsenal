@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace AutoArsenal_App.Controllers
 {
-    public class LookupController
+    public class EmployeeController
     {
         private static IConfiguration Configuration { get; set; }
 
@@ -11,30 +11,32 @@ namespace AutoArsenal_App.Controllers
         {
             Configuration = configuration;
         }
-        public async static Task<List<Lookup>> GetLookup()
+        public async static Task<List<Employee>> GetEmployee()
         {
-            List<Lookup> lookup = new List<Lookup>();
+            List<Employee> employee = new List<Employee>();
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Lookup";
+                    string query = "SELECT * FROM Employee";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                Lookup lookup1 = new Lookup
+                                Employee employee1 = new Employee
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    Category = reader.GetString(reader.GetOrdinal("Category")),
-                                    Value = reader.GetString(reader.GetOrdinal("Value")),
+                                    JoiningDate = reader.GetDateTime(reader.GetOrdinal("JoiningDate")),
+                                    Role = reader.GetInt32(reader.GetOrdinal("Role")),
+                                    CredentialsId = reader.IsDBNull(reader.GetOrdinal("CredentialsId")) ? -1 : reader.GetInt32(reader.GetOrdinal("CredentialsId")),
+                                    Salary = reader.GetDouble(reader.GetOrdinal("Salary")),
                                 };
-                                lookup.Add(lookup1);
+                                employee.Add(employee1);
                             }
-                            return await Task.FromResult(lookup);
+                            return await Task.FromResult(employee);
                         }
                     }
                 }
@@ -48,26 +50,24 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
-        public static string GetLookupValue(int id)
+        //add employee to db
+        public async static Task AddEmployee(Employee employee)
         {
-            string lookupValue = string.Empty;
+            //add employee to db
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
                     connection.Open();
-                    string query = "SELECT Value FROM Lookup WHERE Id = @Id";
+                    string query = "INSERT INTO Employee (Id, JoiningDate, Role, Salary) VALUES (@Id, @JoiningDate, @Role, @Salary)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                lookupValue = reader.GetString(reader.GetOrdinal("Value"));
-                            }
-                            return lookupValue;
-                        }
+                        command.Parameters.AddWithValue("@Id", employee.Id);
+                        command.Parameters.AddWithValue("@JoiningDate", employee.JoiningDate);
+                        command.Parameters.AddWithValue("@Role", employee.Role);
+                        //command.Parameters.AddWithValue("@CredentialsId", employee.CredentialsId);
+                        command.Parameters.AddWithValue("@Salary", employee.Salary);
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
                 catch (Exception ex)
