@@ -28,7 +28,7 @@ namespace AutoArsenal_App.Controllers
                             {
                                 Lookup lookup1 = new Lookup
                                 {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     Category = reader.GetString(reader.GetOrdinal("Category")),
                                     Value = reader.GetString(reader.GetOrdinal("Value")),
                                 };

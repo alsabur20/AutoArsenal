@@ -16,6 +16,10 @@ PersonController.Initialize(builder.Configuration);
 ProductController.Initialize(builder.Configuration);
 ProductCategoryController.Initialize(builder.Configuration);
 
+InventoryController.Initialize(builder.Configuration);
+ManufacturerController.Initialize(builder.Configuration);
+WarehouseController.Initialize(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

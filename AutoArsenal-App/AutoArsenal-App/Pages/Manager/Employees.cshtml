@@ -62,11 +62,11 @@
                     int count = 1;
                     @foreach (var employee in Model.Employees)
                     {
-                        Models.Person person = Model.Persons.Find(p => p.Id == employee.Id);
-                        string gender = Model.Lookups.Find(l => l.Id == person.Gender).Value;
-                        string designation = Model.Lookups.Find(l => l.Id == employee.Role).Value;
+                        Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
+                        string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
+                        string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
                         <tr>
-                            <th>@(count++)</th>
+                            <td>@(count++)</td>
                             <td>@person.FirstName</td>
                             <td>@person.LastName</td>
                             <td>@gender</td>

@@ -26,6 +26,7 @@ namespace AutoArsenal_App.Pages.Manager
         public List<Person> Persons { get; set; }
         [BindProperty]
         public List<Employee> Employees { get; set; }
+        
         public async void OnGet()
         {
             Cities = new List<string> {
@@ -49,12 +50,14 @@ namespace AutoArsenal_App.Pages.Manager
             "Mirpur Khas",
             "Sheikhupura",
             "Jhang"};
+            
             Provinces = new List<string>{
             "Punjab",
             "Sindh",
             "Khyber Pakhtunkhwa",
             "Balochistan",
             "Gilgit-Baltistan" };
+            
             try
             {
                 Lookups = await LookupController.GetLookup();
@@ -67,6 +70,8 @@ namespace AutoArsenal_App.Pages.Manager
                 TempData["ErrorOnServer"] = ex.Message;
             }
         }
+
+
         public async Task<IActionResult> OnPostAddEmployee()
         {
             int peronId = -1;
@@ -86,7 +91,7 @@ namespace AutoArsenal_App.Pages.Manager
                 }
                 if (Employee != null)
                 {
-                    Employee.Id = peronId;
+                    Employee.ID = peronId;
                     await EmployeeController.AddEmployee(Employee);
                 }
                 return RedirectToPage("/Manager/Employees");
