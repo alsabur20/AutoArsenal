@@ -28,6 +28,11 @@ main {
     }
 }
 
+a {
+    color: #000;
+    text-decoration: none;
+}
+
 .navbar {
     position: relative;
     top: 0;
@@ -159,14 +164,11 @@ footer {
     left: 0;
     bottom: 0;
     width: 100%;
-    background-color: #000;
+    background-color: #000; /* Adjust background color as needed */
+    /*    border-top: 1px solid #ebeef4;*/
     padding: 10px 0;
     text-align: left;
     color: #fff;
-}
-footer div{
-    display: flex;
-    margin-left: 20px;
 }
 
 .panelSearch {
@@ -191,4 +193,8 @@ footer div{
         #panelSearch .form-inline {
             margin-bottom: 10px; /* Add spacing between search and radio buttons on small screens */
         }
+}
+
+.dataTables_filter {
+    display: none; /* Hide the default search bar */
 }

@@ -2,9 +2,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
 
 body {
-  font-family: "Poppins", sans-serif;
-  color: #000;
-  background-color: #fff;
+    font-family: "Poppins", sans-serif;
+    color: #000;
+    background-color: #fff;
 }
 
 h1,
@@ -13,179 +13,188 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Poppins", sans-serif !important;
+    font-family: "Poppins", sans-serif !important;
 }
 
 main {
-  margin-bottom: 60px;
-  padding: 10px 30px;
-  transition: all 0.3s;
+    margin-bottom: 60px;
+    padding: 10px 30px;
+    transition: all 0.3s;
 }
 
 @media (max-width: 1199px) {
-  #main {
-    padding: 20px;
-  }
+    #main {
+        padding: 20px;
+    }
+}
+
+a {
+    color: #000;
+    text-decoration: none;
 }
 
 .navbar {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: #000;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #000;
 }
 
 .navbar-brand {
-  color: #fff;
-  padding: 1rem;
-  font-weight: bold;
+    color: #fff;
+    padding: 1rem;
+    font-weight: bold;
 }
 
-.navbar-brand:hover {
-  color: #cd0010;
-  border-color: #fff;
-}
+    .navbar-brand:hover {
+        color: #cd0010;
+        border-color: #fff;
+    }
 
 .navbar-toggler {
-  color: white;
+    color: white;
 }
 
 .navbar-toggler-icon {
-  color: white;
+    color: white;
 }
 
 .navbar-nav .nav-icon {
-  color: #fff;
-  margin-right: 1rem;
+    color: #fff;
+    margin-right: 1rem;
 }
 
 .navbar-nav .nav-link {
-  color: #fff;
-  margin-right: 1rem;
+    color: #fff;
+    margin-right: 1rem;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #cd0010;
-}
+    .navbar-nav .nav-link:hover {
+        color: #cd0010;
+    }
 
-.navbar-nav .nav-link:active {
-  color: #cd0010;
-}
+    .navbar-nav .nav-link:active {
+        color: #cd0010;
+    }
 
-.navbar-nav .nav-link.active,
-.navbar-nav .nav-link.show {
-  color: #fff;
-}
+    .navbar-nav .nav-link.active,
+    .navbar-nav .nav-link.show {
+        color: #fff;
+    }
 
 .dropdown-menu {
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-item {
-  color: #333;
+    color: #333;
 }
 
-.dropdown-item:hover {
-  background-color: #cdcccc;
-}
+    .dropdown-item:hover {
+        background-color: #cdcccc;
+    }
 
 .container {
-  max-width: 1140px;
-  margin: 0 auto;
+    max-width: 1140px;
+    margin: 0 auto;
 }
 
 .breadcrumb,
 .breadcrumb-item,
 .breadcrumb-item a {
-  background-color: transparent;
-  padding: 0;
-  margin-top: auto;
-  color: #000;
-  text-decoration: none;
-  font-size: 14px;
+    background-color: transparent;
+    padding: 0;
+    margin-top: auto;
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
 }
 
 .card {
-  margin-top: 30px;
-  margin-bottom: 30px;
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0px 0 30px rgba(1, 41, 112, 0.2);
-  height: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0px 0 30px rgba(1, 41, 112, 0.2);
+    height: auto;
 }
 
 .row {
-  align-items: center;
-  justify-content: center;
+    align-items: center;
+    justify-content: center;
 }
 
 .card-header,
 .card-footer {
-  border-color: #ebeef4;
-  background-color: #fff;
-  color: #798eb3;
-  padding: 15px;
+    border-color: #ebeef4;
+    background-color: #fff;
+    color: #798eb3;
+    padding: 15px;
 }
 
 .card-title {
-  padding: 20px 0 15px 0;
-  font-size: 20px;
-  font-weight: 500;
-  color: #000;
-  font-family: "Poppins", sans-serif;
+    padding: 20px 0 15px 0;
+    font-size: 20px;
+    font-weight: 500;
+    color: #000;
+    font-family: "Poppins", sans-serif;
 }
 
-.card-title span {
-  color: #899bbd;
-  font-size: 14px;
-  font-weight: 400;
-}
+    .card-title span {
+        color: #899bbd;
+        font-size: 14px;
+        font-weight: 400;
+    }
 
 .card-body {
-  padding: 20px 20px 20px 20px;
-  align-items: center;
+    padding: 20px 20px 20px 20px;
+    align-items: center;
 }
 
 .card-img-overlay {
-  background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.6);
 }
 
 footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  background-color: #000; /* Adjust background color as needed */
-  /*    border-top: 1px solid #ebeef4;*/
-  padding: 10px 0;
-  text-align: left;
-  color: #fff;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #000; /* Adjust background color as needed */
+    /*    border-top: 1px solid #ebeef4;*/
+    padding: 10px 0;
+    text-align: left;
+    color: #fff;
 }
 
 .panelSearch {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
 }
 
-.panelSearch .form-inline {
-  flex-grow: 1; /* Allow the search input to grow and take available space */
-}
+    .panelSearch .form-inline {
+        flex-grow: 1; /* Allow the search input to grow and take available space */
+    }
 
 .form-check {
-  margin-left: 10px; /* Adjust spacing between radio buttons */
+    margin-left: 10px; /* Adjust spacing between radio buttons */
 }
 
 @media (max-width: 767px) {
-  #panelSearch {
-    flex-direction: column;
-  }
+    #panelSearch {
+        flex-direction: column;
+    }
 
-  #panelSearch .form-inline {
-    margin-bottom: 10px; /* Add spacing between search and radio buttons on small screens */
-  }
+        #panelSearch .form-inline {
+            margin-bottom: 10px; /* Add spacing between search and radio buttons on small screens */
+        }
+}
+
+.dataTables_filter {
+    display: none; /* Hide the default search bar */
 }
