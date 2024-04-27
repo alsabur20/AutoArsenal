@@ -10,6 +10,8 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 LookupController.Initialize(builder.Configuration);
 
+ProductController.Initialize(builder.Configuration);
+ProductCategoryController.Initialize(builder.Configuration);
 
 var app = builder.Build();
 

@@ -1,6 +1,9 @@
 ﻿namespace AutoArsenal_App.Models
 {
-    public class Products
+    public class Product
     {
+        public int ID { get; set; }
+        public string productName { get; set; }
+        public string? productDescription { get; set; }
     }
 }
