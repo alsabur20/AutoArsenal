@@ -1,0 +1,427 @@
+﻿@page
+@model AutoArsenal_App.Pages.Manager.EmplyeesModel
+@{
+    ViewData["Title"] = "Employees";
+}
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="card">
+    <div class="card-body">
+        <div id="panelSearch"
+             class="d-flex justify-content-between align-items-center">
+            <div class="searchBarButton" style="margin:10px;">
+                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">Create New</a>
+            </div>
+            <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                <input class="form-control w-100"
+                       type="search"
+                       placeholder="Search"
+                       aria-label="Search" />
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Customers</h5>
+
+        <!-- Table with stripped rows -->
+        <table id="empTable" class="table table-striped datatable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Designation</th>
+                    <th scope="col">Joining Date</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Employees != null && Model.Persons != null)
+                {
+                    int count = 1;
+                    @foreach (var employee in Model.Employees)
+                    {
+                        Models.Person person = Model.Persons.Find(p => p.Id == employee.Id);
+                        string gender = Model.Lookups.Find(l => l.Id == person.Gender).Value;
+                        string designation = Model.Lookups.Find(l => l.Id == employee.Role).Value;
+                        <tr>
+                            <th>@(count++)</th>
+                            <td>@person.FirstName</td>
+                            <td>@person.LastName</td>
+                            <td>@gender</td>
+                            <td>@designation</td>
+                            <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <!-- End Table with stripped rows -->
+    </div>
+</div>
+
+<!-- Add employee modal -->
+<div class="modal fade" id="createEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddEmployee" id="addEmployeeModal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="FirstName" placeholder="First Name" asp-for="Person.FirstName" />
+                                <label for="FirstName">First Name</label>
+                                <p class="invalid" id="firstNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="LastName" placeholder="Last Name" asp-for="Person.LastName" />
+                                <label for="LastName">Last Name</label>
+                                <p class="invalid" id="lastNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <input type="tel" class="form-control" id="Contact" placeholder="Contact" asp-for="Person.Contact" />
+                                <label for="Contact">Contact</label>
+                                <p class="invalid" id="contactError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Gender" aria-label="Default select example" asp-for="Person.Gender">
+                                    <option value="-1" selected>Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                                <label for="Gender">Gender</label>
+                                <p class="invalid" id="genderError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <input type="date" class="form-control" id="JoiningDate" placeholder="Joining Date" asp-for="Employee.JoiningDate" />
+                                <label for="JoiningDate">Joining Date</label>
+                                <p class="invalid" id="joiningDateError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Address" placeholder="Address" asp-for="Location.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="addressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="City" aria-label="Default select example" asp-for="Location.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="City">City</label>
+                                <p class="invalid" id="cityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Province" aria-label="Default select example" asp-for="Location.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="Province">Province</label>
+                                <p class="invalid" id="provinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Country" aria-label="Default select example" asp-for="Location.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="Country">Country</label>
+                                <p class="invalid" id="countryError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="Salary" placeholder="Salary" asp-for="Employee.Salary" />
+                                <label for="Salary">Salary</label>
+                                <p class="invalid" id="salaryError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Role" aria-label="Default select example" asp-for="Employee.Role">
+                                    <option value="-1" selected>Select Role</option>
+                                    <option value="14">Manager</option>
+                                    <option value="11">Cashier</option>
+                                    <option value="10">Worker</option>
+                                </select>
+                                <label for="Role">Role</label>
+                                <p class="invalid" id="roleError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Delete Confirmation Modal-->
+<div class="modal fade" id="deleteEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i>Delete Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this employee></p>
+                <p>Product: <b>Product 1</b></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Adjust the DataTables initialization -->
+    <script>
+        $(document).ready(function () {
+            var table = $("#empTable").DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true, // Disable DataTables default search
+                ordering: false,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                },
+            });
+
+            // Add event listener for your custom search bar
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+    </script>
+
+    <script>
+        // Form validation and submission
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var form = document.querySelector("#addEmployeeModal");
+            var submitButton = form.querySelector("#addBtn");
+            var firstName = form.querySelector("#FirstName");
+            var lastName = form.querySelector("#LastName");
+            var contact = form.querySelector("#Contact");
+            var gender = form.querySelector("#Gender");
+            var joiningDate = form.querySelector("#JoiningDate");
+            var address = form.querySelector("#Address");
+            var city = form.querySelector("#City");
+            var province = form.querySelector("#Province");
+            var country = form.querySelector("#Country");
+            var salary = form.querySelector("#Salary");
+            var role = form.querySelector("#Role");
+
+            // Add event listener for input fields
+            form.addEventListener("input", function () {
+                var errors = false;
+
+                if (firstName.value.trim() === "") {
+                    document.querySelector("#firstNameError").textContent = "First Name is required";
+                    document.querySelector("#firstNameError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    firstName.classList.add("is-invalid");
+                } else {
+                    firstName.classList.remove("is-invalid");
+                }
+
+                if (lastName.value.trim() === "") {
+                    document.querySelector("#lastNameError").textContent = "Last Name is required";
+                    document.querySelector("#lastNameError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    lastName.classList.add("is-invalid");
+                } else {
+                    lastName.classList.remove("is-invalid");
+                }
+
+                if (contact.value.trim() === "") {
+                    document.querySelector("#contactError").textContent = "Contact is required";
+                    document.querySelector("#contactError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    contact.classList.add("is-invalid");
+                } else {
+                    contact.classList.remove("is-invalid");
+                }
+
+                if (gender.value == -1) {
+                    document.querySelector("#genderError").textContent = "Gender is required";
+                    document.querySelector("#genderError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    gender.classList.add("is-invalid");
+                } else {
+                    gender.classList.remove("is-invalid");
+                }
+
+                if (joiningDate.value.trim() === "") {
+                    document.querySelector("#joiningDateError").textContent = "Joining Date is required";
+                    document.querySelector("#joiningDateError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    joiningDate.classList.add("is-invalid");
+                } else {
+                    joiningDate.classList.remove("is-invalid");
+                }
+
+                if (address.value.trim() === "") {
+                    document.querySelector("#addressError").textContent = "Address is required";
+                    document.querySelector("#addressError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    address.classList.add("is-invalid");
+                } else {
+                    address.classList.remove("is-invalid");
+                }
+
+                if (city.value == -1) {
+                    document.querySelector("#cityError").textContent = "City is required";
+                    document.querySelector("#cityError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    city.classList.add("is-invalid");
+                } else {
+                    city.classList.remove("is-invalid");
+                }
+
+                if (province.value == -1) {
+                    document.querySelector("#provinceError").textContent = "Province is required";
+                    document.querySelector("#provinceError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    province.classList.add("is-invalid");
+                } else {
+                    province.classList.remove("is-invalid");
+                }
+
+                if (country.value == -1) {
+                    document.querySelector("#countryError").textContent = "Country is required";
+                    document.querySelector("#countryError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    country.classList.add("is-invalid");
+                } else {
+                    country.classList.remove("is-invalid");
+                }
+
+                if (salary.value.trim() === "") {
+                    document.querySelector("#salaryError").textContent = "Salary is required";
+                    document.querySelector("#salaryError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    salary.classList.add("is-invalid");
+                } else {
+                    salary.classList.remove("is-invalid");
+                }
+
+                if (role.value == -1) {
+                    document.querySelector("#roleError").textContent = "Role is required";
+                    document.querySelector("#roleError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    role.classList.add("is-invalid");
+                } else {
+                    role.classList.remove("is-invalid");
+                }
+
+                if (errors) {
+                    submitButton.disabled = true;
+                } else {
+                    submitButton.disabled = false;
+                }
+
+            });
+        });
+    </script>
+    <script>
+        // Function to clear form fields
+        function clearFormFields() {
+            var form = document.querySelector("#addEmployeeModal");
+            form.reset();
+            var errorMessages = form.querySelectorAll(".invalid");
+            errorMessages.forEach(function (errorMessage) {
+                errorMessage.textContent = "";
+                errorMessage.style.display = "none";
+            });
+            var inputFields = form.querySelectorAll(".form-control");
+            inputFields.forEach(function (inputField) {
+                inputField.classList.remove("is-invalid");
+            });
+            var selectFields = form.querySelectorAll("select");
+            selectFields.forEach(function (selectField) {
+                selectField.classList.remove("is-invalid");
+            });
+        }
+
+        // Event listener for modal close button
+        $('#createEmployeeModal').on('hidden.bs.modal', function (e) {
+            clearFormFields();
+        });
+    </script>
+}
