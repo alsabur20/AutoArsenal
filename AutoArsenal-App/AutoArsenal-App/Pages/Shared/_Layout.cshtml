@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+
+    <!-- Navigation Bar -->
     <header>
         <nav class="navbar navbar-expand-lg body-tertiary">
             <div class="container-fluid">
@@ -102,15 +104,20 @@
             </div>
         </nav>
     </header>
+
+    <!-- Main Body -->
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 
+
+    <!-- Footer -->
     <footer class="border-top footer mt-auto">
         <div>
             &copy; 2024 - Auto Arsenal - <a href="/Privacy">Privacy</a>
         </div>
     </footer>
+
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

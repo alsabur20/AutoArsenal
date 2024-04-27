@@ -10,6 +10,7 @@ builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnC
 
 LookupController.Initialize(builder.Configuration);
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
