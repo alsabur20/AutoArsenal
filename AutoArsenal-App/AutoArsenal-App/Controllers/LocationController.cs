@@ -100,7 +100,7 @@ namespace AutoArsenal_App.Controllers
                             }
                             else
                             {
-                                return await Task.FromResult(0);
+                                return await Task.FromResult(-1);
                             }
                         }
                     }

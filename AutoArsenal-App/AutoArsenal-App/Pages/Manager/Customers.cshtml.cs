@@ -7,8 +7,30 @@ namespace AutoArsenal_App.Pages.Manager
 {
     public class CustomersModel : PageModel
     {
-        public void OnGet()
+        //for deleting
+        [BindProperty]
+        public int DeleteID {  get; set; }
+
+        //for viewing
+        [BindProperty]
+        public List<Lookup> Lookups { get; set; }
+        [BindProperty]
+        public List<Person> Persons { get; set; }
+        [BindProperty]
+        public List<Customer> Customers { get; set; }
+
+        public async void OnGet()
         {
+            try
+            {
+                Lookups = await LookupController.GetLookup();
+                Persons = await PersonController.GetPerson();
+                Customers = await CustomerController.GetCustomer();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
         }
     }
 }
