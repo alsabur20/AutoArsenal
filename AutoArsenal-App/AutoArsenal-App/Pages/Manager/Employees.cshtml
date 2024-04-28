@@ -22,6 +22,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+<!-- End Error message -->
+
 <div class="card">
     <div class="card-body">
         <div id="panelSearch"
@@ -57,7 +59,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (Model.Employees != null && Model.Persons != null)
+                @if (Model.Employees != null && Model.Persons != null && Model.Lookups != null)
                 {
                     int count = 1;
                     @foreach (var employee in Model.Employees)
@@ -76,7 +78,7 @@
                                 <button class="btn btn-sm btn-success">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
+                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
@@ -224,23 +226,34 @@
 <div class="modal fade" id="deleteEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            <form method="post" asp-page-asp-page-handler="DeleteEmployee">
             <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i>Delete Employee</h5>
+                <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Delete Employee</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this employee></p>
-                <p>Product: <b>Product 1</b></p>
+                <input type="hidden" id="deleteId" asp-for="DeleteID" />
+                <p>Are you sure you want to delete this employee?</p>
+                <p>Employee Name: <b id="deleteTitle"></b></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary">Delete</button>
             </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script>
+        //Deletion
+        function deleteEmployee(id, firstName, lastName) {
+            document.getElementById("deleteId").value = id;
+            document.getElementById("deleteTitle").textContent = firstName+' '+lastName;
+        }
+
+    </script>
     <!-- Adjust the DataTables initialization -->
     <script>
         $(document).ready(function () {
@@ -298,6 +311,7 @@
                     firstName.classList.add("is-invalid");
                 } else {
                     firstName.classList.remove("is-invalid");
+                    document.querySelector("#firstNameError").textContent = "";
                 }
 
                 if (lastName.value.trim() === "") {
@@ -307,6 +321,7 @@
                     lastName.classList.add("is-invalid");
                 } else {
                     lastName.classList.remove("is-invalid");
+                    document.querySelector("#lastNameError").textContent = "";
                 }
 
                 if (contact.value.trim() === "") {
@@ -316,6 +331,7 @@
                     contact.classList.add("is-invalid");
                 } else {
                     contact.classList.remove("is-invalid");
+                    document.querySelector("#contactError").textContent = "";
                 }
 
                 if (gender.value == -1) {
@@ -325,6 +341,7 @@
                     gender.classList.add("is-invalid");
                 } else {
                     gender.classList.remove("is-invalid");
+                    document.querySelector("#genderError").textContent = "";
                 }
 
                 if (joiningDate.value.trim() === "") {
@@ -334,6 +351,7 @@
                     joiningDate.classList.add("is-invalid");
                 } else {
                     joiningDate.classList.remove("is-invalid");
+                    document.querySelector("#joiningDateError").textContent = "";
                 }
 
                 if (address.value.trim() === "") {
@@ -343,6 +361,7 @@
                     address.classList.add("is-invalid");
                 } else {
                     address.classList.remove("is-invalid");
+                    document.querySelector("#addressError").textContent = "";
                 }
 
                 if (city.value == -1) {
@@ -352,6 +371,7 @@
                     city.classList.add("is-invalid");
                 } else {
                     city.classList.remove("is-invalid");
+                    document.querySelector("#cityError").textContent = "";
                 }
 
                 if (province.value == -1) {
@@ -361,6 +381,7 @@
                     province.classList.add("is-invalid");
                 } else {
                     province.classList.remove("is-invalid");
+                    document.querySelector("#provinceError").textContent = "";
                 }
 
                 if (country.value == -1) {
@@ -370,6 +391,7 @@
                     country.classList.add("is-invalid");
                 } else {
                     country.classList.remove("is-invalid");
+                    document.querySelector("#countryError").textContent = "";
                 }
 
                 if (salary.value.trim() === "") {
@@ -379,6 +401,7 @@
                     salary.classList.add("is-invalid");
                 } else {
                     salary.classList.remove("is-invalid");
+                    document.querySelector("#salaryError").textContent = "";
                 }
 
                 if (role.value == -1) {
@@ -388,6 +411,7 @@
                     role.classList.add("is-invalid");
                 } else {
                     role.classList.remove("is-invalid");
+                    document.querySelector("#roleError").textContent = "";
                 }
 
                 if (errors) {

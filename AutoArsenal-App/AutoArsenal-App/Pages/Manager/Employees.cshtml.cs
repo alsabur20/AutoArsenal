@@ -7,6 +7,10 @@ namespace AutoArsenal_App.Pages.Manager
 {
     public class EmplyeesModel : PageModel
     {
+        //for deleting
+        [BindProperty]
+        public int DeleteID {  get; set; }
+
         //for creating new
         [BindProperty]
         public Person Person { get; set; }
@@ -17,16 +21,16 @@ namespace AutoArsenal_App.Pages.Manager
 
         //for viewing
         [BindProperty]
-        public List<string> Cities { get; set; }
-        [BindProperty]
-        public List<string> Provinces { get; set; }
-        [BindProperty]
         public List<Lookup> Lookups { get; set; }
         [BindProperty]
         public List<Person> Persons { get; set; }
         [BindProperty]
         public List<Employee> Employees { get; set; }
         
+        [BindProperty]
+        public List<string> Cities { get; set; }
+        [BindProperty]
+        public List<string> Provinces { get; set; }
         public async void OnGet()
         {
             Cities = new List<string> {
@@ -63,7 +67,6 @@ namespace AutoArsenal_App.Pages.Manager
                 Lookups = await LookupController.GetLookup();
                 Persons = await PersonController.GetPerson();
                 Employees = await EmployeeController.GetEmployee();
-
             }
             catch (Exception ex)
             {
@@ -80,8 +83,16 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 if (Location != null)
                 {
-                    await LocationController.AddLocation(Location);
-                    locationId = await LocationController.GetLocationId(Location);
+                    int existingLocationId = await LocationController.GetLocationId(Location);
+                    if(existingLocationId != -1)
+                    {
+                        locationId = existingLocationId;
+                    }
+                    else
+                    {
+                        await LocationController.AddLocation(Location);
+                        locationId = await LocationController.GetLocationId(Location);
+                    }
                 }
                 if (Person != null)
                 {
