@@ -11,7 +11,7 @@ namespace AutoArsenal_App.Pages.Manager
         [BindProperty]
         public int DeleteID {  get; set; }
 
-        //for creating new
+        //for creating and editing
         [BindProperty]
         public Person Person { get; set; }
         [BindProperty]
@@ -26,6 +26,8 @@ namespace AutoArsenal_App.Pages.Manager
         public List<Person> Persons { get; set; }
         [BindProperty]
         public List<Employee> Employees { get; set; }
+        [BindProperty]
+        public List<Location> Locations { get; set; }
         
         [BindProperty]
         public List<string> Cities { get; set; }
@@ -65,6 +67,7 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Lookups = await LookupController.GetLookup();
+                Locations = await LocationController.GetLocation();
                 Persons = await PersonController.GetPerson();
                 Employees = await EmployeeController.GetEmployee();
             }
@@ -73,7 +76,6 @@ namespace AutoArsenal_App.Pages.Manager
                 TempData["ErrorOnServer"] = ex.Message;
             }
         }
-
 
         public async Task<IActionResult> OnPostAddEmployee()
         {
@@ -112,6 +114,27 @@ namespace AutoArsenal_App.Pages.Manager
                 TempData["ErrorOnServer"] = ex.Message;
                 return RedirectToPage("/Manager/Employees");
             }
+        }
+
+        //for deleting
+        public async Task<IActionResult> OnPostDeleteEmployee()
+        {
+            try
+            {
+                await PersonController.DeletePerson(DeleteID);
+                return RedirectToPage("/Manager/Employees");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+                return RedirectToPage("/Manager/Employees");
+            }
+        }
+
+        //for editing
+        public async Task<IActionResult> OnPostEditEmployee()
+        {
+            return Page();
         }
     }
 }
