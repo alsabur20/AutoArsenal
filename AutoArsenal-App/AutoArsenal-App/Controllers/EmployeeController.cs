@@ -79,5 +79,33 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        //edit empployee
+        public async static Task UpdateEmployee(Employee employee)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC stp_UpdateEmployee @Id, @JoiningDate, @Role, @Salary";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", employee.ID);
+                        command.Parameters.AddWithValue("@JoiningDate", employee.JoiningDate);
+                        command.Parameters.AddWithValue("@Role", employee.Role);
+                        command.Parameters.AddWithValue("@Salary", employee.Salary);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

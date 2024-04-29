@@ -9,7 +9,7 @@ namespace AutoArsenal_App.Pages.Manager
     {
         //for deleting
         [BindProperty]
-        public int DeleteID {  get; set; }
+        public int DeleteID { get; set; }
 
         //for creating and editing
         [BindProperty]
@@ -28,7 +28,7 @@ namespace AutoArsenal_App.Pages.Manager
         public List<Employee> Employees { get; set; }
         [BindProperty]
         public List<Location> Locations { get; set; }
-        
+
         [BindProperty]
         public List<string> Cities { get; set; }
         [BindProperty]
@@ -56,14 +56,14 @@ namespace AutoArsenal_App.Pages.Manager
             "Mirpur Khas",
             "Sheikhupura",
             "Jhang"};
-            
+
             Provinces = new List<string>{
             "Punjab",
             "Sindh",
             "Khyber Pakhtunkhwa",
             "Balochistan",
             "Gilgit-Baltistan" };
-            
+
             try
             {
                 Lookups = await LookupController.GetLookup();
@@ -85,16 +85,8 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 if (Location != null)
                 {
-                    int existingLocationId = await LocationController.GetLocationId(Location);
-                    if(existingLocationId != -1)
-                    {
-                        locationId = existingLocationId;
-                    }
-                    else
-                    {
-                        await LocationController.AddLocation(Location);
-                        locationId = await LocationController.GetLocationId(Location);
-                    }
+                    await LocationController.AddLocation(Location);
+                    locationId = await LocationController.GetLocationId(Location);
                 }
                 if (Person != null)
                 {
@@ -134,7 +126,20 @@ namespace AutoArsenal_App.Pages.Manager
         //for editing
         public async Task<IActionResult> OnPostEditEmployee()
         {
-            return Page();
+            try
+            {
+                Person.Status = 8;
+                Employee.ID = Person.ID;
+                await LocationController.UpdateLocation(Location);
+                await PersonController.UpdatePerson(Person);
+                await EmployeeController.UpdateEmployee(Employee);
+                return RedirectToPage("/Manager/Employees");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+                return RedirectToPage("/Manager/Employees");
+            }
         }
     }
 }

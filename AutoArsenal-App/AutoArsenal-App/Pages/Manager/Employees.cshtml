@@ -81,7 +81,7 @@
                                 <td>@designation</td>
                                 <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
                                 <td>
-                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee(@person.ID,@location.ID, @employee.ID)">
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@location.StreetAddress','@location.City','@location.Province','@location.Country','@employee.Salary','@employee.Role')">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
@@ -260,9 +260,10 @@
                         <div class="col-md-6">
                             <!-- Hidden input for storing id for editing -->
                             <input type="hidden" id="editId" asp-for="Person.ID" />
+                            <input type="hidden" id="editLocationId" asp-for="Person.ID" />
                             <!-- First Name -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editFirstName" placeholder="First Name" asp-for="Person.FirstName" disabled />
+                                <input type="text" class="form-control" id="editFirstName" placeholder="First Name" asp-for="Person.FirstName" />
                                 <label for="editFirstName">First Name</label>
                                 <p class="invalid" id="editfirstNameError"></p>
                             </div>
@@ -270,7 +271,7 @@
                         <div class="col-md-6">
                             <!-- Last Name -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editLastName" placeholder="Last Name" asp-for="Person.LastName" disabled />
+                                <input type="text" class="form-control" id="editLastName" placeholder="Last Name" asp-for="Person.LastName" />
                                 <label for="editLastName">Last Name</label>
                                 <p class="invalid" id="editlastNameError"></p>
                             </div>
@@ -425,35 +426,22 @@
             document.getElementById("deleteTitle").textContent = firstName + ' ' + lastName;
         }
         //Editing
-        function editEmployee(person, location, employee) {
-            var persons = @Html.Raw(Json.Serialize(Model.Persons));
-            var locations = @Html.Raw(Json.Serialize(Model.Locations));
-            var employees = @Html.Raw(Json.Serialize(Model.Employees));
-            var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
-
-            var person = persons.find(p => p.id == person);
-            var location = locations.find(l => l.id == location);
-            var employee = employees.find(e => e.id == employee);
-            var gender = null;
-            lookups.forEach(l => {
-                if (parseInt(l.id) === parseInt(person.gender)) {
-                    gender = l.value;
-                }
-            });
-            //now assign values to the form fields
-            document.getElementById("editId").value = person.id;
-            document.getElementById("editFirstName").value = person.firstName;
-            document.getElementById("editLastName").value = person.lastName;
-            document.getElementById("editContact").value = person.contact;
-            document.getElementById("editGender").value = gender == 'Male' ? 1 : 2;
-            var formattedDate = new Date(employee.joiningDate).toISOString().split('T')[0];
-            document.getElementById("editJoiningDate").value = formattedDate;
-            document.getElementById("editAddress").value = location.streetAddress;
-            document.getElementById("editCity").value = location.city;
-            document.getElementById("editProvince").value = location.province;
-            document.getElementById("editCountry").value = location.country;
-            document.getElementById("editSalary").value = employee.salary;
-            document.getElementById("editRole").value = employee.role;
+        function editEmployee(personId, firstName, lastName, contact, gender, joiningDate, streetAddress, city, province, country, salary, role) {
+            document.getElementById("editId").value = personId;
+            document.getElementById("editLocationId").value = personId;
+            document.getElementById("editFirstName").value = firstName;
+            document.getElementById("editLastName").value = lastName;
+            document.getElementById("editContact").value = contact;
+            document.getElementById("editGender").value = gender;
+            var parts = joiningDate.split(/[\s/:]+/); // Split the date string by spaces, slashes, and colons
+            var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]); // Construct a new Date object
+            document.getElementById("editJoiningDate").value = formattedDate.toISOString().split('T')[0]; // Set the value to the input element
+            document.getElementById("editAddress").value = streetAddress;
+            document.getElementById("editCity").value = city;
+            document.getElementById("editProvince").value = province;
+            document.getElementById("editCountry").value = country;
+            document.getElementById("editSalary").value = salary;
+            document.getElementById("editRole").value = role;
         }
 
         // Adjust the DataTables initialization

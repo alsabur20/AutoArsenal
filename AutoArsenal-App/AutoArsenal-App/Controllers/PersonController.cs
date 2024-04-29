@@ -56,7 +56,6 @@ namespace AutoArsenal_App.Controllers
         //add person to db
         public async static Task AddPerson(Person person)
         {
-            //add person to db
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
@@ -111,6 +110,60 @@ namespace AutoArsenal_App.Controllers
                                 return await Task.FromResult(-1);
                             }
                         }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public async static Task DeletePerson(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC stp_DeletePerson @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        //edit person
+        public async static Task UpdatePerson(Person person)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC stp_UpdatePerson @Id, @FirstName, @LastName, @Contact, @Gender, @Status";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", person.ID);
+                        command.Parameters.AddWithValue("@FirstName", person.FirstName);
+                        command.Parameters.AddWithValue("@LastName", person.LastName);
+                        command.Parameters.AddWithValue("@Contact", person.Contact);
+                        command.Parameters.AddWithValue("@Gender", person.Gender);
+                        command.Parameters.AddWithValue("@Status", person.Status);
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
                 catch (Exception ex)

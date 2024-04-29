@@ -29,10 +29,11 @@ namespace AutoArsenal_App.Controllers
                                 Location location1 = new Location
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    StreetAddress = reader.GetString(reader.GetOrdinal("StreetAddress")),
-                                    Country = reader.GetString(reader.GetOrdinal("Country")),
-                                    City = reader.GetString(reader.GetOrdinal("City")),
-                                    Province = reader.GetString(reader.GetOrdinal("Province")),
+                                    //handle null of street address, country, city, province
+                                    StreetAddress = reader.IsDBNull(reader.GetOrdinal("StreetAddress")) ? "" : reader.GetString(reader.GetOrdinal("StreetAddress")),
+                                    Country = reader.IsDBNull(reader.GetOrdinal("Country")) ? "" : reader.GetString(reader.GetOrdinal("Country")),
+                                    City = reader.IsDBNull(reader.GetOrdinal("City")) ? "" : reader.GetString(reader.GetOrdinal("City")),
+                                    Province = reader.IsDBNull(reader.GetOrdinal("Province")) ? "" : reader.GetString(reader.GetOrdinal("Province"))
                                 };
                                 location.Add(location1);
                             }
@@ -112,6 +113,35 @@ namespace AutoArsenal_App.Controllers
                 finally
                 {
                     connectiono.Close();
+                }
+            }
+        }
+        //edit location
+        public async static Task UpdateLocation(Location location)
+        {
+            using(SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC stp_UpdateLocation @Id, @StreetAddress, @Country, @City, @Province";
+                    using(SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", location.ID);
+                        command.Parameters.AddWithValue("@StreetAddress", location.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", location.Country);
+                        command.Parameters.AddWithValue("@City", location.City);
+                        command.Parameters.AddWithValue("@Province", location.Province);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
                 }
             }
         }
