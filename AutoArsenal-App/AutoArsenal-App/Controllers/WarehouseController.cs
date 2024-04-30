@@ -35,8 +35,8 @@ namespace AutoArsenal_App.Controllers
                                     StreetAddress = reader.IsDBNull(reader.GetOrdinal("StreetAddress")) ? null : reader.GetString(reader.GetOrdinal("StreetAddress")),
                                     Country = reader.IsDBNull(reader.GetOrdinal("Country")) ? null : reader.GetString(reader.GetOrdinal("Country")),
                                     City = reader.IsDBNull(reader.GetOrdinal("City")) ? null : reader.GetString(reader.GetOrdinal("City")),
-                                    Province = reader.IsDBNull(reader.GetOrdinal("Province")) ? null : reader.GetString(reader.GetOrdinal("Province"))
-
+                                    Province = reader.IsDBNull(reader.GetOrdinal("Province")) ? null : reader.GetString(reader.GetOrdinal("Province")),
+                                    Status = reader.GetInt32(reader.GetOrdinal("Status"))
                                 };
                                 warehouses.Add(item);
                             }
@@ -63,7 +63,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Warehouse (Name, StreetAddress, Country, City, Province) VALUES (@Name, @StreetAddress, @Country, @City, @Province)";
+                    string query = "EXEC sp_AddWarehouse @Name, @StreetAddress, @Country, @City, @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Name", warehouse.Name);
@@ -71,6 +71,61 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@Country", warehouse.Country);
                         command.Parameters.AddWithValue("@City", warehouse.City);
                         command.Parameters.AddWithValue("@Province", warehouse.Province);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        //update warehouse in db
+        public async static Task UpdateWarehouse(Warehouse warehouse)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC sp_UpdateWarehouse @Id, @Name, @StreetAddress, @Country, @City, @Province";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", warehouse.ID);
+                        command.Parameters.AddWithValue("@Name", warehouse.Name);
+                        command.Parameters.AddWithValue("@StreetAddress", warehouse.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", warehouse.Country);
+                        command.Parameters.AddWithValue("@City", warehouse.City);
+                        command.Parameters.AddWithValue("@Province", warehouse.Province);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        //delete warehouse from db
+        public async static Task DeleteWarehouse(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "EXEC sp_DeleteWarehouse @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
                         await command.ExecuteNonQueryAsync();
                     }
                 }

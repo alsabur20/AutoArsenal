@@ -64,7 +64,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Person (FirstName, LastName, Contact, Gender, Status, StreetAddress, Country, City, Province) VALUES (@FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province)";
+                    string query = "EXEC sp_AddPerson @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@FirstName", person.FirstName);
@@ -135,7 +135,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "EXEC stp_DeletePerson @Id";
+                    string query = "EXEC sp_DeletePerson @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", id);
@@ -160,7 +160,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "EXEC stp_UpdatePerson @Id, @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province";
+                    string query = "EXEC sp_UpdatePerson @Id, @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", person.ID);

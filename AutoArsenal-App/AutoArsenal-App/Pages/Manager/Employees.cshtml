@@ -47,61 +47,62 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Employees</h5>
-
-        <!-- Table with stripped rows -->
-        <table id="empTable" class="table table-striped datatable">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Gender</th>
-                    <th scope="col">Designation</th>
-                    <th scope="col">Joining Date</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Employees != null && Model.Persons != null && Model.Lookups != null)
-                {
-                    int count = 1;
-                    @foreach (var employee in Model.Employees)
+        <div class="table-responsive">
+            <!-- Table with stripped rows -->
+            <table id="empTable" class="table table-hover table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">First Name</th>
+                        <th scope="col">Last Name</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Designation</th>
+                        <th scope="col">Joining Date</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @if (Model.Employees != null && Model.Persons != null && Model.Lookups != null)
                     {
-                        Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
-                        if (person.Status == 8)
+                        int count = 1;
+                        @foreach (var employee in Model.Employees)
                         {
-                            string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
-                            string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
-                            
-                            <tr>
-                                <td>@(count++)</td>
-                                <td>@person.FirstName</td>
-                                <td>@person.LastName</td>
-                                <td>@gender</td>
-                                <td>@designation</td>
-                                <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                            Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
+                            if (person.Status == 8)
+                            {
+                                string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
+                                string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
+
+                                <tr>
+                                    <td>@(count++)</td>
+                                    <td>@person.FirstName</td>
+                                    <td>@person.LastName</td>
+                                    <td>@gender</td>
+                                    <td>@designation</td>
+                                    <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
                         }
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5">No records found</td>
-                    </tr>
-                }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">No records found</td>
+                        </tr>
+                    }
 
-            </tbody>
-        </table>
-        <!-- End Table with stripped rows -->
+                </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+        </div>
     </div>
 </div>
 <!-- End Table -->
@@ -246,7 +247,7 @@
         </div>
     </div>
 </div>
-<!-- End Add Product Modal -->
+<!-- End Add Employee Modal -->
 <!--Edit employee modal-->
 <div class="modal fade" id="editEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">

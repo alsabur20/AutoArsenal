@@ -77,10 +77,8 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Person.Status = 8;
-                await PersonController.AddPerson(Person);
-                Person.ID = await PersonController.GetPersonId(Person);
                 Employee.ID = Person.ID;
-                await EmployeeController.AddEmployee(Employee);
+                await EmployeeController.AddEmployee(Person,Employee);
                 TempData["Success"] = "Employee added successfully";
 
             }

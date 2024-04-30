@@ -7,9 +7,13 @@ namespace AutoArsenal_App.Pages.Manager
 {
     public class WarehouseModel : PageModel
     {
+        // for deleting warehouse
+        [BindProperty]
+        public int DeleteID { get; set; }
+        // for displaying warehouses
         [BindProperty]
         public List<Warehouse> Warehouses { get; set; }
-
+        // for adding or editing warehouse
         [BindProperty]
         public Warehouse Warehouse { get; set; }
 
@@ -61,7 +65,30 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 await WarehouseController.AddWarehouse(Warehouse);
-                TempData["Success"] = "Warehouse added successfully";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
+            return RedirectToPage();
+        }
+        public async Task<IActionResult> OnPostUpdateWarehouse()
+        {
+            try
+            {
+                await WarehouseController.UpdateWarehouse(Warehouse);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
+            return RedirectToPage();
+        }
+        public async Task<IActionResult> OnPostDeleteWarehouse()
+        {
+            try
+            {
+                await WarehouseController.DeleteWarehouse(DeleteID);
             }
             catch (Exception ex)
             {

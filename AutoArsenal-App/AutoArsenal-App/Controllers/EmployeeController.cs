@@ -51,21 +51,27 @@ namespace AutoArsenal_App.Controllers
             }
         }
         //add employee to db
-        public async static Task AddEmployee(Employee employee)
+        public async static Task AddEmployee(Person person, Employee employee)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Employee (Id, JoiningDate, Role, Salary) VALUES (@Id, @JoiningDate, @Role, @Salary)";
+                    string query = "EXEC sp_AddEmployee @FirstName, @LastName, @Contact, @Gender, @JoiningDate, @Role, @Salary, @StreetAddress, @Country, @City, @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", employee.ID);
+                        command.Parameters.AddWithValue("@FirstName", person.FirstName);
+                        command.Parameters.AddWithValue("@LastName", person.LastName);
+                        command.Parameters.AddWithValue("@Contact", person.Contact);
+                        command.Parameters.AddWithValue("@Gender", person.Gender);
                         command.Parameters.AddWithValue("@JoiningDate", employee.JoiningDate);
                         command.Parameters.AddWithValue("@Role", employee.Role);
-                        //command.Parameters.AddWithValue("@CredentialsId", employee.CredentialsId);
                         command.Parameters.AddWithValue("@Salary", employee.Salary);
+                        command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", person.Country);
+                        command.Parameters.AddWithValue("@City", person.City);
+                        command.Parameters.AddWithValue("@Province", person.Province);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -87,7 +93,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "EXEC stp_UpdateEmployee @Id, @JoiningDate, @Role, @Salary";
+                    string query = "EXEC sp_UpdateEmployee @Id, @JoiningDate, @Role, @Salary";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", employee.ID);
