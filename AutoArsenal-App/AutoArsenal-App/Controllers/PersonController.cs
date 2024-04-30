@@ -34,8 +34,11 @@ namespace AutoArsenal_App.Controllers
                                     Contact = reader.GetString(reader.GetOrdinal("Contact")),
                                     Gender = reader.GetInt32(reader.GetOrdinal("Gender")),
                                     Status = reader.GetInt32(reader.GetOrdinal("Status")),
-                                    //handle null for location
-                                    LocationId = reader.IsDBNull(reader.GetOrdinal("LocationId")) ? -1 : reader.GetInt32(reader.GetOrdinal("LocationId"))
+                                    //handle null values
+                                    StreetAddress = reader.IsDBNull(reader.GetOrdinal("StreetAddress")) ? null : reader.GetString(reader.GetOrdinal("StreetAddress")),
+                                    Country = reader.IsDBNull(reader.GetOrdinal("Country")) ? null : reader.GetString(reader.GetOrdinal("Country")),
+                                    City = reader.IsDBNull(reader.GetOrdinal("City")) ? null : reader.GetString(reader.GetOrdinal("City")),
+                                    Province = reader.IsDBNull(reader.GetOrdinal("Province")) ? null : reader.GetString(reader.GetOrdinal("Province"))
                                 };
                                 person.Add(person1);
                             }
@@ -61,7 +64,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Person (FirstName, LastName, Contact, Gender, Status, LocationId) VALUES (@FirstName, @LastName, @Contact, @Gender, @Status, @LocationId)";
+                    string query = "INSERT INTO Person (FirstName, LastName, Contact, Gender, Status, StreetAddress, Country, City, Province) VALUES (@FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@FirstName", person.FirstName);
@@ -69,7 +72,10 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@Contact", person.Contact);
                         command.Parameters.AddWithValue("@Gender", person.Gender);
                         command.Parameters.AddWithValue("@Status", 8);
-                        command.Parameters.AddWithValue("@LocationId", person.LocationId);
+                        command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", person.Country);
+                        command.Parameters.AddWithValue("@City", person.City);
+                        command.Parameters.AddWithValue("@Province", person.Province);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -154,7 +160,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "EXEC stp_UpdatePerson @Id, @FirstName, @LastName, @Contact, @Gender, @Status";
+                    string query = "EXEC stp_UpdatePerson @Id, @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", person.ID);
@@ -163,6 +169,10 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@Contact", person.Contact);
                         command.Parameters.AddWithValue("@Gender", person.Gender);
                         command.Parameters.AddWithValue("@Status", person.Status);
+                        command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", person.Country);
+                        command.Parameters.AddWithValue("@City", person.City);
+                        command.Parameters.AddWithValue("@Province", person.Province);
                         await command.ExecuteNonQueryAsync();
                     }
                 }

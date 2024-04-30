@@ -16,8 +16,6 @@ namespace AutoArsenal_App.Pages.Manager
         public Person Person { get; set; }
         [BindProperty]
         public Employee Employee { get; set; }
-        [BindProperty]
-        public Location Location { get; set; }
 
         //for viewing
         [BindProperty]
@@ -26,8 +24,6 @@ namespace AutoArsenal_App.Pages.Manager
         public List<Person> Persons { get; set; }
         [BindProperty]
         public List<Employee> Employees { get; set; }
-        [BindProperty]
-        public List<Location> Locations { get; set; }
 
         [BindProperty]
         public List<string> Cities { get; set; }
@@ -67,7 +63,6 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Lookups = await LookupController.GetLookup();
-                Locations = await LocationController.GetLocation();
                 Persons = await PersonController.GetPerson();
                 Employees = await EmployeeController.GetEmployee();
             }
@@ -79,33 +74,21 @@ namespace AutoArsenal_App.Pages.Manager
 
         public async Task<IActionResult> OnPostAddEmployee()
         {
-            int peronId = -1;
-            int locationId = -1;
             try
             {
-                if (Location != null)
-                {
-                    await LocationController.AddLocation(Location);
-                    locationId = await LocationController.GetLocationId(Location);
-                }
-                if (Person != null)
-                {
-                    Person.LocationId = locationId;
-                    await PersonController.AddPerson(Person);
-                    peronId = await PersonController.GetPersonId(Person);
-                }
-                if (Employee != null)
-                {
-                    Employee.ID = peronId;
-                    await EmployeeController.AddEmployee(Employee);
-                }
-                return RedirectToPage("/Manager/Employees");
+                Person.Status = 8;
+                await PersonController.AddPerson(Person);
+                Person.ID = await PersonController.GetPersonId(Person);
+                Employee.ID = Person.ID;
+                await EmployeeController.AddEmployee(Employee);
+                TempData["Success"] = "Employee added successfully";
+
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Manager/Employees");
             }
+            return RedirectToPage("/Manager/Employees");
         }
 
         //for deleting
@@ -126,11 +109,10 @@ namespace AutoArsenal_App.Pages.Manager
         //for editing
         public async Task<IActionResult> OnPostEditEmployee()
         {
+            Employee.ID = Person.ID;
+            Person.Status = 8;
             try
             {
-                Person.Status = 8;
-                Employee.ID = Person.ID;
-                await LocationController.UpdateLocation(Location);
                 await PersonController.UpdatePerson(Person);
                 await EmployeeController.UpdateEmployee(Employee);
                 return RedirectToPage("/Manager/Employees");

@@ -46,7 +46,7 @@
 <!-- Table -->
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Customers</h5>
+        <h5 class="card-title">Employees</h5>
 
         <!-- Table with stripped rows -->
         <table id="empTable" class="table table-striped datatable">
@@ -72,7 +72,7 @@
                         {
                             string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
                             string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
-                            Models.Location location = Model.Locations.Find(l => l.ID == person.LocationId);
+                            
                             <tr>
                                 <td>@(count++)</td>
                                 <td>@person.FirstName</td>
@@ -81,7 +81,7 @@
                                 <td>@designation</td>
                                 <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
                                 <td>
-                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@location.StreetAddress','@location.City','@location.Province','@location.Country','@employee.Salary','@employee.Role')">
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
@@ -98,6 +98,7 @@
                         <td colspan="5">No records found</td>
                     </tr>
                 }
+
             </tbody>
         </table>
         <!-- End Table with stripped rows -->
@@ -162,7 +163,7 @@
                         <div class="col-md-6">
                             <!-- Address -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="Address" placeholder="Address" asp-for="Location.StreetAddress" />
+                                <input type="text" class="form-control" id="Address" placeholder="Address" asp-for="Person.StreetAddress" />
                                 <label for="Address">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -170,7 +171,7 @@
                         <div class="col-md-6">
                             <!-- City -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="City" aria-label="Default select example" asp-for="Location.City">
+                                <select class="form-select" id="City" aria-label="Default select example" asp-for="Person.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -184,7 +185,7 @@
                         <div class="col-md-6">
                             <!-- Province -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="Province" aria-label="Default select example" asp-for="Location.Province">
+                                <select class="form-select" id="Province" aria-label="Default select example" asp-for="Person.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -198,7 +199,7 @@
                         <div class="col-md-6">
                             <!-- Country -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="Country" aria-label="Default select example" asp-for="Location.Country">
+                                <select class="form-select" id="Country" aria-label="Default select example" asp-for="Person.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -209,7 +210,7 @@
                         <div class="col-md-6">
                             <!-- Salary -->
                             <div class="form-floating mt-2">
-                                <input type="number" class="form-control" id="Salary" placeholder="Salary" asp-for="Employee.Salary" />
+                                <input type="number" class="form-control" id="Salary" placeholder="Salary" min="0" oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
                                 <label for="Salary">Salary</label>
                                 <p class="invalid" id="salaryError"></p>
                             </div>
@@ -260,7 +261,6 @@
                         <div class="col-md-6">
                             <!-- Hidden input for storing id for editing -->
                             <input type="hidden" id="editId" asp-for="Person.ID" />
-                            <input type="hidden" id="editLocationId" asp-for="Person.ID" />
                             <!-- First Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="editFirstName" placeholder="First Name" asp-for="Person.FirstName" />
@@ -307,7 +307,7 @@
                         <div class="col-md-6">
                             <!-- Address -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editAddress" placeholder="Address" asp-for="Location.StreetAddress" />
+                                <input type="text" class="form-control" id="editAddress" placeholder="Address" asp-for="Person.StreetAddress" />
                                 <label for="editAddress">Address</label>
                                 <p class="invalid" id="editaddressError"></p>
                             </div>
@@ -315,7 +315,7 @@
                         <div class="col-md-6">
                             <!-- City -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editCity" aria-label="Default select example" asp-for="Location.City">
+                                <select class="form-select" id="editCity" aria-label="Default select example" asp-for="Person.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -329,7 +329,7 @@
                         <div class="col-md-6">
                             <!-- Province -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editProvince" aria-label="Default select example" asp-for="Location.Province">
+                                <select class="form-select" id="editProvince" aria-label="Default select example" asp-for="Person.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -343,7 +343,7 @@
                         <div class="col-md-6">
                             <!-- Country -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editCountry" aria-label="Default select example" asp-for="Location.Country">
+                                <select class="form-select" id="editCountry" aria-label="Default select example" asp-for="Person.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -354,7 +354,7 @@
                         <div class="col-md-6">
                             <!-- Salary -->
                             <div class="form-floating mt-2">
-                                <input type="number" class="form-control" id="editSalary" placeholder="Salary" asp-for="Employee.Salary" />
+                                <input type="number" class="form-control" id="editSalary" placeholder="Salary" min="0" oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
                                 <label for="editSalary">Salary</label>
                                 <p class="invalid" id="editsalaryError"></p>
                             </div>
@@ -428,7 +428,6 @@
         //Editing
         function editEmployee(personId, firstName, lastName, contact, gender, joiningDate, streetAddress, city, province, country, salary, role) {
             document.getElementById("editId").value = personId;
-            document.getElementById("editLocationId").value = personId;
             document.getElementById("editFirstName").value = firstName;
             document.getElementById("editLastName").value = lastName;
             document.getElementById("editContact").value = contact;
@@ -437,9 +436,9 @@
             var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]); // Construct a new Date object
             document.getElementById("editJoiningDate").value = formattedDate.toISOString().split('T')[0]; // Set the value to the input element
             document.getElementById("editAddress").value = streetAddress;
-            document.getElementById("editCity").value = city;
-            document.getElementById("editProvince").value = province;
-            document.getElementById("editCountry").value = country;
+            document.getElementById("editCity").value = city == "" ? -1 : city;
+            document.getElementById("editProvince").value = province == "" ? -1 : province;
+            document.getElementById("editCountry").value = country == "" ? -1 : country;
             document.getElementById("editSalary").value = salary;
             document.getElementById("editRole").value = role;
         }
