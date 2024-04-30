@@ -1,0 +1,359 @@
+﻿@page
+@model AutoArsenal_App.Pages.Manager.WarehouseModel
+@{
+    ViewData["Title"] = "Warehouse";
+}
+<!-- Page Title -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- End Page Title -->
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->
+<!-- Search Bar -->
+<div class="card">
+    <div class="card-body">
+        <div id="panelSearch"
+             class="d-flex justify-content-between align-items-center">
+            <div class="searchBarButton" style="margin:10px;">
+                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createWarehouseModal">Create Warehouse</a>
+            </div>
+            <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                <input class="form-control w-100"
+                       type="search"
+                       placeholder="Search"
+                       aria-label="Search" />
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Search Bar -->
+<!-- Table -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Warehouse</h5>
+
+        <!-- Table with stripped rows -->
+        <table id="warehouseTable" class="table table-striped datatable text-center">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Street Address</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Province</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Warehouses != null)
+                {
+                    int count = 1;
+                    @foreach (var warehouse in Model.Warehouses)
+                    {
+                        <tr>
+                            <th>@(count++)</th>
+                            <td>@warehouse.Name</td>
+                            <td>@warehouse.StreetAddress</td>
+                            <td>@warehouse.City</td>
+                            <td>@warehouse.Province</td>
+                            <td>@warehouse.Country</td>
+                            <td>
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editWarehouseModal" onclick="editWarehouse('@warehouse.ID','@warehouse.StreetAddress','@warehouse.City','@warehouse.Province','@warehouse.Country')"><i class="bi bi-pencil"></i></button>
+                                <a class="btn btn-danger"><i class="bi bi-trash"></i></a>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">No records found</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <!-- End Table with stripped rows -->
+    </div>
+</div>
+<!-- End Table -->
+<!-- Add employee modal -->
+<div class="modal fade" id="createWarehouseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="addWarehouseModal" asp-page-handler="AddWarehouse">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Warehouse</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Name" placeholder="Name" asp-for="Warehouse.Name" />
+                                <label for="FirstName">Name</label>
+                                <p class="invalid" id="nameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Address -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Address" placeholder="Address" asp-for="Warehouse.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="addressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- City -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="City" aria-label="Default select example" asp-for="Warehouse.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="City">City</label>
+                                <p class="invalid" id="cityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Province -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Province" aria-label="Default select example" asp-for="Warehouse.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="Province">Province</label>
+                                <p class="invalid" id="provinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Country -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Country" aria-label="Default select example" asp-for="Warehouse.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="Country">Country</label>
+                                <p class="invalid" id="countryError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Add Product Modal -->
+<!-- Edit employee modal -->
+<div class="modal fade" id="editWarehouseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="editWarehouseModal" asp-page-handler="Edit Warehouse">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Edit Warehouse</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="editName" placeholder="Name" asp-for="Warehouse.Name" />
+                                <label for="editName">Name</label>
+                                <p class="invalid" id="editNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Address -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="editAddress" placeholder="Address" asp-for="Warehouse.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="editAddressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- City -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="editCity" aria-label="Default select example" asp-for="Warehouse.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="editCity">City</label>
+                                <p class="invalid" id="editCityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Province -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="editProvince" aria-label="Default select example" asp-for="Warehouse.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="editProvince">Province</label>
+                                <p class="invalid" id="editProvinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Country -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="editCountry" aria-label="Default select example" asp-for="Warehouse.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="editCountry">Country</label>
+                                <p class="invalid" id="editCountryError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="editBtn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Edit Product Modal -->
+@section Scripts {
+    <script>
+        //edit warehouse
+        function editWarehouse(id, name, streetAddress, city, province, country) {
+            console.log((id, name, streetAddress, city, province, country))
+        }
+
+        // Adjust the DataTables initialization
+        $(document).ready(function () {
+            var table = $("#warehouseTable").DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true, // Disable DataTables default search
+                ordering: false,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                },
+            });
+
+            // Add event listener for your custom search bar
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var form = document.querySelector("#addWarehouseModal");
+            var submitButton = form.querySelector("#addBtn");
+            var Name = form.querySelector("#Name");
+            var address = form.querySelector("#Address");
+            var city = form.querySelector("#City");
+            var province = form.querySelector("#Province");
+            var country = form.querySelector("#Country");
+
+            // Add event listener for input fields
+            form.addEventListener("input", function () {
+                var errors = false;
+
+                if (Name.value.trim() === "") {
+                    document.querySelector("#nameError").textContent = "Name is required";
+                    document.querySelector("#nameError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    Name.classList.add("is-invalid");
+                } else {
+                    Name.classList.remove("is-invalid");
+                    document.querySelector("#nameError").textContent = "";
+                }
+
+                if (address.value.trim() === "") {
+                    document.querySelector("#addressError").textContent = "Address is required";
+                    document.querySelector("#addressError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    address.classList.add("is-invalid");
+                } else {
+                    address.classList.remove("is-invalid");
+                    document.querySelector("#addressError").textContent = "";
+                }
+
+                if (city.value == -1) {
+                    document.querySelector("#cityError").textContent = "City is required";
+                    document.querySelector("#cityError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    city.classList.add("is-invalid");
+                } else {
+                    city.classList.remove("is-invalid");
+                    document.querySelector("#cityError").textContent = "";
+                }
+
+                if (province.value == -1) {
+                    document.querySelector("#provinceError").textContent = "Province is required";
+                    document.querySelector("#provinceError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    province.classList.add("is-invalid");
+                } else {
+                    province.classList.remove("is-invalid");
+                    document.querySelector("#provinceError").textContent = "";
+                }
+
+                if (country.value == -1) {
+                    document.querySelector("#countryError").textContent = "Country is required";
+                    document.querySelector("#countryError").style = 'display: block; font-size: 12px; color: red; ';
+                    errors = true;
+                    country.classList.add("is-invalid");
+                } else {
+                    country.classList.remove("is-invalid");
+                    document.querySelector("#countryError").textContent = "";
+                }
+
+                if (errors) {
+                    submitButton.disabled = true;
+                } else {
+                    submitButton.disabled = false;
+                }
+
+            });
+
+        });
+    </script>
+}
