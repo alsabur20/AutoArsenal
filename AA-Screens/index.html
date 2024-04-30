@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
+    <title>@ViewData["Title"] - AutoArsenal_App</title>
     <link rel="icon" href="./assets/images/titleIcon.png" />
     <!-- Bootstrap CSS link -->
     <link
@@ -17,22 +17,28 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <!-- Font awesome icons link -->
+    <!-- Font Awesome icons link -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      integrity=""
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="./assets/datatables/style.css" />
+    <!-- DataTables CSS -->
+    <link
+      href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="./assets/css/style.css" />
   </head>
   <body>
+    <!-- Navigation Bar -->
     <header>
       <nav class="navbar navbar-expand-lg body-tertiary">
         <div class="container-fluid">
-          <a class="navbar-brand" href="./index.html">
+          <a class="navbar-brand" href="#">
             <img
               src="./assets/images/titleIcon.png"
               alt="Logo"
@@ -50,22 +56,18 @@
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <i class="fa-solid fa-bars" style="color: #ffffff"></i>
+            <i class="fas fa-bars" style="color: #ffffff"></i>
           </button>
           <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a
-                  class="nav-link"
-                  aria-current="page"
-                  href="./dashboardManager.html"
-                  >Home</a
-                >
+                <a class="nav-link" href="#">Dashboard</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="./Customer.html"
-                  >Customers</a
-                >
+                <a class="nav-link" href="#">Customers</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Employees</a>
               </li>
               <li class="nav-item dropdown">
                 <a
@@ -75,11 +77,12 @@
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
                 >
-                  Features
+                  Dropdown
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="#">Action</a></li>
                   <li><a class="dropdown-item" href="#">Another action</a></li>
+                  <li><hr class="dropdown-divider" /></li>
                   <li>
                     <a class="dropdown-item" href="#">Something else here</a>
                   </li>
@@ -127,91 +130,515 @@
       </nav>
     </header>
 
-    <main>
-      <h1>Index</h1>
+    <!-- Main Body -->
+    <main role="main" class="pb-3">
+      <h1>Customers</h1>
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active" aria-current="page"><a href="./index.html">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Index</li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <a href="./index.html">Home</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">Customers</li>
         </ol>
       </nav>
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Products Inventory</h5>
+          <div
+            id="panelSearch"
+            class="d-flex justify-content-between align-items-center"
+          >
+            <button
+              class="btn btn-primary"
+              style="margin-right: 1rem"
+              data-bs-toggle="modal"
+              data-bs-target="#createModal"
+            >
+              Add Customer
+            </button>
+            <form class="form-inline flex-grow-1 mr-2">
+              <input
+                class="form-control w-100"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+              />
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Customers</h5>
 
           <!-- Table with stripped rows -->
-          <table class="table table-striped datatable">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Product</th>
-                <th scope="col">Description</th>
-                <th scope="col">Price</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>1</th>
-                <td>Product 1</td>
-                <td>Lorem ipsum text here</td>
-                <td>92.0134</td>
-                <td>
-                  <button class="btn btn-sm btn-primary">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-sm btn-danger">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>Product 2</td>
-                <td>Lorem ipsum text here</td>
-                <td>105.9864</td>
-                <td>
-                  <button class="btn btn-sm btn-primary">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-sm btn-danger">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>Product 3</td>
-                <td>Lorem ipsum text here</td>
-                <td>74.9864</td>
-                <td>
-                  <button class="btn btn-sm btn-primary">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-sm btn-danger">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table
+              id="customersTable"
+              class="table table-hover table-striped table-bordered text-center"
+            >
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Product</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="table-group-divider">
+                <tr>
+                  <th>1</th>
+                  <td>Product 1</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>92.0134</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td>Product 2</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>105.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td>Product 3</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>74.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>1</th>
+                  <td>Product 1</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>92.0134</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td>Product 2</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>105.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td>Product 3</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>74.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>1</th>
+                  <td>Product 1</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>92.0134</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td>Product 2</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>105.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td>Product 3</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>74.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>1</th>
+                  <td>Product 1</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>92.0134</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td>Product 2</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>105.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td>Product 3</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>74.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>1</th>
+                  <td>Product 1</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>92.0134</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2</th>
+                  <td>Product 2</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>105.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <th>3</th>
+                  <td>Product 3</td>
+                  <td>Lorem ipsum text here</td>
+                  <td>74.9864</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <!-- End Table with stripped rows -->
         </div>
       </div>
-    </main>
-    <footer class="border-top footer mt-auto">
-      <div class="container">
-        &copy; 2024 - AutoArsenal_App - <a href="/Privacy">Privacy</a>
+      <!-- Add employee modal -->
+      <div
+        class="modal fade"
+        id="createModal"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form
+              method="post"
+            >
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">
+                  <i class="bi bi-plus"></i>Add Employee
+                </h5>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <!-- First Name -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="FirstName"
+                        placeholder="First Name"
+                      />
+                      <label for="FirstName">First Name</label>
+                      <p class="invalid" id="firstNameError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Last Name -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="LastName"
+                        placeholder="Last Name"
+                      />
+                      <label for="LastName">Last Name</label>
+                      <p class="invalid" id="lastNameError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Contact -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="tel"
+                        class="form-control"
+                        id="Contact"
+                        placeholder="Contact"
+                        value="+923060020007"
+                        disabled
+                      />
+                      <label for="Contact">Contact</label>
+                      <p class="invalid" id="contactError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Gender -->
+                    <div class="form-floating mt-2">
+                      <select
+                        class="form-select"
+                        id="Gender"
+                        aria-label="Default select example"
+                      >
+                        <option value="-1" selected>Select Gender</option>
+                        <option value="1">Male</option>
+                        <option value="2">Female</option>
+                      </select>
+                      <label for="Gender">Gender</label>
+                      <p class="invalid" id="genderError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Joining Date -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="date"
+                        class="form-control"
+                        id="JoiningDate"
+                        placeholder="Joining Date"
+                      />
+                      <label for="JoiningDate">Joining Date</label>
+                      <p class="invalid" id="joiningDateError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Address -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="Address"
+                        placeholder="Address"
+                      />
+                      <label for="Address">Address</label>
+                      <p class="invalid" id="addressError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- City -->
+                    <div class="form-floating mt-2">
+                      <select
+                        class="form-select"
+                        id="City"
+                        aria-label="Default select example"
+                      >
+                        <option value="-1" selected>Select City</option>
+                        <option value="Karachi">Karachi</option>
+                        <option value="Lahore">Lahore</option>
+                        <option value="Islamabad">Islamabad</option>
+                      </select>
+                      <label for="City">City</label>
+                      <p class="invalid" id="cityError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Province -->
+                    <div class="form-floating mt-2">
+                      <select
+                        class="form-select"
+                        id="Province"
+                        aria-label="Default select example"
+                      >
+                        <option value="-1" selected>Select Province</option>
+                        <option value="Sindh">Sindh</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="KPK">KPK</option>
+                      </select>
+                      <label for="Province">Province</label>
+                      <p class="invalid" id="provinceError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Country -->
+                    <div class="form-floating mt-2">
+                      <select
+                        class="form-select"
+                        id="Country"
+                        aria-label="Default select example"
+                      >
+                        <option value="-1" selected>Select Country</option>
+                        <option value="Pakistan">Pakistan</option>
+                      </select>
+                      <label for="Country">Country</label>
+                      <p class="invalid" id="countryError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Salary -->
+                    <div class="form-floating mt-2">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="Salary"
+                        placeholder="Salary"
+                        min="0"
+                        oninput="validity.valid||(value='');"
+                      />
+                      <label for="Salary">Salary</label>
+                      <p class="invalid" id="salaryError"></p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <!-- Role -->
+                    <div class="form-floating mt-2">
+                      <select
+                        class="form-select"
+                        id="Role"
+                        aria-label="Default select example"
+                      >
+                        <option value="-1" selected>Select Role</option>
+                        <option value="1">Admin</option>
+                        <option value="2">Manager</option>
+                        <option value="3">Employee</option>
+                      </select>
+                      <label for="Role">Role</label>
+                      <p class="invalid" id="roleError"></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  >
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+      <!-- End Create Modal -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top footer mt-auto">
+      <div>&copy; 2024 - Auto Arsenal - <a href="/Privacy">Privacy</a></div>
     </footer>
-    <!-- Script files -->
-    <script src="./assets/js/script.js"></script>
-    <script src="./assets/datatables/datatables.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Popper.js -->
+    <script src="./assets/lib/bootstrap/dist/css/bootstrap.min.css"></script>
+    <script src="./assets/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap JS -->
     <script
-      defer
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"
     ></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Custom Script -->
+    <script src="./assets/js/script.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
   </body>
 </html>
