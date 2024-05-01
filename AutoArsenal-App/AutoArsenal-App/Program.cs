@@ -9,7 +9,6 @@ builder.Configuration.SetBasePath(builder.Environment.ContentRootPath);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 LookupController.Initialize(builder.Configuration);
-LocationController.Initialize(builder.Configuration);
 
 CustomerController.Initialize(builder.Configuration);
 EmployeeController.Initialize(builder.Configuration);

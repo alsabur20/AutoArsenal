@@ -192,7 +192,7 @@
           <h5 class="card-title">Customers</h5>
 
           <!-- Table with stripped rows -->
-          <table id="customersTable" class="table table-striped datatable">
+          <!-- <table id="customersTable" class="table table-striped datatable">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -414,8 +414,20 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+          </table> -->
           <!-- End Table with stripped rows -->
+
+          <div class="form-floating mt-2">
+            <input
+              type="tel"
+              class="form-control"
+              id="Contact"
+              placeholder="Contact"
+              asp-for="Person.Contact"
+            />
+            <label for="Contact">Contact</label>
+            <p class="invalid" id="contactError"></p>
+          </div>
         </div>
       </div>
     </main>

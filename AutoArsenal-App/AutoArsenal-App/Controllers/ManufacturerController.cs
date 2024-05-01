@@ -33,7 +33,10 @@ namespace AutoArsenal_App.Controllers
                                     Name = reader.GetString(reader.GetOrdinal("Name")),
                                     Contact = reader.GetString(reader.GetOrdinal("Contact")),                                    
                                     //handle null for location
-                                    LocationId = reader.IsDBNull(reader.GetOrdinal("LocationId")) ? -1 : reader.GetInt32(reader.GetOrdinal("LocationId"))
+                                    StreetAddress = reader.IsDBNull(reader.GetOrdinal("StreetAddress")) ? null : reader.GetString(reader.GetOrdinal("StreetAddress")),
+                                    Country = reader.IsDBNull(reader.GetOrdinal("Country")) ? null : reader.GetString(reader.GetOrdinal("Country")),
+                                    City = reader.IsDBNull(reader.GetOrdinal("City")) ? null : reader.GetString(reader.GetOrdinal("City")),
+                                    Province = reader.IsDBNull(reader.GetOrdinal("Province")) ? null : reader.GetString(reader.GetOrdinal("Province"))
                                 };
                                 manufacturers.Add(item);
                             }
