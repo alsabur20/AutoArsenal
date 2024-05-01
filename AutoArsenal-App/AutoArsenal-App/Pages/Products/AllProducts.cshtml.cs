@@ -33,7 +33,7 @@ namespace AutoArsenal_App.Pages.Products
             {
                 Lookups = await LookupController.GetLookup();
                 Products = await ProductController.GetProducts();
-                ProductCategories = await ProductCategoryController.GetProductCategory();
+                ProductCategories = await ProductCategoryController.GetProductCategories();
                 Manufacturers = await ManufacturerController.GetManufacturers();
             }
             catch (Exception ex)
