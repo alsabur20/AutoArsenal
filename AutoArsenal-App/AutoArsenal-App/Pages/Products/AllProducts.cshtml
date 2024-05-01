@@ -20,14 +20,12 @@
 <!-- Error message -->
 @if (TempData["ErrorOnServer"] != null)
 {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            Error: @TempData["ErrorOnServer"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 <!-- End Error message -->
-
-
 <!-- Search Bar -->
 <div class="card">
     <div class="card-body">
@@ -70,26 +68,26 @@
                         Models.Product prod = Model.Products.Find(p => p.ID == item.ProductId);
                         string category = Model.Lookups.Find(l => l.ID == item.Category).Value;
                         string manu = Model.Manufacturers.Find(m => m.ID == item.ManufactureId).Name;
-                                <tr>
-                                    <td>@(count++)</td>
-                                    <td>@prod.ProductName</td>
-                                    <td>@category</td>
-                                    <td>@item.SalePrice.ToString()</td>
-                                    <td>@prod.ProductDescription</td>
-                                    <td>In-Stock</td> <!-- This part need to be modified -->
-                                    <td>
-                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.ProductName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.ProductDescription')"> <i class="bi bi-eye"></i> </a>
-                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" > <i class="bi bi-pencil"></i> </a>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.ProductName')"> <i class="bi bi-trash"></i> </a>
-                                    </td>
-                                </tr>
+                        <tr>
+                            <td>@(count++)</td>
+                            <td>@prod.ProductName</td>
+                            <td>@category</td>
+                            <td>@item.SalePrice.ToString()</td>
+                            <td>@prod.ProductDescription</td>
+                            <td>In-Stock</td> <!-- This part need to be modified -->
+                            <td>
+                                <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.ProductName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.ProductDescription')"> <i class="bi bi-eye"></i> </a>
+                                <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal"> <i class="bi bi-pencil"></i> </a>
+                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.ProductName')"> <i class="bi bi-trash"></i> </a>
+                            </td>
+                        </tr>
                     }
                 }
                 else
                 {
-                        <tr>
-                            <td colspan="5">No records found</td>
-                        </tr>
+                    <tr>
+                        <td colspan="5">No records found</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -98,7 +96,6 @@
 </div>
 
 <!-- Modals-->
-
 <!-- Update Product Modal -->
 <div class="modal fade" id="UpdateProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -127,7 +124,7 @@
                                     <option value="-1" selected>Select category</option>
                                     @foreach (var lookup in Model.Lookups.Where(l => l.Category == "Product_Category"))
                                     {
-                                            <option value="@lookup.ID">@lookup.Value</option>
+                                        <option value="@lookup.ID">@lookup.Value</option>
                                     }
                                 </select>
                                 <label for="category">Category</label>
@@ -141,7 +138,7 @@
                                     <option value="-1" selected>Select Manufacturer</option>
                                     @foreach (var manufact in Model.Manufacturers)
                                     {
-                                            <option value="@manufact.ID">@manufact.Name</option>
+                                        <option value="@manufact.ID">@manufact.Name</option>
                                     }
                                 </select>
                                 <label for="manufacturerID">Manufacturer</label>
@@ -254,52 +251,52 @@
 
 <!-- JavaScript Section -->
 @section Scripts {
-        <!-- Deletion -->
-        <script>
-            function deleteProduct(id, productName) {
-                document.getElementById("deleteId").value = id;
-                document.getElementById("deleteTitle").textContent = productName;
-            }
-        </script>
+    <!-- Deletion -->
+    <script>
+        function deleteProduct(id, productName) {
+            document.getElementById("deleteId").value = id;
+            document.getElementById("deleteTitle").textContent = productName;
+        }
+    </script>
 
-        <!-- View Product -->
-        <script>
-            function ViewProduct(img, name, category, manufacturer, cost, sale, descr) {
-                document.getElementById("vImage").src = img;
-                document.getElementById("vProductName").textContent = name;
-                document.getElementById("vProductCategory").textContent = category;
-                document.getElementById("vManufacturer").textContent = manufacturer;
-                document.getElementById("vCostPrice").textContent = cost;
-                document.getElementById("vSalePrice").textContent = sale;
-                document.getElementById("vDescription").textContent = descr;
-            }
-        </script>
+    <!-- View Product -->
+    <script>
+        function ViewProduct(img, name, category, manufacturer, cost, sale, descr) {
+            document.getElementById("vImage").src = img;
+            document.getElementById("vProductName").textContent = name;
+            document.getElementById("vProductCategory").textContent = category;
+            document.getElementById("vManufacturer").textContent = manufacturer;
+            document.getElementById("vCostPrice").textContent = cost;
+            document.getElementById("vSalePrice").textContent = sale;
+            document.getElementById("vDescription").textContent = descr;
+        }
+    </script>
 
-        <!-- Table Settings -->
-        <script>
-            $(document).ready(function () {
-                var table = $("#productsTable").DataTable({
-                    paging: true,
-                    lengthChange: false,
-                    searching: true,
-                    ordering: false,
-                    info: true,
-                    autoWidth: false,
-                    language: {
-                        emptyTable: "No data available",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "Showing 0 to 0 of 0 entries",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        zeroRecords: "No matching records found",
-                        search: "Search:"
-                    }
-                });
-
-                // Add event listener for your custom search bar
-                $('#searchBar input').on('input', function () {
-                    var searchText = this.value.trim();
-                    table.search(searchText).draw();
-                });
+    <!-- Table Settings -->
+    <script>
+        $(document).ready(function () {
+            var table = $("#productsTable").DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: false,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:"
+                }
             });
-        </script>
+
+            // Add event listener for your custom search bar
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+    </script>
 }
