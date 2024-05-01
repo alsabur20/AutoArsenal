@@ -24,7 +24,7 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Lookups = await LookupController.GetLookup();
-                Persons = await PersonController.GetPerson();
+                Persons = await PersonController.GetPersons();
                 Customers = await CustomerController.GetCustomer();
             }
             catch (Exception ex)

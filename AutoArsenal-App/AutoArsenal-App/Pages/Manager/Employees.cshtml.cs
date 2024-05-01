@@ -63,7 +63,7 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Lookups = await LookupController.GetLookup();
-                Persons = await PersonController.GetPerson();
+                Persons = await PersonController.GetPersons();
                 Employees = await EmployeeController.GetEmployee();
             }
             catch (Exception ex)
