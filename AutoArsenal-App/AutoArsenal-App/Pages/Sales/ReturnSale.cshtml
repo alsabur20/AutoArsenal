@@ -1,0 +1,30 @@
+﻿@page
+@model AutoArsenal_App.Pages.Sales.ReturnSaleModel
+@{
+    ViewData["Title"] = "Return Sale";
+}
+<!-- Page Title -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="./Sales">Sales</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- End Page Title -->
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->

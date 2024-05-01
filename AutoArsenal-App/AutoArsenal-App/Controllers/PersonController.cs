@@ -11,7 +11,7 @@ namespace AutoArsenal_App.Controllers
         {
             Configuration = configuration;
         }
-        public async static Task<List<Person>> GetPerson()
+        public async static Task<List<Person>> GetPersons()
         {
             List<Person> person = new List<Person>();
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))

@@ -8,6 +8,9 @@ builder.Services.AddRazorPages();
 builder.Configuration.SetBasePath(builder.Environment.ContentRootPath);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
+SaleController.Initialize(builder.Configuration);
+SaleDetailsController.Initialize(builder.Configuration);
+
 LookupController.Initialize(builder.Configuration);
 
 CustomerController.Initialize(builder.Configuration);
@@ -20,6 +23,7 @@ ProductCategoryController.Initialize(builder.Configuration);
 InventoryController.Initialize(builder.Configuration);
 ManufacturerController.Initialize(builder.Configuration);
 WarehouseController.Initialize(builder.Configuration);
+
 
 var app = builder.Build();
 
