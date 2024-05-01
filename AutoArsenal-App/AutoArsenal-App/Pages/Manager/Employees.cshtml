@@ -24,6 +24,8 @@
 }
 <!-- End Error message -->
 
+
+<!-- Search Bar -->
 <div class="card">
     <div class="card-body">
         <div id="panelSearch"
@@ -41,9 +43,10 @@
     </div>
 </div>
 
+
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Customers</h5>
+        <h5 class="card-title">Employees</h5>
 
         <!-- Table with stripped rows -->
         <table id="empTable" class="table table-striped datatable">
@@ -245,15 +248,19 @@
     </div>
 </div>
 
+
+
+<!-- Java Script Section -->
 @section Scripts {
+    <!-- Deletion -->
     <script>
-        //Deletion
         function deleteEmployee(id, firstName, lastName) {
             document.getElementById("deleteId").value = id;
             document.getElementById("deleteTitle").textContent = firstName+' '+lastName;
         }
 
     </script>
+
     <!-- Adjust the DataTables initialization -->
     <script>
         $(document).ready(function () {
@@ -282,8 +289,9 @@
         });
     </script>
 
+
+    <!-- Add Modal Validations and Submission -->
     <script>
-        // Form validation and submission
         document.addEventListener("DOMContentLoaded", function () {
 
             var form = document.querySelector("#addEmployeeModal");
@@ -423,6 +431,8 @@
             });
         });
     </script>
+
+    <!-- Clearing form -->
     <script>
         // Function to clear form fields
         function clearFormFields() {

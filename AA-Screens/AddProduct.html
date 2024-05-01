@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="icon" href="./assets/images/titleIcon.png" />
+
+    <!-- Bootstrap CSS link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous" />
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons link -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <!-- Font awesome icons link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./assets/datatables/style.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar navbar-expand-lg body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="./index.html">
+                    <img src="./assets/images/titleIcon.png" alt="Logo" width="30"
+                        class="d-inline-block align-text-top" />
+                    Auto Arsenal
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="fa-solid fa-bars" style="color: #ffffff"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="./dashboardManager.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="./Customer.html">Customers</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Features
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Pricing
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Dropdown link
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#">Something else here</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+
+    <!-- Main Content -->
+    <main role="main" class="pb-3">
+        <h1>Products</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">
+                    <a href="./index.html">Home /</a>
+                    <a href="./Customer.html">Products</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Customers</li>
+            </ol>
+        </nav>
+
+
+        <!-- Add Products form -->
+        <form class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <input type="text" class="form-control" id="productName" placeholder="Product Name">
+                    <label for="productName">Product Name</label>
+                    <p class="invalid" id="productNameError"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <select class="form-select" id="manufacturerID">
+                        <option value="-1" selected>Select Manufacturer ID</option>
+                        <option> 1 </option>
+                        <option> 2 </option>
+                        <option> 3 </option>
+                    </select>
+                    <label for="manufacturerID">Manufacturer</label>
+                    <p class="invalid" id="manufacturerIdError"></p>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="form-floating mt-2">
+                    <textarea class="form-control" id="description" rows="3"
+                        placeholder="Enter Product Description here..."></textarea>
+                    <label for="description">Product Description</label>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <input type="text" class="form-control" id="costPrice" placeholder="Cost Price">
+                    <label for="costPrice">Cost Price</label>
+                    <p class="invalid" id="costPriceError"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <input type="text" class="form-control" id="salePrice" placeholder="Sale Price">
+                    <label for="salePrice">Sale Price</label>
+                    <p class="invalid" id="salePriceError"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <select id="category" class="form-select">
+                        <option value="-1" selected>Select category</option>
+                        <option> 1 </option>
+                        <option> 2 </option>
+                        <option> 3 </option>
+                    </select>
+                    <label for="category">Category</label>
+                    <p class="invalid" id="categoryError"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <input type="text" class="form-control" id="stock" placeholder="Stock">
+                    <label for="stock">Stock</label>
+                    <p class="invalid" id="stockError"></p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <input class="form-control" type="text" id="img" placeholder="Image">
+                    <label for="img"> Image </label>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <button type="submit" class="btn btn-primary" id="AddinTablebtn" disabled>Add</button>
+            </div>
+        </form>
+
+        <!-- Products Table -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Products</h5>
+
+                <!-- Table with stripped rows -->
+                <table id="customersTable" class="table table-striped datatable">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>1</th>
+                            <td>Product 1</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>92.0134</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Product 2</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>105.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Product 3</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>74.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <td>Product 1</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>92.0134</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Product 2</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>105.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Product 3</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>74.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <td>Product 1</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>92.0134</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Product 2</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>105.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Product 3</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>74.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <td>Product 1</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>92.0134</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Product 2</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>105.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Product 3</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>74.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>1</th>
+                            <td>Product 1</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>92.0134</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>Product 2</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>105.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>Product 3</td>
+                            <td>Lorem ipsum text here</td>
+                            <td>74.9864</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- End Table with stripped rows -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top footer mt-auto">
+        <div class="container">
+            &copy; 2024 - AutoArsenal_App - <a href="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JS -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <!-- Script files -->
+    <script src="./assets/js/script.js"></script>
+    <script src="./assets/datatables/datatables.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+
+    <!-- table Data -->
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $("#customersTable").DataTable({
+                paging: true, // Enable pagination
+                lengthChange: false, // Disable number of records per page dropdown
+                searching: true, // Enable search box
+                ordering: false, // Enable column sorting
+                info: true, // Show table information (e.g., "Showing 1 to 10 of 20 entries")
+                autoWidth: false, // Disable auto-width calculation
+
+                // Language settings
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                },
+            });
+        });
+    </script>
+
+    <!-- Form Validations -->
+    <script>
+        $(document).ready(function () {
+            document.load('AddProduct.html', function () {
+                // Your script here, adjusted as needed
+                var form = document.querySelector("#AddProduct");
+                var submitButton = form.querySelector("#AddinTablebtn");
+                var productName = form.querySelector("#productName");
+                var manufacturerID = form.querySelector("#manufacturerID");
+                var costPrice = form.querySelector("#costPrice");
+                var salePrice = form.querySelector("#salePrice");
+                var category = form.querySelector("#category");
+                var stock = form.querySelector("#stock");
+
+                // Add event listener for input fields
+                form.addEventListener("input", function () {
+                    var errors = false;
+
+                    if (productName.value.trim() === "") {
+                        document.querySelector("#productNameError").textContent = "Product Name is required";
+                        document.querySelector("#productNameError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        productName.classList.add("is-invalid");
+                    } else {
+                        productName.classList.remove("is-invalid");
+                        document.querySelector("#productNameError").textContent = "";
+                    }
+
+                    if (manufacturerID.value == -1) {
+                        document.querySelector("#manufacturerIdError").textContent = "Manufacturer ID is required";
+                        document.querySelector("#manufacturerIdError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        manufacturerID.classList.add("is-invalid");
+                    } else {
+                        manufacturerID.classList.remove("is-invalid");
+                        document.querySelector("#manufacturerIdError").textContent = "";
+                    }
+
+                    if (costPrice.value.trim() === "") {
+                        document.querySelector("#costPriceError").textContent = "Cost Price is required";
+                        document.querySelector("#costPriceError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        costPrice.classList.add("is-invalid");
+                    } else {
+                        costPrice.classList.remove("is-invalid");
+                        document.querySelector("#costPriceError").textContent = "";
+                    }
+
+                    if (salePrice.value.trim() === "") {
+                        document.querySelector("#salePriceError").textContent = "Sale Price is required";
+                        document.querySelector("#salePriceError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        salePrice.classList.add("is-invalid");
+                    } else {
+                        salePrice.classList.remove("is-invalid");
+                        document.querySelector("#salePriceError").textContent = "";
+                    }
+
+                    if (category.value == -1) {
+                        document.querySelector("#categoryError").textContent = "Category is required";
+                        document.querySelector("#categoryError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        category.classList.add("is-invalid");
+                    } else {
+                        category.classList.remove("is-invalid");
+                        document.querySelector("#categoryError").textContent = "";
+                    }
+
+                    if (stock.value.trim() === "") {
+                        document.querySelector("#stockError").textContent = "Stock is required";
+                        document.querySelector("#stockError").style = 'display: block; font-size: 12px; color: red; ';
+                        errors = true;
+                        stock.classList.add("is-invalid");
+                    } else {
+                        stock.classList.remove("is-invalid");
+                        document.querySelector("#stockError").textContent = "";
+                    }
+
+                    if (errors) {
+                        submitButton.disabled = true;
+                    } else {
+                        submitButton.disabled = false;
+                    }
+
+                });
+            });
+        });
+    </script>
+
+<script>
+    function myFunction() {
+        alert("Button clicked!");
+
+            var form = document.querySelector("#AddProduct");
+            var submitButton = form.querySelector("#AddinTablebtn");
+            var productName = form.querySelector("#productName");
+            var manufacturerID = form.querySelector("#manufacturerID");
+            var costPrice = form.querySelector("#costPrice");
+            var salePrice = form.querySelector("#salePrice");
+            var category = form.querySelector("#category");
+            var stock = form.querySelector("#stock");
+
+            // Add event listener for input fields
+            form.addEventListener("input", function () {
+                var errors = false;
+
+                if (productName.value.trim() === "") {
+                    document.querySelector("#productNameError").textContent = "Product Name is required";
+                    document.querySelector("#productNameError").style = 'display: block; font-size: 12px; color: red; ';
+                    productName.classList.add("is-invalid");
+                } else {
+                    productName.classList.remove("is-invalid");
+                    document.querySelector("#productNameError").textContent = "";
+                }
+
+                if (manufacturerID.value == -1) {
+                    document.querySelector("#manufacturerIdError").textContent = "Manufacturer ID is required";
+                    document.querySelector("#manufacturerIdError").style = 'display: block; font-size: 12px; color: red; ';
+                    manufacturerID.classList.add("is-invalid");
+                } else {
+                    manufacturerID.classList.remove("is-invalid");
+                    document.querySelector("#manufacturerIdError").textContent = "";
+                }
+
+                if (costPrice.value.trim() === "") {
+                    document.querySelector("#costPriceError").textContent = "Cost Price is required";
+                    document.querySelector("#costPriceError").style = 'display: block; font-size: 12px; color: red; ';
+                    costPrice.classList.add("is-invalid");
+                } else {
+                    costPrice.classList.remove("is-invalid");
+                    document.querySelector("#costPriceError").textContent = "";
+                }
+
+                if (salePrice.value.trim() === "") {
+                    document.querySelector("#salePriceError").textContent = "Sale Price is required";
+                    document.querySelector("#salePriceError").style = 'display: block; font-size: 12px; color: red; ';
+                    salePrice.classList.add("is-invalid");
+                } else {
+                    salePrice.classList.remove("is-invalid");
+                    document.querySelector("#salePriceError").textContent = "";
+                }
+
+                if (category.value == -1) {
+                    document.querySelector("#categoryError").textContent = "Category is required";
+                    document.querySelector("#categoryError").style = 'display: block; font-size: 12px; color: red; ';
+                    category.classList.add("is-invalid");
+                } else {
+                    category.classList.remove("is-invalid");
+                    document.querySelector("#categoryError").textContent = "";
+                }
+
+                if (stock.value.trim() === "") {
+                    document.querySelector("#stockError").textContent = "Stock is required";
+                    document.querySelector("#stockError").style = 'display: block; font-size: 12px; color: red; ';
+                    stock.classList.add("is-invalid");
+                } else {
+                    stock.classList.remove("is-invalid");
+                    document.querySelector("#stockError").textContent = "";
+                }
+
+            });
+        }
+</script>
+</body>
+
+</html>
