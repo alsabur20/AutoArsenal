@@ -1,9 +1,10 @@
 ﻿@page
 @model AutoArsenal_App.Pages.Products.ProductsModel
 @{
-	ViewData["Title"] = "Products";
+    ViewData["Title"] = "Products";
 }
 
+<!-- Address Bar -->
 <div class="pagetitle">
     <h1>@ViewData["Title"]</h1>
     <nav aria-label="breadcrumb">
@@ -24,40 +25,23 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 }
-
 <!-- End Error message -->
+
+
+<!-- Search Bar -->
 <div class="card">
     <div class="card-body">
-        <div id="panelSearch"
-             class="d-flex justify-content-between align-items-center">
-            <form class="form-inline flex-grow-1 mr-2">
-                <input class="form-control w-100"
-                       type="search"
-                       placeholder="Search"
-                       aria-label="Search" />
-            </form>
-            <div>
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="radio"
-                           name="exampleRadios"
-                           id="exampleRadios1"
-                           value="option1"
-                           checked />
-                    <label class="form-check-label" for="exampleRadios1">Active</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="radio"
-                           name="exampleRadios"
-                           id="exampleRadios2"
-                           value="option2" />
-                    <label class="form-check-label" for="exampleRadios2">InActive</label>
-                </div>
+        <div id="panelSearch" class="d-flex justify-content-between align-items-center">
+            <div class="searchBarButton" style="margin:10px;">
+                <a class="btn btn-primary" href="~/Products/AddProduct">Add New Product</a>
             </div>
+            <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                <input class="form-control w-100" type="search" placeholder="Search" aria-label="Search" />
+            </form>
         </div>
     </div>
 </div>
+
 
 <!-- Products Front Page Design -->
 <div class="card">
@@ -73,6 +57,7 @@
                     <th scope="col">Category</th>
                     <th scope="col">Price</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Status</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -84,19 +69,18 @@
                     {
                         Models.Product prod = Model.Products.Find(p => p.ID == item.ProductId);
                         string category = Model.Lookups.Find(l => l.ID == item.Category).Value;
+                        string manu = Model.Manufacturers.Find(m => m.ID == item.ManufactureId).Name;
                                 <tr>
                                     <td>@(count++)</td>
                                     <td>@prod.ProductName</td>
                                     <td>@category</td>
                                     <td>@item.SalePrice.ToString()</td>
-                                    <td>@prod.ProductDescription</td>
+                                    <td>@prod.productDescription</td>
+                                    <td>In-Stock</td> <!-- This part need to be modified -->
                                     <td>
-                                        <button class="btn btn-sm btn-primary">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.productName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.productDescription')"> <i class="bi bi-eye"></i> </a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" > <i class="bi bi-pencil"></i> </a>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.productName')"> <i class="bi bi-trash"></i> </a>
                                     </td>
                                 </tr>
                     }
@@ -113,27 +97,208 @@
     </div>
 </div>
 
+<!-- Modals-->
+
+<!-- Update Product Modal -->
+<div class="modal fade" id="UpdateProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="UpdateProduct">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i> Update Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <form class="row g-3" id="UpdateProductForm">
+                        <!-- Product Name -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="productName" placeholder="Product Name">
+                                <label for="productName">Product Name</label>
+                                <p class="invalid" id="productNameError"></p>
+                            </div>
+                        </div>
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <select id="category" class="form-select">
+                                    <option value="-1" selected>Select category</option>
+                                    @foreach (var lookup in Model.Lookups.Where(l => l.Category == "Product_Category"))
+                                    {
+                                            <option value="@lookup.ID">@lookup.Value</option>
+                                    }
+                                </select>
+                                <label for="category">Category</label>
+                                <p class="invalid" id="categoryError"></p>
+                            </div>
+                        </div>
+                        <!-- Manufacturer -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="manufacturerID">
+                                    <option value="-1" selected>Select Manufacturer</option>
+                                    @foreach (var manufact in Model.Manufacturers)
+                                    {
+                                            <option value="@manufact.ID">@manufact.Name</option>
+                                    }
+                                </select>
+                                <label for="manufacturerID">Manufacturer</label>
+                                <p class="invalid" id="manufacturerIdError"></p>
+                            </div>
+                        </div>
+                        <!-- Cost Price -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="costPrice" placeholder="Cost Price">
+                                <label for="costPrice">Cost Price</label>
+                                <p class="invalid" id="costPriceError"></p>
+                            </div>
+                        </div>
+                        <!-- Sale Price -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="salePrice" placeholder="Sale Price">
+                                <label for="salePrice">Sale Price</label>
+                                <p class="invalid" id="salePriceError"></p>
+                            </div>
+                        </div>
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <textarea class="form-control" id="description" rows="3" placeholder="Enter Product Description here..."></textarea>
+                                <label for="description">Product Description</label>
+                            </div>
+                        </div>
+                        <!-- Image -->
+                        <div class="mb-3">
+                            <div class="form-floating mt-2">
+                                <input class="form-control" type="text" id="img" placeholder="Image">
+                                <label for="img"> Image </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- View Product Modal -->
+<div class="modal fade" id="ViewProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="ViewProduct">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-eye"></i> View Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <!-- Product Image -->
+                            <div class="col-md-4">
+                                <img id="vImage" class="img-fluid rounded-start" alt="Product">
+                            </div>
+                            <!-- Product Name and Description -->
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title"><b id="vProductName"></b></h5>
+                                    <p class="card-text" id="vDescription"></p>
+                                </div>
+                                <!-- Other Items -->
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><p>Category: <b id="vProductCategory"></b></p></li>
+                                    <li class="list-group-item"><p>Manufacturer: <b id="vManufacturer"></b></p></li>
+                                    <li class="list-group-item"><p>Cost Price: <b id="vCostPrice"></b></p></li>
+                                    <li class="list-group-item"><p>Sale Price: <b id="vSalePrice"></b></p></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="DeleteProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="DeleteProduct">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Delete Products</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="deleteId" asp-for="DeleteID" />
+                    <p>Are you sure you want to delete this product?</p>
+                    <p>Product Name: <b id="deleteTitle"></b></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Section -->
 @section Scripts {
+        <!-- Deletion -->
+        <script>
+            function deleteProduct(id, productName) {
+                document.getElementById("deleteId").value = id;
+                document.getElementById("deleteTitle").textContent = productName;
+            }
+        </script>
+
+        <!-- View Product -->
+        <script>
+            function ViewProduct(img, name, category, manufacturer, cost, sale, descr) {
+                document.getElementById("vImage").src = img;
+                document.getElementById("vProductName").textContent = name;
+                document.getElementById("vProductCategory").textContent = category;
+                document.getElementById("vManufacturer").textContent = manufacturer;
+                document.getElementById("vCostPrice").textContent = cost;
+                document.getElementById("vSalePrice").textContent = sale;
+                document.getElementById("vDescription").textContent = descr;
+            }
+        </script>
+
+        <!-- Table Settings -->
         <script>
             $(document).ready(function () {
-                // Initialize DataTable
-                $("#productsTable").DataTable({
-                    paging: true, // Enable pagination
-                    lengthChange: false, // Disable number of records per page dropdown
-                    searching: false, // Enable search box
-                    ordering: false, // Enable column sorting
-                    info: true, // Show table information (e.g., "Showing 1 to 10 of 20 entries")
-                    autoWidth: false, // Disable auto-width calculation
-
-                    // Language settings
+                var table = $("#productsTable").DataTable({
+                    paging: true,
+                    lengthChange: false,
+                    searching: true,
+                    ordering: false,
+                    info: true,
+                    autoWidth: false,
                     language: {
                         emptyTable: "No data available",
                         info: "Showing _START_ to _END_ of _TOTAL_ entries",
                         infoEmpty: "Showing 0 to 0 of 0 entries",
                         infoFiltered: "(filtered from _MAX_ total entries)",
                         zeroRecords: "No matching records found",
-                        search: "Search:",
-                    },
+                        search: "Search:"
+                    }
+                });
+
+                // Add event listener for your custom search bar
+                $('#searchBar input').on('input', function () {
+                    var searchText = this.value.trim();
+                    table.search(searchText).draw();
                 });
             });
         </script>
