@@ -78,8 +78,17 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 Person.Status = 8;
                 Employee.ID = Person.ID;
-                await EmployeeController.AddEmployee(Person,Employee);
-                TempData["Success"] = "Employee added successfully";
+                if (await PersonController.GetPersonId(Person) == -1)
+                {
+                    await EmployeeController.AddEmployee(Person, Employee);
+                    TempData["Success"] = "Employee added successfully";
+                }
+                else
+                {
+
+                    TempData["ErrorOnServer"] = "Employee already exists";
+                    return RedirectToPage("/Manager/Employees");
+                }
 
             }
             catch (Exception ex)
