@@ -75,12 +75,12 @@
                                     <td>@prod.ProductName</td>
                                     <td>@category</td>
                                     <td>@item.SalePrice.ToString()</td>
-                                    <td>@prod.productDescription</td>
+                                    <td>@prod.ProductDescription</td>
                                     <td>In-Stock</td> <!-- This part need to be modified -->
                                     <td>
-                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.productName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.productDescription')"> <i class="bi bi-eye"></i> </a>
+                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.ProductName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.ProductDescription')"> <i class="bi bi-eye"></i> </a>
                                         <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" > <i class="bi bi-pencil"></i> </a>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.productName')"> <i class="bi bi-trash"></i> </a>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.ProductName')"> <i class="bi bi-trash"></i> </a>
                                     </td>
                                 </tr>
                     }
