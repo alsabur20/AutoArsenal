@@ -14,7 +14,7 @@ namespace AutoArsenal_App.Controllers
             Configuration = configuration;
         }
 
-        public async static Task<List<ProductCategory>> GetProductCategory()
+        public async static Task<List<ProductCategory>> GetProductCategories()
         {
             List<ProductCategory> products = new List<ProductCategory>();
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
@@ -37,7 +37,7 @@ namespace AutoArsenal_App.Controllers
                                     InventoryId = reader.GetInt32(reader.GetOrdinal("InventoryId")),
                                     UnitPrice = reader.GetDouble(reader.GetOrdinal("UnitPrice")),
                                     SalePrice = reader.GetDouble(reader.GetOrdinal("SalePrice")),
-                                    ImagePath = reader.GetString(reader.GetOrdinal("Image")),
+                                    ImagePath = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
                                     Category = reader.GetInt32(reader.GetOrdinal("Category")),
                                 };
                                 products.Add(item);

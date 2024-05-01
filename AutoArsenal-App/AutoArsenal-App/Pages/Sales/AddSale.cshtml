@@ -28,3 +28,336 @@
     </div>
 }
 <!-- End Error message -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        New Sale <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-secondary mx-1">Cancel</button>
+                        <form method="post" asp-page-handler="SaveSales">
+                            <input type="hidden" asp-for="Sales" id="sales" />
+                            <input type="hidden" asp-for="SaleDetails" id="saleDetails" />
+                            <button type="submit" class="btn btn-primary mx-1" onclick="saveSales()">Save</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-5">
+                            <!-- Product name -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="productName" aria-label="Default select example">
+                                    <option value="-1" selected>Select Product</option>
+                                    @if (Model.Products != null)
+                                    {
+                                        foreach (var product in Model.Products)
+                                        {
+                                            <option value="@product.ID">
+                                                @product.ProductName
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <label for="productName">Product Name</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <!-- Customer Name -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="customerName" aria-label="Default select example" onchange="loadContact()">
+                                    <option value="-1" selected>Select Customer</option>
+                                    @if (Model.Customers != null && Model.Persons != null)
+                                    {
+                                        foreach (Models.Customer customer in Model.Customers)
+                                        {
+                                            Models.Person person = Model.Persons.Find(p => p.ID == customer.ID);
+                                            <option value="@customer.ID">
+                                                @(person.FirstName + " " + person.LastName)
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                                <label for="customerName">Customer Name</label>
+                            </div>
+                        </div>
+                        <div class="col-1 text-end d-flex align-items-center"
+                             style="height: 100%">
+                            <!-- Add Customer Button -->
+                            <a class="btn btn-lg btn-primary">
+                                <i class="bi bi-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <!-- Product Category -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="productCategory" aria-label="Default select example">
+                                    <option value="-1" selected>Select Product Category</option>
+                                    @if (Model.ProductCategories != null)
+                                    {
+                                        foreach (var lookup in Model.Lookups)
+                                        {
+                                            if (lookup.Category == "Product_Category")
+                                            {
+                                                <option value="@lookup.ID">
+                                                    @lookup.Value
+                                                </option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                                <label for="productCategory">Product Category</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <input class="form-control"
+                                       id="customerContact"
+                                       disabled />
+                                <label for="customerContact">Customer Contact</label>
+                            </div>
+                        </div>
+                        <div class="col-1 text-end d-flex align-items-center"
+                             style="height: 100%"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <!-- Product Quantity -->
+                            <div class="form-floating mt-2">
+                                <input type="number"
+                                       class="form-control"
+                                       id="productQuantity"
+                                       placeholder="Product Quantity"
+                                       value="0"
+                                       min="1"
+                                       oninput="validity.valid||(value='');" />
+                                <label for="productQuantity">Product Quantity</label>
+                            </div>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-1 text-end d-flex align-items-center"
+                             style="height: 100%"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <!-- Total Amount -->
+                            <div class="form-floating mt-2">
+                                <input type="number"
+                                       class="form-control"
+                                       id="totalAmount"
+                                       placeholder="Total Amount"
+                                       value="0.00"
+                                       min="1"
+                                       oninput="validity.valid||(value='');"
+                                       disabled />
+                                <label for="totalAmount">Total Amount</label>
+                            </div>
+                        </div>
+                        <div class="col-6"></div>
+                        <div class="col-1 text-end d-flex align-items-center"
+                             style="height: 100%">
+                            <!-- Add Product Button -->
+                            <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="salesTable"
+                                       class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Product Name</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Unit Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <!-- Will be loaded later -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#salesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+    </script>
+    <script>
+        var persons = @Html.Raw(Json.Serialize(Model.Persons));
+        var customers = @Html.Raw(Json.Serialize(Model.Customers));
+        var products = @Html.Raw(Json.Serialize(Model.Products));
+        var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+        var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+        var saleDetailsList = null;
+
+
+        // Load Customer Contact
+        function loadContact() {
+            var customerID = document.getElementById("customerName").value;
+            var person = persons.find(p => p.id == customerID);
+            var customerContact = document.getElementById("customerContact");
+            if (customerID != -1 && person) {
+                customerContact.value = person.contact;
+            } else {
+                customerContact.value = "Select A Customer";
+            }
+        }
+
+        //add Product to a list and to the datatable also
+        function addProduct() {
+            var customerId = document.getElementById("customerName").value;
+            var productId = document.getElementById("productName").value;
+            var productCategoryId = document.getElementById("productCategory").value;
+            var productQuantity = parseInt(document.getElementById("productQuantity").value);
+            var totalAmountElement = document.getElementById("totalAmount");
+
+            var table = $('#salesTable').DataTable();
+
+            // find product and product category from the original list
+            var product = products.find(p => p.id == productId);
+            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+
+            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1") {
+                var message = "Please select a product, category, customer and enter a valid quantity."
+                alert(message);
+                return;
+            }
+
+            if (saleDetailsList == null) {
+                saleDetailsList = [];
+            }
+            var categoryType = lookups.find(l => l.id == productCategoryId).value;
+            //add in the datatable and list and also handle existing ones
+            var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
+            console.log(existingProductIndex);
+            if (existingProductIndex !== -1) {
+                // Update the quantity of existing product
+                saleDetailsList[existingProductIndex].quantity += productQuantity;
+                var row = table.row(existingProductIndex).data([
+                    existingProductIndex + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    saleDetailsList[existingProductIndex].quantity,
+                    (category.salePrice * saleDetailsList[existingProductIndex].quantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            } else {
+                // Add the product to the list and table
+                saleDetailsList.push({
+                    saleId: -1,
+                    productCategoryId: category.id,
+                    quantity: productQuantity
+                });
+                var row = table.row.add([
+                    table.rows().count() + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    productQuantity,
+                    (category.salePrice * productQuantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            }
+
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.productId == productId && pc.category == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            totalAmountElement.value = totalAmount.toFixed(2);
+            console.log(saleDetailsList)
+        }
+
+        // Remove Product from the list and datatable
+        function removeProduct(element) {
+            var table = $('#salesTable').DataTable();
+            var row = table.row($(element).parents('tr'));
+            var rowIndex = row.index();
+            var rowData = row.data();
+
+            // Remove the corresponding item from the saleDetailsList
+            saleDetailsList.splice(rowIndex, 1);
+
+            // Redraw the table
+            table.row(rowIndex).remove().draw();
+
+            // Update the row numbers in the table
+            table.rows().every(function (index) {
+                var rowData = this.data();
+                rowData[0] = index + 1;
+                this.data(rowData).draw(false);
+            });
+
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.category == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            var totalAmountElement = document.getElementById("totalAmount");
+            totalAmountElement.value = totalAmount.toFixed(2);
+            console.log(saleDetailsList)
+        }
+
+
+        // Save Sales
+        function saveSales() {
+            //handle if list is empty
+            if (saleDetailsList == null || saleDetailsList.length == 0) {
+                alert("Please add a product to the sale.");
+                return;
+            }
+            var customer = document.getElementById("customerName").value;
+            var temp = {
+                id: -1,
+                employeeId: -1,
+                customerID: customer,
+                dateOfSale: new Date().toISOString().split('T')[0],
+                paymentId: -1
+            };
+            var sales = JSON.stringify(temp);
+            var saleDetails = JSON.stringify(saleDetailsList);
+            console.log(sales, saleDetails)
+            document.getElementById("sales").value = sales;
+            document.getElementById("saleDetails").value = saleDetails;
+        }
+    </script>
+}

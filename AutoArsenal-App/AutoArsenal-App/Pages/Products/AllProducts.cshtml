@@ -86,10 +86,10 @@
                         string category = Model.Lookups.Find(l => l.ID == item.Category).Value;
                                 <tr>
                                     <td>@(count++)</td>
-                                    <td>@prod.productName</td>
+                                    <td>@prod.ProductName</td>
                                     <td>@category</td>
                                     <td>@item.SalePrice.ToString()</td>
-                                    <td>@prod.productDescription</td>
+                                    <td>@prod.ProductDescription</td>
                                     <td>
                                         <button class="btn btn-sm btn-primary">
                                             <i class="bi bi-pencil"></i>

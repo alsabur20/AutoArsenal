@@ -31,8 +31,8 @@ namespace AutoArsenal_App.Controllers
                                 Product item = new Product
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    productName = reader.GetString(reader.GetOrdinal("Name")),
-                                    productDescription = reader.GetString(reader.GetOrdinal("Description")),
+                                    ProductName = reader.GetString(reader.GetOrdinal("Name")),
+                                    ProductDescription = reader.GetString(reader.GetOrdinal("Description")),
                                 };
                                 products.Add(item);
                             }

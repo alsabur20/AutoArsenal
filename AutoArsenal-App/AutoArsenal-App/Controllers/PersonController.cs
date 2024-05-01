@@ -97,7 +97,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT Id FROM Person WHERE FirstName = @FirstName AND LastName = @LastName AND Contact = @Contact AND Gender = @Gender AND Status = @Status";
+                    string query = "SELECT Id FROM Person WHERE FirstName = @FirstName AND LastName = @LastName AND Contact = @Contact AND Gender = @Gender AND Status = @Status AND StreetAddress = @StreetAddress AND Country = @Country AND City = @City AND Province = @Province";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@FirstName", person.FirstName);
@@ -105,6 +105,10 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@Contact", person.Contact);
                         command.Parameters.AddWithValue("@Gender", person.Gender);
                         command.Parameters.AddWithValue("@Status", 8);
+                        command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", person.Country);
+                        command.Parameters.AddWithValue("@City", person.City);
+                        command.Parameters.AddWithValue("@Province", person.Province);
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             if (reader.Read())

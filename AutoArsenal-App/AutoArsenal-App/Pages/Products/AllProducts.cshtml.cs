@@ -22,7 +22,7 @@ namespace AutoArsenal_App.Pages.Products
             {
                 Lookups = await LookupController.GetLookup();
                 Products = await ProductController.GetProducts();
-                ProductCategories = await ProductCategoryController.GetProductCategory();
+                ProductCategories = await ProductCategoryController.GetProductCategories();
                 Inventories = await InventoryController.GetInventory();
                 Manufacturers = await ManufacturerController.GetManufacturers();
 

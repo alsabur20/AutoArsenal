@@ -62,12 +62,11 @@
                                 <td>@sale.ID</td>
                                 <td>@(employee.FirstName + " " + employee.LastName)</td>
                                 <td>@(customer.FirstName + " " + customer.LastName)</td>
-                                <td>@sale.DateOfSale.ToString("yyyy-MM-dd")</td> <!-- Assuming DateOfSale is of DateTime type -->
+                                <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
                                 <td>@(sale.PaymentID == -1 ? "N/A" : sale.PaymentID)</td>
                                 <td>
                                     <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                    <a asp-page="./Edit" asp-route-id="@sale.ID" class="btn btn-sm btn-success"><i class="bi bi-pencil"></i></a>
-                                    <a asp-page="./Delete" asp-route-id="@sale.ID" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                                    <a class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
                                     <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
                                 </td>
                             </tr>

@@ -52,5 +52,79 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        // Add sale
+        public async static Task<int> AddSaleAndGetId(Sale sale)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Sale (EmployeeId, CustomerId, DateOfSale, PaymentID) OUTPUT INSERTED.Id VALUES (@EmployeeId, @CustomerId, @DateOfSale, @PaymentID)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@EmployeeId", (object)sale.EmployeeID ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@CustomerId", sale.CustomerID);
+                        command.Parameters.AddWithValue("@DateOfSale", sale.DateOfSale);
+                        command.Parameters.AddWithValue("@PaymentID", (object)sale.PaymentID ?? DBNull.Value);
+
+                        // Execute the command and get the inserted ID
+                        int saleId = (int)await command.ExecuteScalarAsync();
+                        return saleId;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        // Get sale by ID
+        public async static Task<Sale> GetSale(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT * FROM Sale WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                Sale item = new Sale
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
+                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID"))
+                                };
+                                return await Task.FromResult(item);
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
