@@ -294,26 +294,34 @@
             // Check if Description is empty
             if (editProductDescription.value.trim() === "") {
                 isValid = false;
-                console.log(isValid)
                 document.getElementById("editProductDescriptionError").textContent = "Description is required.";
+                document.getElementById("editProductDescriptionError").style = 'display: block; font-size: 12px; color: red; ';
+                editProductDescription.classList.add("is-invalid");
             } else {
                 document.getElementById("editProductDescriptionError").textContent = "";
+                editProductDescription.classList.remove("is-invalid");
             }
 
             // Check if Sale Price is empty
             if (editSalePrice.value.trim() === "") {
                 isValid = false;
                 document.getElementById("editSalePriceError").textContent = "Sale Price is required.";
+                document.getElementById("editSalePriceError").style = 'display: block; font-size: 12px; color: red; ';
+                editSalePrice.classList.add("is-invalid");
             } else {
                 document.getElementById("editSalePriceError").textContent = "";
+                editSalePrice.classList.remove("is-invalid");
             }
 
             // Check if Manufacturer is selected
             if (editManufacturerID.value.trim() === "-1") {
                 isValid = false;
                 document.getElementById("editManufacturerIdError").textContent = "Manufacturer is required.";
+                document.getElementById("editManufacturerIdError").style = 'display: block; font-size: 12px; color: red; ';
+                editManufacturerID.classList.add("is-invalid");
             } else {
                 document.getElementById("editManufacturerIdError").textContent = "";
+                editManufacturerID.classList.remove("is-invalid");
             }
 
             return isValid;
