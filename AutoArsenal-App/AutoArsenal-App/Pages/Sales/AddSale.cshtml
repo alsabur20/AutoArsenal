@@ -165,7 +165,7 @@
                             <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
                         </div>
                     </div>
-                    <div class="row mt-4">
+                    <div class="row">
                         <div class="col">
                             <div class="table-responsive">
                                 <table id="salesTable"
@@ -304,7 +304,7 @@
                 return total + item.quantity * category.salePrice;
             }, 0);
             totalAmountElement.value = totalAmount.toFixed(2);
-            console.log(saleDetailsList)
+            console.log(totalAmount)
         }
 
         // Remove Product from the list and datatable
@@ -334,7 +334,6 @@
             }, 0);
             var totalAmountElement = document.getElementById("totalAmount");
             totalAmountElement.value = totalAmount.toFixed(2);
-            console.log(saleDetailsList)
         }
 
 
@@ -351,7 +350,8 @@
                 employeeId: -1,
                 customerID: customer,
                 dateOfSale: new Date().toISOString().split('T')[0],
-                paymentId: -1
+                paymentId: -1,
+                isDeleted: false
             };
             var sales = JSON.stringify(temp);
             var saleDetails = JSON.stringify(saleDetailsList);

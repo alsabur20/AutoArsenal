@@ -8,6 +8,7 @@ namespace AutoArsenal_App.Pages.Sales
     public class SalesModel : PageModel
     {
         [BindProperty]
+        public int DeleteId { get; set; }
         public List<Sale> Sales { get; set; }
         [BindProperty]
         public List<Person> Persons { get; set; }
@@ -21,6 +22,19 @@ namespace AutoArsenal_App.Pages.Sales
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
+            }
+        }
+        public async Task<IActionResult> OnPostDeleteSale()
+        {
+            try
+            {
+                await SaleController.DeleteSale(DeleteId);
+                return RedirectToPage("/Sales/Sales");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+                return RedirectToPage("/Sales/Sales");
             }
         }
     }
