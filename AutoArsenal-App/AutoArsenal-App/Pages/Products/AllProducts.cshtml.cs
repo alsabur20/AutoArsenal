@@ -10,6 +10,11 @@ namespace AutoArsenal_App.Pages.Products
 {
     public class ProductsModel : PageModel
     {
+        // for editing
+        [BindProperty]
+        public Product Product { get; set; }
+        [BindProperty]
+        public ProductCategory ProductCategory { get; set; }
         // for deleting
         [BindProperty]
         public int DeleteID { get; set; }
@@ -27,7 +32,7 @@ namespace AutoArsenal_App.Pages.Products
         [BindProperty]
         public List<Manufacturer> Manufacturers { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGet()
         {
             try
             {
@@ -42,32 +47,31 @@ namespace AutoArsenal_App.Pages.Products
             }
         }
 
-        public async Task<IActionResult> OnPostUpdateProductAsync(Product product)
+        public async Task<IActionResult> OnPostUpdateProduct(Product product)
         {
             try
             {
-                
-                return Page();
+                await ProductController.UpdateProduct(product);
+                await ProductCategoryController.UpdateProductCategory(ProductCategory);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return Page();
             }
+            return RedirectToPage("/Products/AllProducts");
         }
 
-        public async Task<IActionResult> OnPostDeleteProductAsync()
+        public async Task<IActionResult> OnPostDeleteProduct()
         {
             try
             {
-                
-                return Page();
+                await ProductCategoryController.DeleteProductCategory(DeleteID);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return Page();
             }
+            return RedirectToPage("/Products/AllProducts");
         }
 
 

@@ -63,7 +63,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "EXEC sp_AddWarehouse @Name, @StreetAddress, @Country, @City, @Province";
+                    string query = "EXEC sp_AddWarehouse @Name, @StreetAddress, @Country, @City, @Province, @Status";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Name", warehouse.Name);
@@ -71,6 +71,7 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@Country", warehouse.Country);
                         command.Parameters.AddWithValue("@City", warehouse.City);
                         command.Parameters.AddWithValue("@Province", warehouse.Province);
+                        command.Parameters.AddWithValue("@Status", warehouse.Status);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
