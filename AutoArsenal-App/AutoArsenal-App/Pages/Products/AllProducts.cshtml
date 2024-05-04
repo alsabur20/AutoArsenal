@@ -60,27 +60,39 @@
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    @if (Model.Products != null && Model.ProductCategories != null)
+                    @if (Model.Products != null && Model.ProductCategories != null && Model.Lookups != null && Model.Inventories != null)
                     {
                         int count = 1;
-                        @foreach (var item in Model.ProductCategories)
+                        @foreach (var productCategory in Model.ProductCategories)
                         {
-                            if (!item.IsDeleted)
+                            if (!productCategory.IsDeleted)
                             {
-                                Models.Product prod = Model.Products.Find(p => p.ID == item.ProductId);
-                                string category = Model.Lookups.Find(l => l.ID == item.Category).Value;
-                                string manu = Model.Manufacturers.Find(m => m.ID == item.ManufacturerId).Name;
+                                Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
+                                Models.Inventory inventory = Model.Inventories.Find(i => i.ID == productCategory.InventoryId);
+                                string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
+                                string manufacturer = Model.Manufacturers.Find(m => m.ID == productCategory.ManufacturerId).Name;
                                 <tr>
                                     <td>@(count++)</td>
-                                    <td>@prod.ProductName</td>
+                                    <td>@product.ProductName</td>
                                     <td>@category</td>
-                                    <td>@prod.ProductDescription</td>
-                                    <td>@item.SalePrice.ToString()</td>
-                                    <td>In-Stock</td> <!-- This part need to be modified -->
+                                    <td>@product.ProductDescription</td>
+                                    <td>@productCategory.SalePrice.ToString()</td>
+                                    @if (inventory.StockInShop <= 10 || inventory.StockInShop == null)
+                                    {
+                                        <td>Out of Stock</td>
+                                    }
+                                    else if (inventory.StockInShop > 10 && inventory.StockInShop <= 35)
+                                    {
+                                        <td>Low Stock</td>
+                                    }
+                                    else
+                                    {
+                                        <td>In Stock</td>
+                                    }
                                     <td>
-                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.Image','@prod.ProductName','@category', '@manu', '@item.SalePrice','@prod.ProductDescription')"> <i class="bi bi-eye"></i> </a>
-                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" onclick="updateProduct('@prod.ID', '@item.ID','@prod.ProductName','@prod.ProductDescription','@item.ManufacturerId','@item.Category','@item.SalePrice')"><i class="bi bi-pencil"></i> </a>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ID','@prod.ProductName')"> <i class="bi bi-trash"></i> </a>
+                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@productCategory.Image','@product.ProductName','@category', '@manufacturer', '@productCategory.SalePrice','@product.ProductDescription')"> <i class="bi bi-eye"></i> </a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" onclick="updateProduct('@product.ID', '@productCategory.ID','@product.ProductName','@product.ProductDescription','@productCategory.ManufacturerId','@productCategory.Category','@productCategory.SalePrice')"><i class="bi bi-pencil"></i> </a>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@productCategory.ID','@product.ProductName')"> <i class="bi bi-trash"></i> </a>
                                     </td>
                                 </tr>
                             }

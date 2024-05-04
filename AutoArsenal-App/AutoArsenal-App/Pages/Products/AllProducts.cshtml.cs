@@ -31,6 +31,8 @@ namespace AutoArsenal_App.Pages.Products
 
         [BindProperty]
         public List<Manufacturer> Manufacturers { get; set; }
+        [BindProperty]
+        public List<Inventory> Inventories { get; set; }
 
         public async Task OnGet()
         {
@@ -40,6 +42,7 @@ namespace AutoArsenal_App.Pages.Products
                 Products = await ProductController.GetProducts();
                 ProductCategories = await ProductCategoryController.GetProductCategories();
                 Manufacturers = await ManufacturerController.GetManufacturers();
+                Inventories = await InventoryController.GetInventory();
             }
             catch (Exception ex)
             {
