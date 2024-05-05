@@ -90,15 +90,15 @@
                                                     Models.ProductCategory productCategory = Model.ProductCategories.Find(p => p.ID == purchaseDetail.ProductCategoryID);
                                                     Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
                                                     string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
-                                                    string manu = Model.People.Find(m => m.ID == productCategory.ManufactureId).Name;
+                                                    string manu = Model.People.Find(m => m.ID == productCategory.ManufacturerId).Name;
                                                     <tr>
                                                         <td>@(count++)</td>
                                                         <td>@product.ProductName</td>
                                                         <td>@category</td>
                                                         <td>@manu</td>
-                                                        <td>@productCategory.UnitPrice</td>
+                                                        <td>@purchaseDetail.UnitPrice</td>
                                                         <td>@purchaseDetail.Quantity</td>
-                                                        <td>@(productCategory.UnitPrice * purchaseDetail.Quantity)</td>
+                                                        <td>@(purchaseDetail.UnitPrice * purchaseDetail.Quantity)</td>
                                                         <td>
                                                             <a class="btn btn-sm btn-success" data-bs-toggle="modal"
                                                                 data-bs-target="#addQuantityModal"
@@ -107,7 +107,7 @@
                                                             </a>
                                                         </td>
                                                     </tr>
-                                                    Model.Total += productCategory.UnitPrice * purchaseDetail.Quantity;
+                                                    Model.Total += purchaseDetail.UnitPrice * purchaseDetail.Quantity;
                                                 }
                                             }
                                         }
@@ -148,8 +148,7 @@
                                     <label for="purchaseID">Purchase Id</label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
+                        
                             <!-- Item Name -->
                             <div class="col-5">
                                 <div class="form-floating mt-2">
@@ -168,8 +167,7 @@
                                     <label for="orderedQuantity">Ordered Quantity</label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
+                        
                             <!-- received Quantity -->
                             <div class="col-5">
                                 <div class="form-floating mt-2">

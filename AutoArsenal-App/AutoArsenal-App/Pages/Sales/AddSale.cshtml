@@ -132,9 +132,14 @@
                                 <label for="productQuantity">Product Quantity</label>
                             </div>
                         </div>
-                        <div class="col-6"></div>
-                        <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
+                            <!-- Add Product Button -->
+                            <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
+                        </div>
                     </div>
+
+                    <hr />
+
                     <div class="row">
                         <div class="col-5">
                             <!-- Total Amount -->
@@ -143,11 +148,6 @@
                                     value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
                                 <label for="totalAmount">Total Amount</label>
                             </div>
-                        </div>
-                        <div class="col-6"></div>
-                        <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
-                            <!-- Add Product Button -->
-                            <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
                         </div>
                     </div>
                     <div class="row">
@@ -228,68 +228,55 @@
 
         //add Product to a list and to the datatable also
         function addProduct() {
-            var customerId = document.getElementById("customerName").value;
-            var productId = document.getElementById("productName").value;
-            var productCategoryId = document.getElementById("productCategory").value;
-            var productQuantity = parseInt(document.getElementById("productQuantity").value);
-            var totalAmountElement = document.getElementById("totalAmount");
+            var productName = document.getElementById("productName").value;
+            var productCategory = document.getElementById("productCategory").value;
+            var productQuantity = document.getElementById("productQuantity").value;
+            var totalAmount = document.getElementById("totalAmount").value;
 
-            var table = $('#salesTable').DataTable();
-
-            // find product and product category from the original list
-            var product = products.find(p => p.id == productId);
-            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
-
-            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1") {
-                var message = "Please select a product, category, customer and enter a valid quantity."
-                alert(message);
+            if (productName == -1) {
+                alert("Please select a product.");
                 return;
             }
+            if (productCategory == -1) {
+                alert("Please select a product category.");
+                return;
+            }
+            if (productQuantity == 0) {
+                alert("Please enter a valid quantity.");
+                return;
+            }
+
+            var product = products.find(p => p.id == productName);
+            var category = productCategories.find(pc => pc.id == productCategory);
+            var total = productQuantity * category.salePrice;
 
             if (saleDetailsList == null) {
                 saleDetailsList = [];
             }
-            var categoryType = lookups.find(l => l.id == productCategoryId).value;
-            //add in the datatable and list and also handle existing ones
-            var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
-            console.log(existingProductIndex);
-            if (existingProductIndex !== -1) {
-                // Update the quantity of existing product
-                saleDetailsList[existingProductIndex].quantity += productQuantity;
-                var row = table.row(existingProductIndex).data([
-                    existingProductIndex + 1,
-                    product.productName,
-                    categoryType,
-                    category.salePrice.toFixed(2),
-                    saleDetailsList[existingProductIndex].quantity,
-                    (category.salePrice * saleDetailsList[existingProductIndex].quantity).toFixed(2),
-                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
-                ]).draw(false).node();
-            } else {
-                // Add the product to the list and table
-                saleDetailsList.push({
-                    saleId: -1,
-                    productCategoryId: category.id,
-                    quantity: productQuantity
-                });
-                var row = table.row.add([
-                    table.rows().count() + 1,
-                    product.productName,
-                    categoryType,
-                    category.salePrice.toFixed(2),
-                    productQuantity,
-                    (category.salePrice * productQuantity).toFixed(2),
-                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
-                ]).draw(false).node();
-            }
+
+            saleDetailsList.push({
+                productCategoryId: productCategory,
+                quantity: productQuantity
+            });
+
+            var table = $('#salesTable').DataTable();
+            table.row.add([
+                table.rows().count() + 1,
+                product.productName,
+                category.category,
+                category.salePrice,
+                productQuantity,
+                total.toFixed(2),
+                '<a class="btn btn-danger" onclick="removeProduct(this)">Remove</a>'
+            ]).draw();
 
             // Recalculate total amount
             var totalAmount = saleDetailsList.reduce((total, item) => {
-                var category = productCategories.find(pc => pc.productId == productId && pc.category == item.productCategoryId);
+                var category = productCategories.find(pc => pc.category == item.productCategoryId);
                 return total + item.quantity * category.salePrice;
             }, 0);
+            var totalAmountElement = document.getElementById("totalAmount");
             totalAmountElement.value = totalAmount.toFixed(2);
-            console.log(totalAmount)
         }
 
         // Remove Product from the list and datatable
@@ -324,7 +311,6 @@
 
         // Going Back
         function goBack() {
-            // Using the history object to go back
             window.history.back();
         }
 

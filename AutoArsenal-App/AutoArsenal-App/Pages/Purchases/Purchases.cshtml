@@ -60,31 +60,31 @@
                         @foreach (var purchase in Model.Purchases)
                         {
                             Models.Person employee = Model.Persons.Find(p => p.ID == purchase.AddedBy);
-                            <tr>
-                                <td>@count</td>
-                                <td>@purchase.ID</td>
-                                <td>@(employee.FirstName + " " + employee.LastName)</td>
-                                <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                <td>@(purchase.PaymentID == -1 ? "N/A" : purchase.PaymentID)</td>
-                                <td>
-                                    <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
-                                        class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                    <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
-                                        onclick="addPayment('@purchase.PaymentID')"><i class="bi bi-wallet"></i></a>
-                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#returnPurchaseModal"
-                                        onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')"><i
-                                            class="bi bi-arrow-counterclockwise"></i></a>
-                                </td>
-                            </tr>
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@purchase.ID</td>
+                                        <td>@(employee.FirstName + " " + employee.LastName)</td>
+                                        <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                                        <td>@(purchase.PaymentID == -1 ? "N/A" : purchase.PaymentID)</td>
+                                        <td>
+                                            <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
+                                                class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                            <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+                                                onclick="addPayment('@purchase.PaymentID')"><i class="bi bi-wallet"></i></a>
+                                            <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#returnPurchaseModal"
+                                                onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')"><i
+                                                    class="bi bi-arrow-counterclockwise"></i></a>
+                                        </td>
+                                    </tr>
                             count++;
                         }
                     }
                     else
                     {
-                        <tr>
-                            <td colspan="7">No records found</td>
-                        </tr>
+                            <tr>
+                                <td colspan="7">No records found</td>
+                            </tr>
                     }
                 </tbody>
             </table>
@@ -191,7 +191,7 @@
                         <!-- Purchase Date -->
                         <div class="col-5">
                             <div class="form-floating mt-2">
-                                <input type="date" class="form-control" id="purchaseDate" placeholder="Purchase Date"
+                                <input type="datetime" class="form-control" id="purchaseDate" placeholder="Purchase Date"
                                     disabled />
                                 <label for="purchaseDate">Purchase Date</label>
                             </div>
@@ -218,55 +218,55 @@
 
 <!-- Java Script Section -->
 @section Scripts {
-    <script>
-        $(document).ready(function () {
-            var table = $('#PurchasesTable').DataTable({
-                paging: true,
-                lengthChange: false,
-                searching: true,
-                ordering: true,
-                info: true,
-                autoWidth: false,
-                language: {
-                    emptyTable: "No data available",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    zeroRecords: "No matching records found",
-                    search: "Search:",
-                }
+        <script>
+            $(document).ready(function () {
+                var table = $('#PurchasesTable').DataTable({
+                    paging: true,
+                    lengthChange: false,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    language: {
+                        emptyTable: "No data available",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)",
+                        zeroRecords: "No matching records found",
+                        search: "Search:",
+                    }
+                });
+
+                $('#searchBar input').on('input', function () {
+                    var searchText = this.value.trim();
+                    table.search(searchText).draw();
+                });
             });
 
-            $('#searchBar input').on('input', function () {
-                var searchText = this.value.trim();
-                table.search(searchText).draw();
-            });
-        });
+            function dateChange() {
+                var date = document.getElementById("purchaseSearchDate").value;
+                var table = $('#PurchasesTable').DataTable();
+                table.column(4).search(date).draw();
+            }
+        </script>
 
-        function dateChange() {
-            var date = document.getElementById("purchaseSearchDate").value;
-            var table = $('#PurchasesTable').DataTable();
-            table.column(4).search(date).draw();
-        }
-    </script>
+        <!-- Modal Settings -->
+        <script>
+            var payments = @Html.Raw(Json.Serialize(Model.Payments));
+            var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
 
-    <!-- Modal Settings -->
-    <script>
-        var payments = @Html.Raw(Json.Serialize(Model.Payments));
-        var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
+            // Add Payment
+            function addPayment(paymentID) {
+                document.getElementById("paymentID").value = paymentID;
 
-        // Add Payment
-        function addPayment(paymentID) {
-            document.getElementById("paymentID").value = paymentID;
+            }
 
-        }
+            // Return Purchase
+            function returnPurchase(purchaseID, date, paymentID) {
+                document.getElementById("purchaseID").value = purchaseID;
+                document.getElementById("purchaseDate").textContent = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+                document.getElementById("purchaseAmount").value = payments.find(p => p.ID == paymentID).TotalAmount;
+            }
 
-        // Return Purchase
-        function returnPurchase(purchaseID, date, paymentID) {
-            document.getElementById("purchaseID").value = purchaseID;
-            document.getElementById("purchaseDate").value = date;
-            document.getElementById("purchaseAmount").value = payments.find(p => p.ID == paymentID).TotalAmount;
-        }
-
-    </script>
+        </script>
 }
