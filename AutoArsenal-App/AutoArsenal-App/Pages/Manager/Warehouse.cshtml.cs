@@ -64,6 +64,7 @@ namespace AutoArsenal_App.Pages.Manager
         {
             try
             {
+                Warehouse.Status = 8;
                 await WarehouseController.AddWarehouse(Warehouse);
             }
             catch (Exception ex)

@@ -34,6 +34,8 @@
         </div>
     </div>
 </div>
+<!-- End Error message -->
+<!-- Table -->
 
 <!-- Table -->
 <div class="card">
@@ -58,21 +60,25 @@
                         int count = 1;
                         @foreach (Models.Sale sale in Model.Sales)
                         {
-                            Models.Person employee = Model.Persons.Find(p => p.ID == sale.EmployeeID);
-                            Models.Person customer = Model.Persons.Find(p => p.ID == sale.CustomerID);
-                            <tr>
-                                <td>@count</td>
-                                <td>@sale.ID</td>
-                                <td>@(employee.FirstName + " " + employee.LastName)</td>
-                                <td>@(customer.FirstName + " " + customer.LastName)</td>
-                                <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                <td>@(sale.PaymentID == -1 ? "N/A" : sale.PaymentID)</td>
-                                <td>
-                                    <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                    <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
-                                </td>
-                            </tr>
-                            count++;
+                            if (!sale.IsDeleted)
+                            {
+                                Models.Person employee = Model.Persons.Find(p => p.ID == sale.EmployeeID);
+                                Models.Person customer = Model.Persons.Find(p => p.ID == sale.CustomerID);
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@sale.ID</td>
+                                    <td>@(employee.FirstName + " " + employee.LastName)</td>
+                                    <td>@(customer.FirstName + " " + customer.LastName)</td>
+                                    <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                                    <td>@(sale.PaymentID == -1 ? "N/A" : sale.PaymentID)</td>
+                                    <td>
+                                        <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteSaleModal" onclick="deleteSale('@sale.ID','@(customer.FirstName + " " + customer.LastName)','@(employee.FirstName + " " + employee.LastName)')"><i class="bi bi-trash"></i></a>
+                                        <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                    </td>
+                                </tr>
+                                count++;
+                            }
                         }
                     }
                     else
@@ -86,9 +92,34 @@
         </div>
     </div>
 </div>
-
-
-<!-- Java Script Section -->
+<!-- End Table -->
+<!--Delete Confirmation Modal-->
+<div class="modal fade" id="deleteSaleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="DeleteSale">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Delete Sale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Hidden input to store id for deletion-->
+                    <input type="hidden" id="deleteId" asp-for="DeleteId" />
+                    <!-- Confirmation Message-->
+                    <p>Are you sure you want to delete this Sale?</p>
+                    <p>Sale Id: <b id="displayDeleteId"></b></p>
+                    <p>Customer: <b id="customerName"></b></p>
+                    <p>Employee: <b id="employeeName"></b></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--End Delete Confirmation Modal-->
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -119,6 +150,13 @@
             var date = document.getElementById("salesSearchDate").value;
             var table = $('#salesTable').DataTable();
             table.column(4).search(date).draw();
+        }
+
+        function deleteSale(id, customerName, employeeName) {
+            document.getElementById("deleteId").value = id;
+            document.getElementById("displayDeleteId").textContent = id;
+            document.getElementById("customerName").textContent = customerName;
+            document.getElementById("employeeName").textContent = employeeName;
         }
     </script>
 }

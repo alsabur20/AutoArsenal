@@ -10,8 +10,10 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item active" aria-current="page">
-                <a asp-page="../Index">Home /</a>
-                <a asp-page="~/Pages/Products/AllProducts"> Products</a>
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="/Products/AllProducts">Products</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
         </ol>
@@ -21,126 +23,158 @@
 <!-- Error message -->
 @if (TempData["ErrorOnServer"] != null)
 {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            Error: @TempData["ErrorOnServer"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 <!-- End Error message -->
-
 <!-- Add Product Form -->
-<form class="row g-3" id="AddProduct">
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        New Product <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-secondary mx-1">Discard</button>
+                        <form method="post" asp-page-handler="AddProduct" onsubmit="return validateAndSubmit()">
+                            <input type="hidden" id="Product" asp-for="Product" />
+                            <input type="hidden" id="ProductCategory" asp-for="ProductCategory" />
+                            <button type="submit" class="btn btn-primary mx-1">Save</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Product Name -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text"
+                                       class="form-control"
+                                       id="productName"
+                                       placeholder="Product Name">
+                                <label for="productName">Product Name</label>
+                                <p class="invalid" id="productNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-7"></div>
+                    </div>
+                    <div class="row">
+                        <!-- Description -->
+                        <div class="col-11 mb-3">
+                            <div class="form-floating mt-2">
+                                <textarea class="form-control"
+                                          id="description"
+                                          rows="3"
+                                          placeholder="Enter Product Description here..."></textarea>
+                                <label for="description">Product Description</label>
+                            </div>
+                        </div>
+                        <div class="col-1"></div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <!-- Category -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <select id="category" class="form-select">
+                                    <option value="-1" selected>Select category</option>
+                                    @foreach (var lookup in Model.Lookups)
+                                    {
+                                        if (lookup.Category == "Product_Category")
+                                        {
+                                            <option value="@lookup.ID">@lookup.Value</option>
+                                        }
+                                    }
+                                </select>
+                                <label for="category">Category</label>
+                                <p class="invalid" id="categoryError"></p>
+                            </div>
+                        </div>
+                        <!-- Manufacturers -->
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="manufacturerID">
+                                    <option value="-1" selected>Select Manufacturer</option>
+                                    @foreach (var manufact in Model.Manufacturers)
+                                    {
+                                        <option value="@manufact.ID">@manufact.Name</option>
+                                    }
+                                </select>
+                                <label for="manufacturerID">Manufacturer</label>
+                                <p class="invalid" id="manufacturerIdError"></p>
+                            </div>
+                        </div>
+                        <!-- Add Manufaturer Button -->
+                        <div class="col-1 text-end d-flex align-items-center"
+                             style="height: 100%">
+                            <a class="btn btn-lg btn-primary">
+                                <i class="bi bi-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5">
+                            <!-- Sale Price -->
+                            <div class="form-floating mt-2">
+                                <input type="number"
+                                       class="form-control"
+                                       id="salePrice"
+                                       placeholder="Sale Price"
+                                       value="0.00"
+                                       min="1.00"
+                                       oninput="validity.valid||(value='');" />
+                                <label for="salePrice">Sale Price</label>
+                                <p class="invalid" id="salePriceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <!-- Image -->
+                                <input type="file"
+                                       class="form-control"
+                                       id="img"
+                                       placeholder="Select Image"
+                                       accept="image/*" />
+                                <label for="img">Image</label>
+                                <p class="invalid" id="imageError"></p>
 
-    <!-- Product Name -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <input type="text" class="form-control" id="productName" placeholder="Product Name">
-            <label for="productName">Product Name</label>
-            <p class="invalid" id="productNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-lg btn-primary" onclick="addRow()">Add</button>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="addProductsTable"
+                                       class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Product</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Manufacturer</th>
+                                            <th scope="col">Sale Price</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <!-- Will be loaded later -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Manufacturers -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <select class="form-select" id="manufacturerID">
-                <option value="-1" selected>Select Manufacturer</option>
-                @foreach (var manufact in Model.Manufacturers)
-                {
-                        <option value="@manufact.Name">@manufact.Name</option>
-                }
-            </select>
-            <label for="manufacturerID">Manufacturer</label>
-            <p class="invalid" id="manufacturerIdError"></p>
-        </div>
-    </div>
-    <!-- Description -->
-    <div class="col-md-12">
-        <div class="form-floating mt-2">
-            <textarea class="form-control" id="description" rows="3" placeholder="Enter Product Description here..."></textarea>
-            <label for="description">Product Description</label>
-        </div>
-    </div>
-    <!-- Cost Price -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <input type="text" class="form-control" id="costPrice" placeholder="Cost Price">
-            <label for="costPrice">Cost Price</label>
-            <p class="invalid" id="costPriceError"></p>
-        </div>
-    </div>
-    <!-- Sale Price -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <input type="text" class="form-control" id="salePrice" placeholder="Sale Price">
-            <label for="salePrice">Sale Price</label>
-            <p class="invalid" id="salePriceError"></p>
-        </div>
-    </div>
-    <!-- Category -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <select id="category" class="form-select">
-                <option value="-1" selected>Select category</option>
-                @foreach (var lookup in Model.Lookups)
-                {
-                    if (lookup.Category == "Product_Category")
-                    {
-                                <option value="@lookup.Value">@lookup.Value</option>
-                    }
-                }
-            </select>
-            <label for="category">Category</label>
-            <p class="invalid" id="categoryError"></p>
-        </div>
-    </div>
-    <!-- Stock -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <input type="text" class="form-control" id="stock" placeholder="Stock">
-            <label for="stock">Stock</label>
-            <p class="invalid" id="stockError"></p>
-        </div>
-    </div>
-    <!-- Image -->
-    <div class="col-md-6">
-        <div class="form-floating mt-2">
-            <input class="form-control" type="text" id="img" placeholder="Image">
-            <label for="img"> Image </label>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <button type="button" class="btn btn-primary" onclick="PopulateData()">Add</button>
-    </div>
-</form>
-
-<!-- Showing the added products Table -->
-<div class="card mt-4">
-    <div class="card-body d-flex justify-content-between align-items-center">
-        <h5 class="card-title">Products</h5>
-        <button type="button" class="btn btn-primary" onclick="sendDataToServer()">Save</button>
-    </div>
-    <!-- Table with stripped rows -->
-    <table id="addProductsTable" class="table table-striped datatable">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Product</th>
-                <th scope="col">Category</th>
-                <th scope="col">Manufacturer</th>
-                <th scope="col">Cost Price</th>
-                <th scope="col">Sale Price</th>
-                <th scope="col">Stock</th>
-                <th scope="col">Description</th>
-                <th scope="col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-
-        </tbody>
-    </table>
-    <!-- End Table with stripped rows -->
-</div>
+</section>
 
 <!-- View Product Modal -->
 <div class="modal fade" id="ViewProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -157,11 +191,11 @@
                     <div class="card mb-3">
                         <div class="row g-0">
                             <!-- Product Image -->
-                            <div class="col-md-4">
+                            <div class="col-4">
                                 <img id="vImage" class="img-fluid rounded-start" alt="Product">
                             </div>
                             <!-- Product Name and Description -->
-                            <div class="col-md-8">
+                            <div class="col-8">
                                 <div class="card-body">
                                     <h5 class="card-title"><b id="vProductName"></b></h5>
                                     <p class="card-text" id="vDescription"></p>
@@ -174,150 +208,216 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
-        <script>
-            function ViewProduct(img, name, descr) {
-                document.getElementById("vImage").src = img;
-                document.getElementById("vProductName").textContent = name;
-                document.getElementById("vDescription").textContent = descr;
-            }
-        </script>
+    <script>
+        // Document ready function to initialize DataTable
+        $(document).ready(function () {
+            var table = $('#addProductsTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+        });
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var form = document.querySelector("#AddProduct");
-                form.addEventListener("input", function () {
-                    CheckingInput();
-                });
+        // Function to display product details in a modal
+        function ViewProduct(img, name, descr) {
+            document.getElementById("vImage").src = img;
+            document.getElementById("vProductName").textContent = name;
+            document.getElementById("vDescription").textContent = descr;
+        }
+
+        // Function to check input fields for validation
+        function validateInput() {
+            var productName = document.querySelector("#productName");
+            var manufacturerID = document.querySelector("#manufacturerID");
+            var salePrice = document.querySelector("#salePrice");
+            var category = document.querySelector("#category");
+
+            var errors = false;
+
+            if (productName.value.trim() === "") {
+                showError(productName, "#productNameError", "Product Name is required");
+                errors = true;
+            } else {
+                hideError(productName, "#productNameError");
+            }
+
+            if (manufacturerID.value == -1) {
+                showError(manufacturerID, "#manufacturerIdError", "Manufacturer ID is required");
+                errors = true;
+            } else {
+                hideError(manufacturerID, "#manufacturerIdError");
+            }
+
+            if (salePrice.value.trim() === "") {
+                showError(salePrice, "#salePriceError", "Sale Price is required");
+                errors = true;
+            } else {
+                hideError(salePrice, "#salePriceError");
+            }
+
+            if (category.value == -1) {
+                showError(category, "#categoryError", "Category is required");
+                errors = true;
+            } else {
+                hideError(category, "#categoryError");
+            }
+
+            return errors;
+        }
+
+        // Function to display error message for input field
+        function showError(inputField, errorFieldSelector, errorMessage) {
+            var errorField = document.querySelector(errorFieldSelector);
+            errorField.textContent = errorMessage;
+            errorField.style.display = 'block';
+            inputField.classList.add("is-invalid");
+        }
+
+        // Function to hide error message for input field
+        function hideError(inputField, errorFieldSelector) {
+            var errorField = document.querySelector(errorFieldSelector);
+            errorField.textContent = "";
+            errorField.style.display = 'none';
+            inputField.classList.remove("is-invalid");
+        }
+
+        // Variables to store lookup data and manufacturer data
+        var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+        var manufacturers = @Html.Raw(Json.Serialize(Model.Manufacturers));
+        var categorylist = null;
+
+        // Function to add a new row to the DataTable
+        function addRow() {
+            // Check input fields for validation
+            if (validateInput()) {
+                alert("All required fields must be filled.");
+                return;
+            }
+
+            //disable name and description fields
+            document.querySelector("#productName").disabled = true;
+            document.querySelector("#description").disabled = true;
+
+            // Get input values
+            var productName = document.querySelector("#productName").value;
+            var manufacturerID = document.querySelector("#manufacturerID").value;
+            var salePrice = document.querySelector("#salePrice").value;
+            var category = document.querySelector("#category").value;
+            var ImagePath = document.querySelector("#img").value;
+            var description = document.querySelector("#description").value;
+
+            // Initialize DataTable
+            var table = $('#addProductsTable').DataTable();
+
+            // Initialize categorylist array if null
+            if (categorylist === null) {
+                categorylist = [];
+            }
+
+            // Get category value and manufacturer name
+            var categoryValue = lookups.find(l => l.id == category).value;
+            var manufacturerName = manufacturers.find(m => m.id == manufacturerID).name;
+
+            // Check if product already exists in the list
+            var existingRowIndex = categorylist.findIndex(function (item) {
+                return item.category === category;
             });
 
-            function CheckingInput() {
-                var form = document.querySelector("#AddProduct");
-                var productName = form.querySelector("#productName");
-                var manufacturerID = form.querySelector("#manufacturerID");
-                var costPrice = form.querySelector("#costPrice");
-                var salePrice = form.querySelector("#salePrice");
-                var category = form.querySelector("#category");
-                var stock = form.querySelector("#stock");
-
-                var errors = false;
-
-                if (productName.value.trim() === "") {
-                    showError(productName, "#productNameError", "Product Name is required");
-                    errors = true;
-                } else {
-                    hideError(productName, "#productNameError");
-                }
-
-                if (manufacturerID.value == -1) {
-                    showError(manufacturerID, "#manufacturerIdError", "Manufacturer ID is required");
-                    errors = true;
-                } else {
-                    hideError(manufacturerID, "#manufacturerIdError");
-                }
-
-                if (costPrice.value.trim() === "") {
-                    showError(costPrice, "#costPriceError", "Cost Price is required");
-                    errors = true;
-                } else {
-                    hideError(costPrice, "#costPriceError");
-                }
-
-                if (salePrice.value.trim() === "") {
-                    showError(salePrice, "#salePriceError", "Sale Price is required");
-                    errors = true;
-                } else {
-                    hideError(salePrice, "#salePriceError");
-                }
-
-                if (category.value == -1) {
-                    showError(category, "#categoryError", "Category is required");
-                    errors = true;
-                } else {
-                    hideError(category, "#categoryError");
-                }
-
-                if (stock.value.trim() === "") {
-                    showError(stock, "#stockError", "Stock is required");
-                    errors = true;
-                } else {
-                    hideError(stock, "#stockError");
-                }
-
-                return errors;
-            }
-
-            function showError(inputField, errorFieldSelector, errorMessage) {
-                var errorField = document.querySelector(errorFieldSelector);
-                errorField.textContent = errorMessage;
-                errorField.style.display = 'block';
-                inputField.classList.add("is-invalid");
-            }
-
-            function hideError(inputField, errorFieldSelector) {
-                var errorField = document.querySelector(errorFieldSelector);
-                errorField.textContent = "";
-                errorField.style.display = 'none';
-                inputField.classList.remove("is-invalid");
-            }
-
-            function PopulateData() {
-                var productName = document.querySelector("#productName").value;
-                var manufacturerID = document.querySelector("#manufacturerID").value;
-                var costPrice = document.querySelector("#costPrice").value;
-                var salePrice = document.querySelector("#salePrice").value;
-                var category = document.querySelector("#category").value;
-                var stock = document.querySelector("#stock").value;
-                var ImagePath = document.querySelector("#img").value;
-                var description = document.querySelector("#description").value;
-
-                var table = document.getElementById("addProductsTable");
-                var newRow = "<tr><td>" + (table.rows.length + 1) + "</td><td>" + productName + "</td><td>" + category + "</td><td>" + manufacturerID + "</td><td>" + costPrice + "</td><td>" + salePrice + "</td><td>" + stock + "</td><td>" + description + "</td><td><a class='btn btn-sm btn-primary' data-bs-toggle='modal' data-bs-target='#ViewProductModal' onclick='ViewProduct(\"" + ImagePath + "\", \"" + productName + "\", \"" + description + "\")'> <i class='bi bi-eye'></i> </a><a class='btn btn-sm btn-danger' data-bs-toggle='modal' data-bs-target='#DeleteProductModal' onclick='deleteRow(this)'> <i class='bi bi-trash'></i> </a></td></tr>";
-
-                var tableBody = document.querySelector("#addProductsTable tbody");
-                tableBody.innerHTML += newRow;
-
-                document.querySelector("#AddProduct").reset();
-            }
-
-
-            function deleteRow(btn) {
-                var row = btn.parentNode.parentNode;
-                row.parentNode.removeChild(row);
-            }
-        </script>
-
-        <script>
-            function sendDataToServer() {
-                var table = document.getElementById("addProductsTable"); 
-                var data = [];
-                for (var i = 1; i < table.rows.length; i++) {
-                    var row = table.rows[i];
-                    var rowData = {
-                        "Product": row.cells[1].innerText,
-                        "Category": row.cells[2].innerText,
-                        "Manufacturer": row.cells[3].innerText,
-                        "CostPrice": row.cells[4].innerText,
-                        "SalePrice": row.cells[5].innerText,
-                        "Stock": row.cells[6].innerText,
-                        "Description": row.cells[7].innerText
-                    };
-                    data.push(rowData);
-                }
-                var jsonData = JSON.stringify(data);
-                $.ajax({
-                    type: "POST",
-                    url: "asp-page-handler=OnPostAddProductInDB",
-                    contentType: "application/json",
-                    data: jsonData,
-                    success: function (response) {
-                        console.log("Data sent successfully");
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Failed to send data:", error);
-                    }
+            if (existingRowIndex !== -1) {
+                alert("Product already exists in the list");
+            } else {
+                // Add product to categorylist array
+                categorylist.push({
+                    id: -1,
+                    productId: -1,
+                    manufacturerId: parseInt(manufacturerID),
+                    inventoryId: -1,
+                    salePrice: parseFloat(salePrice),
+                    image: ImagePath,
+                    category: category,
+                    isDeleted: false
                 });
+
+                // Add new row to DataTable
+                var newRow = [
+                    table.rows().count() + 1,
+                    productName,
+                    categoryValue,
+                    manufacturerName,
+                    salePrice,
+                    '<button type="button" class="btn btn-sm btn-danger" onclick="deleteRow(this)"><i class="bi bi-trash"></i></button>'
+                ];
+                table.row.add(newRow).draw(false);
             }
-        </script>
+        }
+
+        // Function to delete a row from the DataTable
+        function deleteRow(button) {
+            var table = $('#addProductsTable').DataTable();
+            var row = table.row($(button).parents('tr'));
+            var rowData = row.data();
+
+            // Find the index of the row in the DataTable
+            var rowIndex = row.index();
+
+            // Remove the row from the DataTable
+            row.remove().draw();
+
+            // Find the corresponding item in the categorylist array
+            var categoryIndex = categorylist.findIndex(function (item) {
+                var categoryValue = lookups.find(l => l.id == item.category).value;
+                return categoryValue === rowData[2];
+            });
+
+            // Remove the item from the categorylist array
+            if (categoryIndex !== -1) {
+                categorylist.splice(categoryIndex, 1);
+            }
+        }
+
+        // Function to add product details to hidden fields before form submission
+        function addProduct() {
+            var product = {
+                id: -1,
+                productName: document.querySelector("#productName").value,
+                productDescription: document.querySelector("#description").value
+            }
+            var sProduct = JSON.stringify(product);
+            var sCategory = JSON.stringify(categorylist);
+
+            document.querySelector("#Product").value = sProduct;
+            document.querySelector("#ProductCategory").value = sCategory;
+        }
+        function validateAndSubmit() {
+            // Check if categorylist count is greater than 0
+            if (categorylist && categorylist.length > 0) {
+                // If categorylist count is greater than 0, validate input fields
+                if (validateInput()) {
+                    alert("All required fields must be filled.");
+                    return false; // Prevent form submission
+                } else {
+                    // If input fields are valid, add product details to hidden fields
+                    addProduct();
+                    return true; // Allow form submission
+                }
+            } else {
+                // If categorylist count is not greater than 0, show an alert
+                alert("Please add at least one product.");
+                return false; // Prevent form submission
+            }
+        }
+    </script>
+
 }

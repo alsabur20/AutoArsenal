@@ -12,8 +12,11 @@ namespace AutoArsenal_App.Pages.Products
         [BindProperty]
         public int DeleteID { get; set; }
 
-        
-        
+        [BindProperty]
+        public string Product { get; set; }
+        [BindProperty]
+        public string ProductCategory { get; set; }
+
         // Showing Data for Drop downs
         [BindProperty]
         public List<Inventory> Inventories { get; set; }
@@ -25,7 +28,7 @@ namespace AutoArsenal_App.Pages.Products
         public List<Lookup> Lookups { get; set; }
 
 
-        public async Task OnGetAsync()
+        public async void OnGet()
         {
             try
             {
@@ -38,20 +41,27 @@ namespace AutoArsenal_App.Pages.Products
                 TempData["ErrorOnServer"] = ex.Message;
             }
         }
-
-
-
         // Add product in DB
-        public async Task<IActionResult> OnPostAddProductInDB()
+        public async Task<IActionResult> OnPostAddProduct()
         {
-            using (StreamReader reader = new StreamReader(Request.Body))
+            try
             {
-                string json = await reader.ReadToEndAsync();
-                string product = JsonConvert.DeserializeObject<string>(json);
+                Product product = JsonConvert.DeserializeObject<Product>(Product);
+                List<ProductCategory> productCategories = JsonConvert.DeserializeObject<List<ProductCategory>>(ProductCategory);
 
-                await Console.Out.WriteLineAsync(product);
+                int pId = await ProductController.AddProduct(product);
+                foreach (var pc in productCategories)
+                {
+                    Inventory inventory = new Inventory();
+                    pc.ProductId = pId;
+                    pc.InventoryId = await InventoryController.AddInventory(inventory);
+                    await ProductCategoryController.AddProductCategory(pc);
+                }
             }
-
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message + ex.StackTrace;
+            }
             return RedirectToPage("/Products/AllProducts");
         }
     }

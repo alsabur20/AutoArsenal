@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{id:int}"
 @model AutoArsenal_App.Pages.Sales.ReturnSaleModel
 @{
     ViewData["Title"] = "Return Sale";
@@ -28,3 +28,4 @@
     </div>
 }
 <!-- End Error message -->
+<h1>@Model.SaleId</h1>

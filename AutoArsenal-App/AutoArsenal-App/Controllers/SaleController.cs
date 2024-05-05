@@ -33,7 +33,8 @@ namespace AutoArsenal_App.Controllers
                                     EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                     CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                     DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
-                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID"))
+                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID")),
+                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
                                 };
                                 sales.Add(item);
                             }
@@ -60,13 +61,14 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Sale (EmployeeId, CustomerId, DateOfSale, PaymentID) OUTPUT INSERTED.Id VALUES (@EmployeeId, @CustomerId, @DateOfSale, @PaymentID)";
+                    string query = "INSERT INTO Sale (EmployeeId, CustomerId, DateOfSale, PaymentID, IsDeleted) OUTPUT INSERTED.Id VALUES (@EmployeeId, @CustomerId, @DateOfSale, @PaymentID, @IsDeleted)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@EmployeeId", (object)sale.EmployeeID ?? DBNull.Value);
                         command.Parameters.AddWithValue("@CustomerId", sale.CustomerID);
                         command.Parameters.AddWithValue("@DateOfSale", sale.DateOfSale);
                         command.Parameters.AddWithValue("@PaymentID", (object)sale.PaymentID ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@IsDeleted", sale.IsDeleted);
 
                         // Execute the command and get the inserted ID
                         int saleId = (int)await command.ExecuteScalarAsync();
@@ -105,7 +107,8 @@ namespace AutoArsenal_App.Controllers
                                     EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                     CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                     DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
-                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID"))
+                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID")),
+                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
                                 };
                                 return await Task.FromResult(item);
                             }
@@ -114,6 +117,31 @@ namespace AutoArsenal_App.Controllers
                                 return null;
                             }
                         }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        // Delete sale
+        public async static Task DeleteSale(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "Update Sale SET IsDeleted = '1' WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        await command.ExecuteNonQueryAsync();
                     }
                 }
                 catch (Exception ex)

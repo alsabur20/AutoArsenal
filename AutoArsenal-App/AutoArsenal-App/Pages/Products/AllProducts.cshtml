@@ -46,52 +46,67 @@
     <div class="card-body">
         <h5 class="card-title">Products</h5>
 
-        <!-- Table with stripped rows -->
-        <table id="productsTable" class="table table-striped datatable">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Product</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Products != null && Model.ProductCategories != null)
-                {
-                    int count = 1;
-                    @foreach (var item in Model.ProductCategories)
+        <div class="table-responsive">
+            <table id="productsTable" class="table table-hover table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Sale Price</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @if (Model.Products != null && Model.ProductCategories != null && Model.Lookups != null && Model.Inventories != null)
                     {
-                        Models.Product prod = Model.Products.Find(p => p.ID == item.ProductId);
-                        string category = Model.Lookups.Find(l => l.ID == item.Category).Value;
-                        string manu = Model.Manufacturers.Find(m => m.ID == item.ManufactureId).Name;
+                        int count = 1;
+                        @foreach (var productCategory in Model.ProductCategories)
+                        {
+                            if (!productCategory.IsDeleted)
+                            {
+                                Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
+                                Models.Inventory inventory = Model.Inventories.Find(i => i.ID == productCategory.InventoryId);
+                                string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
+                                string manufacturer = Model.Manufacturers.Find(m => m.ID == productCategory.ManufacturerId).Name;
+                                <tr>
+                                    <td>@(count++)</td>
+                                    <td>@product.ProductName</td>
+                                    <td>@category</td>
+                                    <td>@product.ProductDescription</td>
+                                    <td>@productCategory.SalePrice.ToString()</td>
+                                    @if (inventory.StockInShop <= 10 || inventory.StockInShop == null)
+                                    {
+                                        <td>Out of Stock</td>
+                                    }
+                                    else if (inventory.StockInShop > 10 && inventory.StockInShop <= 35)
+                                    {
+                                        <td>Low Stock</td>
+                                    }
+                                    else
+                                    {
+                                        <td>In Stock</td>
+                                    }
+                                    <td>
+                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@productCategory.Image','@product.ProductName','@category', '@manufacturer', '@productCategory.SalePrice','@product.ProductDescription')"> <i class="bi bi-eye"></i> </a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal" onclick="updateProduct('@product.ID', '@productCategory.ID','@product.ProductName','@product.ProductDescription','@productCategory.ManufacturerId','@productCategory.Category','@productCategory.SalePrice')"><i class="bi bi-pencil"></i> </a>
+                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@productCategory.ID','@product.ProductName')"> <i class="bi bi-trash"></i> </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                            <td>@(count++)</td>
-                            <td>@prod.ProductName</td>
-                            <td>@category</td>
-                            <td>@item.SalePrice.ToString()</td>
-                            <td>@prod.ProductDescription</td>
-                            <td>In-Stock</td> <!-- This part need to be modified -->
-                            <td>
-                                <a class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ViewProductModal" onclick="ViewProduct('@item.ImagePath','@prod.ProductName','@category', '@manu','@item.UnitPrice', '@item.SalePrice','@prod.ProductDescription')"> <i class="bi bi-eye"></i> </a>
-                                <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#UpdateProductModal"> <i class="bi bi-pencil"></i> </a>
-                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteProductModal" onclick="deleteProduct('@item.ProductId','@prod.ProductName')"> <i class="bi bi-trash"></i> </a>
-                            </td>
+                            <td colspan="5">No records found</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="5">No records found</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <!-- End Table with stripped rows -->
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -100,7 +115,7 @@
 <div class="modal fade" id="UpdateProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="UpdateProduct">
+            <form method="post" asp-page-handler="UpdateProduct" onsubmit="return validateUpdateProductForm()">
                 <!-- Header -->
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i> Update Product</h5>
@@ -108,74 +123,105 @@
                 </div>
                 <!-- Body -->
                 <div class="modal-body">
-                    <form class="row g-3" id="UpdateProductForm">
+                    <input type="hidden" id="updateProductId" asp-for="Product.ID" />
+                    <input type="hidden" id="updateProductCategoryId" asp-for="ProductCategory.ID" />
+                    <input type="hidden" id="editProductName1" asp-for="Product.ProductName" />
+                    <input type="hidden" id="editCategory1" asp-for="ProductCategory.Category" />
+
+                    <div class="mb-3">
                         <!-- Product Name -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="productName" placeholder="Product Name">
-                                <label for="productName">Product Name</label>
-                                <p class="invalid" id="productNameError"></p>
-                            </div>
+                        <div class="form-floating mt-2">
+                            <input type="text"
+                                   class="form-control"
+                                   id="editProductName"
+                                   placeholder="Product Name"
+                                   disabled />
+                            <label for="editProductName">Product Name</label>
+                            <p class="invalid" id="editProductNameError"></p>
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <!-- Description -->
+                        <div class="form-floating mt-2">
+                            <textarea class="form-control"
+                                      id="editProductDescription"
+                                      rows="3"
+                                      placeholder="Enter Product Description here..."
+                                      asp-for="Product.ProductDescription">
+                                  </textarea>
+                            <label for="editProductDescription">Product Description</label>
+                            <p class="invalid" id="editProductDescriptionError"></p>
+
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <!-- Category -->
-                        <div class="mb-3">
+                        <div class="form-floating mt-2">
                             <div class="form-floating mt-2">
-                                <select id="category" class="form-select">
+                                <select class="form-select"
+                                        id="editCategory"
+                                        disabled>
                                     <option value="-1" selected>Select category</option>
-                                    @foreach (var lookup in Model.Lookups.Where(l => l.Category == "Product_Category"))
+                                    @if (Model.Lookups != null)
                                     {
-                                        <option value="@lookup.ID">@lookup.Value</option>
+                                        foreach (var lookup in Model.Lookups)
+                                        {
+                                            if (lookup.Category == "Product_Category")
+                                            {
+                                                <option value="@lookup.ID">@lookup.Value</option>
+                                            }
+                                        }
                                     }
                                 </select>
-                                <label for="category">Category</label>
+                                <label for="editCategory">Category</label>
                                 <p class="invalid" id="categoryError"></p>
                             </div>
                         </div>
+                    </div>
+                    <div class="mb-3">
                         <!-- Manufacturer -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <select class="form-select" id="manufacturerID">
-                                    <option value="-1" selected>Select Manufacturer</option>
-                                    @foreach (var manufact in Model.Manufacturers)
-                                    {
-                                        <option value="@manufact.ID">@manufact.Name</option>
-                                    }
-                                </select>
-                                <label for="manufacturerID">Manufacturer</label>
-                                <p class="invalid" id="manufacturerIdError"></p>
-                            </div>
+                        <div class="form-floating mt-2">
+                            <select class="form-select"
+                                    id="editManufacturerID"
+                                    asp-for="ProductCategory.ManufacturerId">
+                                <option value="-1" selected>Select Manufacturer</option>
+                                @foreach (var manufact in Model.Manufacturers)
+                                {
+                                    <option value="@manufact.ID">@manufact.Name</option>
+                                }
+                            </select>
+                            <label for="editManufacturerID">Manufacturer</label>
+                            <p class="invalid" id="editManufacturerIdError"></p>
                         </div>
-                        <!-- Cost Price -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="costPrice" placeholder="Cost Price">
-                                <label for="costPrice">Cost Price</label>
-                                <p class="invalid" id="costPriceError"></p>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="mb-3">
                         <!-- Sale Price -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="salePrice" placeholder="Sale Price">
-                                <label for="salePrice">Sale Price</label>
-                                <p class="invalid" id="salePriceError"></p>
-                            </div>
+                        <div class="form-floating mt-2">
+                            <input type="number"
+                                   class="form-control"
+                                   id="editSalePrice"
+                                   placeholder="Sale Price"
+                                   value="0.00"
+                                   min="1.00"
+                                   oninput="validity.valid||(value='');"
+                                   asp-for="ProductCategory.SalePrice" />
+                            <label for="editSalePrice">Sale Price</label>
+                            <p class="invalid" id="editSalePriceError"></p>
                         </div>
-                        <!-- Description -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <textarea class="form-control" id="description" rows="3" placeholder="Enter Product Description here..."></textarea>
-                                <label for="description">Product Description</label>
-                            </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-floating mt-2">
+                            <!-- Image -->
+                            <input type="file"
+                                   class="form-control"
+                                   id="img"
+                                   placeholder="Select Image"
+                                   accept="image/*"
+                                   asp-for="ProductCategory.Image" />
+                            <label for="img">Image</label>
+                            <p class="invalid" id="imageError"></p>
                         </div>
-                        <!-- Image -->
-                        <div class="mb-3">
-                            <div class="form-floating mt-2">
-                                <input class="form-control" type="text" id="img" placeholder="Image">
-                                <label for="img"> Image </label>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
                 <!-- Footer -->
                 <div class="modal-footer">
@@ -190,42 +236,38 @@
 <div class="modal fade" id="ViewProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="post" asp-page-handler="ViewProduct">
-                <!-- Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-eye"></i> View Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <!-- Body -->
-                <div class="modal-body">
-                    <div class="card mb-3">
-                        <div class="row g-0">
-                            <!-- Product Image -->
-                            <div class="col-md-4">
-                                <img id="vImage" class="img-fluid rounded-start" alt="Product">
-                            </div>
-                            <!-- Product Name and Description -->
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title"><b id="vProductName"></b></h5>
-                                    <p class="card-text" id="vDescription"></p>
-                                </div>
-                                <!-- Other Items -->
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item"><p>Category: <b id="vProductCategory"></b></p></li>
-                                    <li class="list-group-item"><p>Manufacturer: <b id="vManufacturer"></b></p></li>
-                                    <li class="list-group-item"><p>Cost Price: <b id="vCostPrice"></b></p></li>
-                                    <li class="list-group-item"><p>Sale Price: <b id="vSalePrice"></b></p></li>
-                                </ul>
-                            </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-eye"></i> View Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <!-- Body -->
+            <div class="modal-body">
+                <div class="row g-0">
+                    <!-- Product Image without Border -->
+                    <div class="col-md-4 d-flex align-items-center justify-content-center">
+                        <img src="~/images/titleIcon.png" id="vImage" class="rounded mx-auto d-block" alt="Product">
+                    </div>
+                    <div class="col-md-1">
+                        <div class="d-flex justify-content-around" style="height: 200px;">
+                            <div class="vr" style="color:black"></div>
                         </div>
                     </div>
+                    <!-- Product Name and Description -->
+                    <div class="col-md-5">
+                        <!-- Other Items -->
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item"><div style="font-size:28px;"><b id="vProductName"></b></div></li>
+                            <li class="list-group-item"><p>Description: <b id="vDescription"></b></p></li>
+                            <li class="list-group-item"><p>Category: <b id="vProductCategory"></b></p></li>
+                            <li class="list-group-item"><p>Manufacturer: <b id="vManufacturer"></b></p></li>
+                            <li class="list-group-item"><p>Sale Price: <b id="vSalePrice"></b></p></li>
+                        </ul>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
-
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="DeleteProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -251,22 +293,88 @@
 
 <!-- JavaScript Section -->
 @section Scripts {
-    <!-- Deletion -->
     <script>
+        // Validation for Update Product form
+        function validateUpdateProductForm() {
+            var editProductName = document.getElementById("editProductName");
+            var editProductDescription = document.getElementById("editProductDescription");
+            var editSalePrice = document.getElementById("editSalePrice");
+            var editManufacturerID = document.getElementById("editManufacturerID");
+
+            var isValid = true;
+
+            // Check if Description is empty
+            if (editProductDescription.value.trim() === "") {
+                isValid = false;
+                document.getElementById("editProductDescriptionError").textContent = "Description is required.";
+                document.getElementById("editProductDescriptionError").style = 'display: block; font-size: 12px; color: red; ';
+                editProductDescription.classList.add("is-invalid");
+            } else {
+                document.getElementById("editProductDescriptionError").textContent = "";
+                editProductDescription.classList.remove("is-invalid");
+            }
+
+            // Check if Sale Price is empty
+            if (editSalePrice.value.trim() === "") {
+                isValid = false;
+                document.getElementById("editSalePriceError").textContent = "Sale Price is required.";
+                document.getElementById("editSalePriceError").style = 'display: block; font-size: 12px; color: red; ';
+                editSalePrice.classList.add("is-invalid");
+            } else {
+                document.getElementById("editSalePriceError").textContent = "";
+                editSalePrice.classList.remove("is-invalid");
+            }
+
+            // Check if Manufacturer is selected
+            if (editManufacturerID.value.trim() === "-1") {
+                isValid = false;
+                document.getElementById("editManufacturerIdError").textContent = "Manufacturer is required.";
+                document.getElementById("editManufacturerIdError").style = 'display: block; font-size: 12px; color: red; ';
+                editManufacturerID.classList.add("is-invalid");
+            } else {
+                document.getElementById("editManufacturerIdError").textContent = "";
+                editManufacturerID.classList.remove("is-invalid");
+            }
+
+            return isValid;
+        }
+    </script>
+
+    <script>
+        // Editing
+        function updateProduct(productId, productCategoryId, productName, productDescription, manufacturer, category, salePrice) {
+            console.log(productId, productCategoryId, productName, productDescription, manufacturer, category, salePrice);
+            document.getElementById("updateProductId").value = productId;
+            document.getElementById("updateProductCategoryId").value = productCategoryId;
+            var editProductName = document.getElementById("editProductName");
+            var editProductName1 = document.getElementById("editProductName1");
+            var editProductDescription = document.getElementById("editProductDescription");
+            var editCategory = document.getElementById("editCategory");
+            var editCategory1 = document.getElementById("editCategory1");
+            var editManufacturerID = document.getElementById("editManufacturerID");
+            var editSalePrice = document.getElementById("editSalePrice");
+            var img = document.getElementById("img");
+
+            editProductName.value = productName;
+            editProductName1.value = productName;
+            editProductDescription.value = productDescription;
+            editCategory.value = category;
+            editCategory1.value = category;
+            editManufacturerID.value = manufacturer;
+            editSalePrice.value = salePrice;
+        }
+
+        // Deletion
         function deleteProduct(id, productName) {
             document.getElementById("deleteId").value = id;
             document.getElementById("deleteTitle").textContent = productName;
         }
-    </script>
-
-    <!-- View Product -->
-    <script>
-        function ViewProduct(img, name, category, manufacturer, cost, sale, descr) {
-            document.getElementById("vImage").src = img;
+        // View Product
+        function ViewProduct(img, name, category, manufacturer, sale, descr) {
+            // document.getElementById("vImage").src = img;
             document.getElementById("vProductName").textContent = name;
             document.getElementById("vProductCategory").textContent = category;
             document.getElementById("vManufacturer").textContent = manufacturer;
-            document.getElementById("vCostPrice").textContent = cost;
             document.getElementById("vSalePrice").textContent = sale;
             document.getElementById("vDescription").textContent = descr;
         }

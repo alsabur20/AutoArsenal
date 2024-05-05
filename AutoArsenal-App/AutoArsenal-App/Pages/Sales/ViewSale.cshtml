@@ -87,7 +87,6 @@
                                             <th scope="col">#</th>
                                             <th scope="col">Product Name</th>
                                             <th scope="col">Category</th>
-                                            <th scope="col">Unit Price</th>
                                             <th scope="col">Quantity</th>
                                             <th scope="col">Amount</th>
                                         </tr>
@@ -107,11 +106,10 @@
                                                         <td>@(count++)</td>
                                                         <td>@product.ProductName</td>
                                                         <td>@category</td>
-                                                        <td>@productCategory.UnitPrice</td>
                                                         <td>@saleDetail.Quantity</td>
-                                                        <td>@(productCategory.UnitPrice * saleDetail.Quantity)</td>
+                                                        <td>@(saleDetail.Quantity * productCategory.SalePrice)</td>
                                                     </tr>
-                                                    Model.Total += productCategory.UnitPrice * saleDetail.Quantity;
+                                                    Model.Total += (saleDetail.Quantity * productCategory.SalePrice);
                                                 }
                                             }
                                         }

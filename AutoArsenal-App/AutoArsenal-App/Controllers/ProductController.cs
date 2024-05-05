@@ -50,5 +50,58 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        //add product and get id
+        public async static Task<int> AddProduct(Product product)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Product (Name, Description) OUTPUT INSERTED.Id VALUES (@Name, @Description);";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Name", product.ProductName);
+                        command.Parameters.AddWithValue("@Description", product.ProductDescription);
+                        return await Task.FromResult(Convert.ToInt32(command.ExecuteScalar()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        //update product
+        public async static Task UpdateProduct(Product product)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "UPDATE Product SET Name = @Name, Description = @Description WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", product.ID);
+                        command.Parameters.AddWithValue("@Name", product.ProductName);
+                        command.Parameters.AddWithValue("@Description", product.ProductDescription);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
