@@ -34,8 +34,11 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between">
                     <h5 class="card-title">
-                        @ViewData["Title"]
+                        @ViewData["Title"] <span> | @Model.DateOfSale </span>
                     </h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>                        
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -125,7 +128,11 @@
         </div>
     </div>
 </section>
+
+<!-- Java Script Section -->
 @section Scripts {
+
+    <!-- Table Settings -->
     <script>
         $(document).ready(function () {
             var table = $('#salesTable').DataTable({
@@ -145,5 +152,13 @@
                 }
             });
         });
+    </script>
+
+    <!-- Going Back button -->
+    <script>
+        function goBack() {
+          // Using the history object to go back
+          window.history.back();
+        }
     </script>
 }

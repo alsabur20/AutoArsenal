@@ -1,0 +1,272 @@
+﻿@page
+@model AutoArsenal_App.Pages.Purchases.PurchasesModel
+@{
+    ViewData["Title"] = "Purchases";
+}
+
+
+<!-- Page Navigation -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Search Card -->
+<div class="card">
+    <div class="card-body">
+        <div id="panelSearch" class="d-flex justify-content-between align-items-center">
+            <a asp-page="/Purchases/AddPurchase" class="btn btn-primary" style="margin:10px;">Add Purchase</a>
+            <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                <input class="form-control w-100" type="search" placeholder="Search" aria-label="Search" />
+            </form>
+            <div class="searchBarButton" style="margin:10px;">
+                <div class="form-floating mt-2">
+                    <input type="date" class="form-control" name="purchaseSearchDate" id="purchaseSearchDate"
+                        onchange="dateChange()" style="height:auto;" />
+                    <label for="purchaseSearchDate">Search by Date</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Purchases</h5>
+        <div class="table-responsive">
+            <table id="PurchasesTable" class="table table-hover table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Purchase ID</th>
+                        <th scope="col">Added By</th>
+                        <th scope="col">Dated</th>
+                        <th scope="col">Payment ID</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @if (Model.Purchases != null && Model.Persons != null)
+                    {
+                        int count = 1;
+                        @foreach (var purchase in Model.Purchases)
+                        {
+                            Models.Person employee = Model.Persons.Find(p => p.ID == purchase.AddedBy);
+                            <tr>
+                                <td>@count</td>
+                                <td>@purchase.ID</td>
+                                <td>@(employee.FirstName + " " + employee.LastName)</td>
+                                <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                                <td>@(purchase.PaymentID == -1 ? "N/A" : purchase.PaymentID)</td>
+                                <td>
+                                    <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
+                                        class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                    <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+                                        onclick="addPayment('@purchase.PaymentID')"><i class="bi bi-wallet"></i></a>
+                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#returnPurchaseModal"
+                                        onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')"><i
+                                            class="bi bi-arrow-counterclockwise"></i></a>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7">No records found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modals ->
+
+<!-- Add Payment -->
+<div class="modal fade" id="addPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddPayment">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Add Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <!-- Payment Id -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
+                                        asp-for="PaymentID" disabled />
+                                    <label for="paymentID">Payment Id</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Total Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
+                                        disabled />
+                                    <label for="totalAmount">Total Amount</label>
+                                </div>
+                            </div>
+                            <!-- Paid Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                        disabled />
+                                    <label for="paidAmount">Paid Amount</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Pending amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="pendingAmount"
+                                        placeholder="Pending Amount" disabled />
+                                    <label for="pendingAmount">Pending Amount</label>
+                                </div>
+                            </div>
+                            <!-- Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
+                                        value="0" min="1" oninput="validity.valid||(value='');" />
+                                    <label for="amount">Enter Amount</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Return Purchase -->
+<div class="modal fade" id="returnPurchaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="ReturnPurchase">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Return Purchase</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to undo this purchase?</p>
+                    <div class="row">
+                        <!-- Purchase Id -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="purchaseID" placeholder="Purchase ID"
+                                    disabled />
+                                <label for="purchaseID">Purchase Id</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Purchase Date -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="date" class="form-control" id="purchaseDate" placeholder="Purchase Date"
+                                    disabled />
+                                <label for="purchaseDate">Purchase Date</label>
+                            </div>
+                        </div>
+                        <!-- Purchase Amount -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="purchaseAmount" placeholder="Amount"
+                                    disabled />
+                                <label for="purchaseAmount">Amount</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Java Script Section -->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#PurchasesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+
+        function dateChange() {
+            var date = document.getElementById("purchaseSearchDate").value;
+            var table = $('#PurchasesTable').DataTable();
+            table.column(4).search(date).draw();
+        }
+    </script>
+
+    <!-- Modal Settings -->
+    <script>
+        var payments = @Html.Raw(Json.Serialize(Model.Payments));
+        var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
+
+        // Add Payment
+        function addPayment(paymentID) {
+            document.getElementById("paymentID").value = paymentID;
+
+        }
+
+        // Return Purchase
+        function returnPurchase(purchaseID, date, paymentID) {
+            document.getElementById("purchaseID").value = purchaseID;
+            document.getElementById("purchaseDate").value = date;
+            document.getElementById("purchaseAmount").value = payments.find(p => p.ID == paymentID).TotalAmount;
+        }
+
+    </script>
+}

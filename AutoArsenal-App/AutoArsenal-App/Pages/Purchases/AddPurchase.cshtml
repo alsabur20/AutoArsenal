@@ -1,0 +1,356 @@
+﻿@page
+@model AutoArsenal_App.Pages.Purchases.AddPurchaseModel
+@{
+    ViewData["Title"] = "Add Purchase";
+}
+
+<!-- Page Title -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="./Purchases">Purchases</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- End Page Title -->
+
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->
+
+<!-- Add new Purchase Card -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        New Purchase <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-secondary mx-1" onclick="goBack()">Cancel</button>
+                        <form method="post" asp-page-handler="SavePurchase">
+                            <input type="hidden" asp-for="Purchases" id="purchases" />
+                            <input type="hidden" asp-for="PurchaseDetails" id="purchaseDetails" />
+                            <button type="submit" class="btn btn-primary mx-1" onclick="savePurchases()">Save</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Product name -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="productName" aria-label="Default select example">
+                                    <option value="-1" selected>Select Product</option>
+                                    @if (Model.Products != null)
+                                    {
+                                        foreach (var product in Model.Products)
+                                        {
+                                            <option value="@product.ID"> @product.ProductName </option>
+                                        }
+                                    }
+                                </select>
+                                <label for="productName">Product Name</label>
+                            </div>
+                        </div>
+                        <!-- Manufacturer Name -->
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <input class="form-control" id="manufacturerName" placeholder="Manufacturer Name"
+                                    disabled />
+                                <label for="manufacturerName">Manufacturer Name</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Product Category -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="productCategory" aria-label="Default select example">
+                                    <option value="-1" selected>Select Product Category</option>
+                                    @if (Model.ProductCategories != null)
+                                    {
+                                        foreach (var lookup in Model.Lookups)
+                                        {
+                                            if (lookup.Category == "Product_Category")
+                                            {
+                                                <option value="@lookup.ID"> @lookup.Value </option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                                <label for="productCategory">Product Category</label>
+                            </div>
+                        </div>
+                        <!-- Cost Price -->
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="costPrice" placeholder="Product Quantity"
+                                    value="0" min="1" oninput="validity.valid||(value='');" />
+                                <label for="costPrice">Cost Price</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Product Quantity -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="productQuantity"
+                                    placeholder="Product Quantity" value="0" min="1"
+                                    oninput="validity.valid||(value='');" />
+                                <label for="productQuantity">Product Quantity</label>
+                            </div>
+                        </div>
+
+                        <!-- Total Amount -->
+                        <div class="col-6">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="totalAmount" placeholder="Total Amount"
+                                    value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
+                                <label for="totalAmount">Total Amount</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Delivering -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="deliverOption" aria-label="Default select example">
+                                    <option value="-1" selected>Shop</option>
+                                    @if (Model.Warehouses != null)
+                                    {
+                                        foreach (var house in Model.Warehouses)
+                                        {
+                                            <option value="@house.ID"> @house.Name </option>
+                                        }
+                                    }
+                                </select>
+                                <label for="deliverOption">Deliver To</label>
+                            </div>
+                        </div>
+
+
+                        <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
+                            <!-- Add Product Button -->
+                            <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
+                        </div>
+                    </div>
+
+                    <!-- Purchase Tables -->
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="purchasesTable"
+                                    class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Product Name</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Manufacturer</th>
+                                            <th scope="col">Cost Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <!-- Will be loaded later -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- JAVASCRIPT SECTION -->
+@section Scripts {
+
+    <!-- Table Settings -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Table Settings
+            var table = $('#salesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+
+            document.getElementById('searchBar').addEventListener('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+    </script>
+
+    <!-- Other Settings -->
+    <script>
+            var persons = @Html.Raw(Json.Serialize(Model.Persons));
+            var products = @Html.Raw(Json.Serialize(Model.Products));
+            var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+            var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+            var warehouses = @Html.Raw(Json.Serialize(Model.Warehouses));
+            var manufacturers = @Html.Raw(Json.Serialize(Model.Manufacturers));
+            var purchaseDetailsList = null;
+
+            // Add Product to a list and to the datatable also
+            function addProduct() {
+                var productId = document.getElementById("productName").value;
+                var productCategoryId = document.getElementById("productCategory").value;
+                var productQuantity = parseInt(document.getElementById("productQuantity").value);
+                var totalAmountElement = document.getElementById("totalAmount");
+                var costPrice = document.getElementById("costPrice").value;
+                var deliver = document.getElementById("deliverOption").value;
+
+                // Check if essential elements are present
+                if (!productId || !productCategoryId || !productQuantity || !costPrice || !deliver || !totalAmountElement) {
+                    alert("Please ensure all required fields are filled out.");
+                    return;
+                }
+
+                // Find product and product category from the original list
+                var product = products.find(p => p.id == productId);
+                var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+
+                // Validation for selected options
+                if (productId === "-1" || productCategoryId === "-1" || productQuantity <= 0 || deliver === "-1") {
+                    var message = "Please select a product, category, and enter a valid quantity.";
+                    alert(message);
+                    return;
+                }
+
+                if (purchaseDetailsList == null) {
+                    purchaseDetailsList = [];
+                }
+
+                var categoryType = lookups.find(l => l.id == productCategoryId).value;
+                var manufacturer = manufacturers.find(m => m.id == category.ManufactureId);
+
+                // Add or update product in the list and table
+                var existingProductIndex = purchaseDetailsList.findIndex(p => p.productCategoryId == category.id);
+                if (existingProductIndex !== -1) {
+                    // Update the quantity of existing product
+                    purchaseDetailsList[existingProductIndex].quantity += productQuantity;
+                    var row = table.row(existingProductIndex).data([
+                        existingProductIndex + 1,
+                        product.productName,
+                        categoryType,
+                        manufacturer.Name,
+                        costPrice.toFixed(2),
+                        purchaseDetailsList[existingProductIndex].quantity,
+                        (costPrice * purchaseDetailsList[existingProductIndex].quantity).toFixed(2),
+                        '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                    ]).draw(false).node();
+                } else {
+                    // Add the product to the list and table
+                    purchaseDetailsList.push({
+                        purchaseId: -1,
+                        quantity: productQuantity,
+                        productCategoryId: category.id,
+                        ManufacturerId: manufacturer.Id,
+                        UnitPrice: costPrice
+                    });
+                    var row = table.row.add([
+                        table.rows().count() + 1,
+                        product.productName,
+                        categoryType,
+                        manufacturer.Name,
+                        costPrice.toFixed(2),
+                        productQuantity,
+                        (costPrice * productQuantity).toFixed(2),
+                        '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                    ]).draw(false).node();
+                }
+
+                // Recalculate total amount
+                var totalAmount = purchaseDetailsList.reduce((total, item) => {
+                    return total + item.quantity * costPrice;
+                }, 0);
+                totalAmountElement.value = totalAmount.toFixed(2);
+            }
+
+
+            // Remove Product from the list and datatable
+            function removeProduct(element) {
+                var row = table.row($(element).parents('tr'));
+                var rowIndex = row.index();
+                var rowData = row.data();
+
+                // Remove the corresponding item from the purchaseDetailsList
+                purchaseDetailsList.splice(rowIndex, 1);
+
+                // Redraw the table
+                table.row(rowIndex).remove().draw();
+
+                // Update the row numbers in the table
+                table.rows().every(function (index) {
+                    var rowData = this.data();
+                    rowData[0] = index + 1;
+                    this.data(rowData).draw(false);
+                });
+
+                // Recalculate total amount
+                var totalAmount = purchaseDetailsList.reduce((total, item) => {
+                    return total + item.quantity * costPrice;
+                }, 0);
+                var totalAmountElement = document.getElementById("totalAmount");
+                totalAmountElement.value = totalAmount.toFixed(2);
+            }
+
+            // Go Back
+            function goBack() {
+                window.history.back();
+            }
+
+            // Save Purchases
+            function savePurchases() {
+                // Handle if list is empty
+                if (purchaseDetailsList == null || purchaseDetailsList.length == 0) {
+                    alert("Please add a product to the purchase.");
+                    return;
+                }
+                var temp = {
+                    id: -1,
+                    employeeId: -1,
+                    dateOfPurchase: new Date().toISOString().split('T')[0]
+                };
+                var purchases = JSON.stringify(temp);
+                var purchaseDetails = JSON.stringify(purchaseDetailsList);
+                document.getElementById("purchases").value = purchases;
+                document.getElementById("purchaseDetails").value = purchaseDetails;
+            }
+        });
+    </script>
+}

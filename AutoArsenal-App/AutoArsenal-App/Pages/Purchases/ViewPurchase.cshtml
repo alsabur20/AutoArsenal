@@ -1,0 +1,246 @@
+﻿@page
+@model AutoArsenal_App.Pages.Purchases.ViewPurchaseModel
+@{
+    ViewData["Title"] = "View Purchase";
+}
+<!-- Page Title -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="./Purchases">Purchases</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- End Page Title -->
+
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->
+
+<!-- Card Section -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        @ViewData["Title"] <span> | @Model.DateOfPurchase </span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- purchase Id -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="purchaseId" placeholder="Purchase ID"
+                                    value="@Model.PurchaseID" disabled />
+                                <label for="purchaseId">Purchase ID</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <!-- purchase Amount -->
+                            <div class="form-floating mt-2">
+                                <input class="form-control" id="totalAmount" placeholder="Total Amount" disabled />
+                                <label for="totalAmount">Total Amount</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="purchasesTable"
+                                    class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Product Name</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Manufacturer</th>
+                                            <th scope="col">Unit Price</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        @if (Model.PurchaseDetails != null)
+                                        {
+                                            int count = 1;
+                                            foreach (var purchaseDetail in Model.PurchaseDetails)
+                                            {
+                                                if (Model.PurchaseID == purchaseDetail.PurchaseID)
+                                                {
+                                                    Models.ProductCategory productCategory = Model.ProductCategories.Find(p => p.ID == purchaseDetail.ProductCategoryID);
+                                                    Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
+                                                    string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
+                                                    string manu = Model.People.Find(m => m.ID == productCategory.ManufactureId).Name;
+                                                    <tr>
+                                                        <td>@(count++)</td>
+                                                        <td>@product.ProductName</td>
+                                                        <td>@category</td>
+                                                        <td>@manu</td>
+                                                        <td>@productCategory.UnitPrice</td>
+                                                        <td>@purchaseDetail.Quantity</td>
+                                                        <td>@(productCategory.UnitPrice * purchaseDetail.Quantity)</td>
+                                                        <td>
+                                                            <a class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                                                data-bs-target="#addQuantityModal"
+                                                                onclick="updatePurchase('@Model.PurchaseID', '@product.ProductName', '@category', '@purchaseDetail.Quantity')">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    Model.Total += productCategory.UnitPrice * purchaseDetail.Quantity;
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <script>
+                                    document.getElementById("totalAmount").value = "@Model.Total";
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Modal -->
+<!-- Add Quantity -->
+<div class="modal fade" id="addQuantityModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddQuantity">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Add Quantity</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <!-- Purchase Id -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="purchaseID" placeholder="Purchase ID"
+                                        disabled />
+                                    <label for="purchaseID">Purchase Id</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Item Name -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="Item" placeholder="Product Name"
+                                        disabled />
+                                    <label for="Item">Product Name</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Ordered Quantity -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="paidQuantity"
+                                        placeholder="Ordered Quantity" disabled />
+                                    <label for="orderedQuantity">Ordered Quantity</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- received Quantity -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="receivedQuantity"
+                                        placeholder="Received Quantity" disabled />
+                                    <label for="receivedQuantity">Received Quantity</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Quantity -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="Quantity" placeholder="Enter Quantity"
+                                        value="0" min="1" oninput="validity.valid||(value='');" />
+                                    <label for="Quantity">Enter Quantity</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Java Script Section -->
+@section Scripts {
+
+    <!-- Table Settings -->
+    <script>
+        $(document).ready(function () {
+            var table = $('#purchasesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Going Back button 
+        function goBack() {
+            window.history.back();
+        }
+
+        function updatePurchase(id, name, category, Quantity) {
+            document.getElementById("purchaseID").value = id;
+            document.getElementById("Item").value = name;
+            document.getElementById("orderedQuantity").value = Quantity;
+
+            // Getting the received quantity from the inventory
+        }
+
+    </script>
+}
