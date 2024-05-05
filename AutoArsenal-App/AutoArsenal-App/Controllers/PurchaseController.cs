@@ -60,11 +60,12 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Purchase (DateOfPurchase, PaymentID) OUTPUT INSERTED.Id VALUES (@DateOfPurchase, @PaymentID)";
+                    string query = "INSERT INTO Purchase (DateOfPurchase, PaymentID, AddedBy) OUTPUT INSERTED.Id VALUES (@DateOfPurchase, @PaymentID, @AddedBy)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@DateOfPurchase", purchase.DateOfPurchase);
                         command.Parameters.AddWithValue("@PaymentID", (object)purchase.PaymentID ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@AddedBy", (object)purchase.AddedBy ?? DBNull.Value);
 
                         // Execute the command and get the inserted ID
                         int purchaseId = (int)await command.ExecuteScalarAsync();

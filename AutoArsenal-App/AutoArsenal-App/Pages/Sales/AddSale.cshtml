@@ -87,9 +87,10 @@
                         </div>
                         <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
                             <!-- Add Customer Button -->
-                            <a class="btn btn-lg btn-primary">
+                            <button class="btn btn-lg btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createCustomerModal">
                                 <i class="bi bi-plus"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                     <div class="row">
@@ -179,7 +180,156 @@
     </div>
 </section>
 
+
+<!-- Add customer Modal -->
+<div class="modal fade" id="createCustomerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddCustomer" id="addCustomerModal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- First Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="FirstName" placeholder="First Name"
+                                    asp-for="Person.FirstName" />
+                                <label for="FirstName">First Name</label>
+                                <p class="invalid" id="firstNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Last Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="LastName" placeholder="Last Name"
+                                    asp-for="Person.LastName" />
+                                <label for="LastName">Last Name</label>
+                                <p class="invalid" id="lastNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Contact -->
+                            <div class="form-floating mt-2">
+                                <input type="tel" class="form-control" id="Contact" placeholder="Contact"
+                                    asp-for="Person.Contact" />
+                                <label for="Contact">Contact</label>
+                                <p class="invalid" id="contactError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Gender -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Gender" aria-label="Default select example"
+                                    asp-for="Person.Gender">
+                                    <option value="-1" selected>Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                                <label for="Gender">Gender</label>
+                                <p class="invalid" id="genderError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Address -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Address" placeholder="Address"
+                                    asp-for="Person.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="addressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- City -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="City" aria-label="Default select example"
+                                    asp-for="Person.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="City">City</label>
+                                <p class="invalid" id="cityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Province -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Province" aria-label="Default select example"
+                                    asp-for="Person.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="Province">Province</label>
+                                <p class="invalid" id="provinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Country -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Country" aria-label="Default select example"
+                                    asp-for="Person.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="Country">Country</label>
+                                <p class="invalid" id="countryError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- IsTrustworthy -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="trusty" aria-label="Default select example"
+                                    asp-for="customer.IsTrustworthy">
+                                    <option value="-1" selected>IsTrustworthy</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label for="trusty">IsTrustworthy</label>
+                                <p class="invalid" id="trustyError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Discount -->
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="discount" placeholder="Discount" min="0"
+                                    oninput="validity.valid||(value='');" asp-for="customer.Discount" />
+                                <label for="discount">Discount</label>
+                                <p class="invalid" id="discountError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Credit -->
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="credit" placeholder="Credit" min="0"
+                                    oninput="validity.valid||(value='');" asp-for="customer.Credit" />
+                                <label for="credit">Credit</label>
+                                <p class="invalid" id="creditError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT SECTION -->
 @section Scripts {
+    <!-- Sale Table-->
     <script>
         $(document).ready(function () {
             var table = $('#salesTable').DataTable({
@@ -205,6 +355,8 @@
             });
         });
     </script>
+
+    <!-- Add Sale -->
     <script>
         var persons = @Html.Raw(Json.Serialize(Model.Persons));
         var customers = @Html.Raw(Json.Serialize(Model.Customers));
@@ -228,55 +380,68 @@
 
         //add Product to a list and to the datatable also
         function addProduct() {
-            var productName = document.getElementById("productName").value;
-            var productCategory = document.getElementById("productCategory").value;
-            var productQuantity = document.getElementById("productQuantity").value;
-            var totalAmount = document.getElementById("totalAmount").value;
+            var customerId = document.getElementById("customerName").value;
+            var productId = document.getElementById("productName").value;
+            var productCategoryId = document.getElementById("productCategory").value;
+            var productQuantity = parseInt(document.getElementById("productQuantity").value);
+            var totalAmountElement = document.getElementById("totalAmount");
 
-            if (productName == -1) {
-                alert("Please select a product.");
-                return;
-            }
-            if (productCategory == -1) {
-                alert("Please select a product category.");
-                return;
-            }
-            if (productQuantity == 0) {
-                alert("Please enter a valid quantity.");
-                return;
-            }
+            var table = $('#salesTable').DataTable();
 
-            var product = products.find(p => p.id == productName);
-            var category = productCategories.find(pc => pc.id == productCategory);
-            var total = productQuantity * category.salePrice;
+            // find product and product category from the original list
+            var product = products.find(p => p.id == productId);
+            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+
+            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1") {
+                var message = "Please select a product, category, customer and enter a valid quantity."
+                alert(message);
+                return;
+            }
 
             if (saleDetailsList == null) {
                 saleDetailsList = [];
             }
-
-            saleDetailsList.push({
-                productCategoryId: productCategory,
-                quantity: productQuantity
-            });
-
-            var table = $('#salesTable').DataTable();
-            table.row.add([
-                table.rows().count() + 1,
-                product.productName,
-                category.category,
-                category.salePrice,
-                productQuantity,
-                total.toFixed(2),
-                '<a class="btn btn-danger" onclick="removeProduct(this)">Remove</a>'
-            ]).draw();
+            var categoryType = lookups.find(l => l.id == productCategoryId).value;
+            //add in the datatable and list and also handle existing ones
+            var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
+            console.log(existingProductIndex);
+            if (existingProductIndex !== -1) {
+                // Update the quantity of existing product
+                saleDetailsList[existingProductIndex].quantity += productQuantity;
+                var row = table.row(existingProductIndex).data([
+                    existingProductIndex + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    saleDetailsList[existingProductIndex].quantity,
+                    (category.salePrice * saleDetailsList[existingProductIndex].quantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            } else {
+                // Add the product to the list and table
+                saleDetailsList.push({
+                    saleId: -1,
+                    productCategoryId: category.id,
+                    quantity: productQuantity
+                });
+                var row = table.row.add([
+                    table.rows().count() + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    productQuantity,
+                    (category.salePrice * productQuantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            }
 
             // Recalculate total amount
             var totalAmount = saleDetailsList.reduce((total, item) => {
-                var category = productCategories.find(pc => pc.category == item.productCategoryId);
+                var category = productCategories.find(pc => pc.productId == productId && pc.category == item.productCategoryId);
                 return total + item.quantity * category.salePrice;
             }, 0);
-            var totalAmountElement = document.getElementById("totalAmount");
             totalAmountElement.value = totalAmount.toFixed(2);
+            console.log(totalAmount)
         }
 
         // Remove Product from the list and datatable
@@ -309,12 +474,6 @@
         }
 
 
-        // Going Back
-        function goBack() {
-            window.history.back();
-        }
-
-
         // Save Sales
         function saveSales() {
             //handle if list is empty
@@ -337,5 +496,47 @@
             document.getElementById("sales").value = sales;
             document.getElementById("saleDetails").value = saleDetails;
         }
+    </script>
+
+    <!-- Add Customer Modal Settings -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector("#createCustomerModal");
+            var submitButton = form.querySelector("#addBtn");
+
+            // Define input fields and their corresponding error elements
+            var fields = [
+                { input: form.querySelector("#FirstName"), error: document.querySelector("#firstNameError"), errorMessage: "First Name is required" },
+                { input: form.querySelector("#LastName"), error: document.querySelector("#lastNameError"), errorMessage: "Last Name is required" },
+                { input: form.querySelector("#Contact"), error: document.querySelector("#contactError"), errorMessage: "Contact is required" },
+                { input: form.querySelector("#Gender"), error: document.querySelector("#genderError"), errorMessage: "Gender is required" },
+                { input: form.querySelector("#Address"), error: document.querySelector("#addressError"), errorMessage: "Address is required" },
+                { input: form.querySelector("#City"), error: document.querySelector("#cityError"), errorMessage: "City is required" },
+                { input: form.querySelector("#Province"), error: document.querySelector("#provinceError"), errorMessage: "Province is required" },
+                { input: form.querySelector("#Country"), error: document.querySelector("#countryError"), errorMessage: "Country is required" },
+                { input: form.querySelector("#trusty"), error: document.querySelector("#trustyError"), errorMessage: "IsTrustworthy is required" },
+                { input: form.querySelector("#discount"), error: document.querySelector("#discountError"), errorMessage: "Discount is required" },
+                { input: form.querySelector("#credit"), error: document.querySelector("#creditError"), errorMessage: "Credit is required" }
+            ];
+
+            // Add event listener for input fields
+            form.addEventListener("input", function () {
+                var errors = fields.some(function (field) {
+                    if (field.input.value.trim() === "") {
+                        field.error.textContent = field.errorMessage;
+                        field.error.style.display = 'block';
+                        field.input.classList.add("is-invalid");
+                        return true;
+                    } else {
+                        field.error.textContent = "";
+                        field.error.style.display = 'none';
+                        field.input.classList.remove("is-invalid");
+                        return false;
+                    }
+                });
+
+                submitButton.disabled = errors;
+            });
+        });
     </script>
 }

@@ -77,7 +77,6 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 Person.Status = 8;
-                Employee.ID = Person.ID;
                 if (await PersonController.GetPersonId(Person) == -1)
                 {
                     await EmployeeController.AddEmployee(Person, Employee);

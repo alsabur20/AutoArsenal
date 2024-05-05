@@ -11,7 +11,7 @@ namespace AutoArsenal_App.Controllers
         {
             Configuration = configuration;
         }
-        public async static Task<List<Customer>> GetCustomer()
+        public async static Task<List<Customer>> GetCustomers()
         {
             List<Customer> customer = new List<Customer>();
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
@@ -50,17 +50,24 @@ namespace AutoArsenal_App.Controllers
             }
         }
         //add customer to db
-        public async static Task AddCustomer(Customer customer)
+        public async static Task AddCustomer(Person person, Customer customer)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Customer (Id, IsTrustworthy, Discount, Credit) VALUES (@Id, @IsTrustworthy, @Discount, @Credit)";
+                    string query = "EXEC sp_AddCustomer @FirstName, @LastName, @Contact, @Gender, @StreetAddress, @Country, @City, @Province, @IsTrustworthy, @Discount, @Credit";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", customer.ID);
+                        command.Parameters.AddWithValue("@FirstName", person.FirstName);
+                        command.Parameters.AddWithValue("@LastName", person.LastName);
+                        command.Parameters.AddWithValue("@Contact", person.Contact);
+                        command.Parameters.AddWithValue("@Gender", person.Gender);
+                        command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
+                        command.Parameters.AddWithValue("@Country", person.Country);
+                        command.Parameters.AddWithValue("@City", person.City);
+                        command.Parameters.AddWithValue("@Province", person.Province);
                         command.Parameters.AddWithValue("@IsTrustworthy", customer.IsTrustworthy);
                         command.Parameters.AddWithValue("@Discount", customer.Discount);
                         command.Parameters.AddWithValue("@Credit", customer.Credit);
@@ -77,6 +84,5 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
-
     }
 }

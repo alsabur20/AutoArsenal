@@ -42,10 +42,10 @@
                     </h5>
                     <div class="d-flex align-items-center">
                         <button class="btn btn-secondary mx-1" onclick="goBack()">Cancel</button>
-                        <form method="post" asp-page-handler="SavePurchase">
+                        <form method="post" asp-page-handler="SavePurchases">
                             <input type="hidden" asp-for="Purchases" id="purchases" />
                             <input type="hidden" asp-for="PurchaseDetails" id="purchaseDetails" />
-                            <button type="submit" class="btn btn-primary mx-1">Save</button>
+                            <button type="submit" class="btn btn-primary mx-1" onclick="savePurchases()">Save</button>
                         </form>
                     </div>
                 </div>
@@ -219,6 +219,7 @@
 
     <!-- Other Settings -->
     <script>
+        // Load data from server-side Model into client-side variables
         var products = @Html.Raw(Json.Serialize(Model.Products));
         var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
         var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
@@ -226,74 +227,71 @@
         var manufacturers = @Html.Raw(Json.Serialize(Model.Manufacturers));
         var purchaseDetailsList = [];
 
-        // Load Manufacturer based on selected product and category
-        function loadManufacturer() {
-            var productId = document.getElementById("productName").value;
-            var productCategoryId = document.getElementById("productCategory").value;
-
-            if (productId === "-1" || productCategoryId === "-1") {
-                return;
-            }
-
-            var product = products.find(p => p.ID == productId);
-            var category = productCategories.find(pc => pc.ProductID == productId && pc.Category == productCategoryId);
-            var manufacturer = manufacturers.find(m => m.ID == category.ManufacturerID);
-
-            document.getElementById("manufacturerName").value = "Abdul Rehman";
-        }
-
-        // Loading Total amount based on quantity and cost price
-        function loadTotalAmount() {
-            var productQuantity = parseInt(document.getElementById("productQuantity").value);
-            var costPrice = parseFloat(document.getElementById("costPrice").value);
-
-            if (productQuantity <= 0 || costPrice <= 0) {
-                return;
-            }
-
-            var totalAmount = productQuantity * costPrice;
-            document.getElementById("totalAmount").value = totalAmount.toFixed(2);
-        }
-
         // Add Product to a list and to the datatable also
         function addProduct() {
             var productId = document.getElementById("productName").value;
             var productCategoryId = document.getElementById("productCategory").value;
             var productQuantity = parseInt(document.getElementById("productQuantity").value);
             var costPrice = parseFloat(document.getElementById("costPrice").value);
-            var totalAmount = parseFloat(document.getElementById("totalAmount").value);
 
             if (productId === "-1" || productCategoryId === "-1" || productQuantity <= 0 || costPrice <= 0) {
                 alert("Please fill all the fields correctly.");
                 return;
             }
 
-            var product = products.find(p => p.ID == productId);
+            var product = products.find(p => p.id == productId);
+            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+            var manufacturer = category ? manufacturers.find(m => m.id == category.manufacturerId) : null;
 
-            var category = productCategories.find(pc => pc.ProductID == productId && pc.Category == productCategoryId);
-            var manufacturer = manufacturers.find(m => m.ID == category.ManufacturerID);
+            console.log("Data",category);
 
-            var purchaseDetail = {
-                Quantity: productQuantity,
-                CategoryID: productCategoryId,
-                ManufacturerID: manufacturer.ID,
-                UnitPrice: costPrice,
-            };
+            // Check if the same product of the same category exists in the purchase details list
+            var existingIndex = purchaseDetailsList.findIndex(function (detail) {
+                return detail.categoryId == productCategoryId && detail.manufacturerId == (manufacturer ? manufacturer.id : null);
+            });
 
-            purchaseDetailsList.push(purchaseDetail);
+            if (existingIndex !== -1) {
+                // Update quantity
+                purchaseDetailsList[existingIndex].quantity += productQuantity;
+            } else {
+                // Add new purchase detail
+                var purchaseDetail = {
+                    quantity: productQuantity,
+                    categoryId: category.id,
+                    manufacturerId: manufacturer ? manufacturer.id : null,
+                    unitPrice: costPrice,
+                };
 
-            // Add the product to the datatable
+                purchaseDetailsList.push(purchaseDetail);
+            }
+
+            // Add or update the product in the datatable
             var table = $('#purchasesTable').DataTable();
-            table.row.add([
-                purchaseDetailsList.length,
-                product.ProductName,
-                lookups.find(l => l.ID == productCategoryId).Value,
-                manufacturer.ManufacturerName,
-                costPrice,
-                productQuantity,
-                totalAmount,
-                '<button type="button" class="btn btn-danger" onclick="removeProduct(this)">Remove</button>'
-            ]).draw(false);
+            if (existingIndex !== -1) {
+                // Update row with the new quantity
+                table.row(existingIndex).data([
+                    existingIndex + 1,
+                    product ? product.productName : "",
+                    category ? lookups.find(l => l.id == productCategoryId).value : "",
+                    manufacturer ? manufacturer.name : "",
+                    costPrice,
+                    purchaseDetailsList[existingIndex].quantity,
+                    (purchaseDetailsList[existingIndex].quantity * costPrice).toFixed(2),
+                    '<button type="button" class="btn btn-danger" onclick="removeProduct(this)">Remove</button>'
+                ]).draw(false);
+            } else {
+                // Add new row
+                table.row.add([
+                    purchaseDetailsList.length,
+                    product ? product.productName : "",
+                    category ? lookups.find(l => l.id == productCategoryId).value : "",
+                    manufacturer ? manufacturer.name : "",
+                    costPrice,
+                    productQuantity,
+                    (productQuantity * costPrice).toFixed(2),
+                    '<button type="button" class="btn btn-danger" onclick="removeProduct(this)">Remove</button>'
+                ]).draw(false);
+            }
 
             // Clear the fields
             document.getElementById("productName").value = "-1";
@@ -306,6 +304,7 @@
 
         // Remove Product from the list and datatable
         function removeProduct(element) {
+            var table = $('#purchasesTable').DataTable();
             var row = table.row($(element).parents('tr'));
             var index = row.index();
             row.remove().draw(false);
@@ -321,6 +320,35 @@
             });
         }
 
+        // Load Manufacturer based on selected product and category
+        function loadManufacturer() {
+            var productId = document.getElementById("productName").value;
+            var productCategoryId = document.getElementById("productCategory").value;
+
+            if (productId === "-1" || productCategoryId === "-1") {
+                return;
+            }
+
+            var product = products.find(p => p.id == productId);
+            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+            var manufacturer = category ? manufacturers.find(m => m.id == category.manufacturerId) : null;
+
+            document.getElementById("manufacturerName").value = manufacturer ? manufacturer.name : "";
+        }
+
+        // Loading Total amount based on quantity and cost price
+        function loadTotalAmount() {
+            var productQuantity = parseInt(document.getElementById("productQuantity").value);
+            var costPrice = parseFloat(document.getElementById("costPrice").value);
+
+            if (productQuantity <= 0 || costPrice <= 0) {
+                return;
+            }
+
+            var totalAmount = productQuantity * costPrice;
+            document.getElementById("totalAmount").value = totalAmount.toFixed(2);
+        }
+
         // Go Back
         function goBack() {
             window.history.back();
@@ -328,16 +356,23 @@
 
         // Save Purchases
         function savePurchases() {
+            //handle if list is empty
             if (purchaseDetailsList == null || purchaseDetailsList.length == 0) {
-                alert("Please add products to the purchase list.");
+                alert("Please add a product to the sale.");
                 return;
             }
 
-            document.getElementById("purchases").value = JSON.stringify({
-                PurchaseDate: new Date().toISOString(),
-                WarehouseId: document.getElementById("deliverOption").value,
-                PurchaseDetails: purchaseDetailsList
-            });
+            var temp = {
+                id: -1,
+                addedBy: 1,
+                dateOfPurchase: new Date().toISOString().split('T')[0],
+                paymentId: -1,
+                isDeleted: false
+            }
+
+            document.getElementById("purchases").value = JSON.stringify(temp);;
+            document.getElementById("purchaseDetails").value = JSON.stringify(purchaseDetailsList);
         }
     </script>
+
 }

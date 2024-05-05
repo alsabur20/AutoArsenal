@@ -68,7 +68,7 @@ namespace AutoArsenal_App.Controllers
                         foreach (var prch in purchaseDetails)
                         {
                             command.Parameters.Clear();
-                            command.Parameters.AddWithValue("@SaleID", prch.PurchaseID);
+                            command.Parameters.AddWithValue("@PurchaseID", prch.PurchaseID);
                             command.Parameters.AddWithValue("@Quantity", prch.Quantity);
                             command.Parameters.AddWithValue("@ProductCategoryID", prch.ProductCategoryID);
                             command.Parameters.AddWithValue("@UnitPrice", prch.UnitPrice);

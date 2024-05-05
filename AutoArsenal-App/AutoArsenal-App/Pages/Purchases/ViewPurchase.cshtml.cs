@@ -42,7 +42,7 @@ namespace AutoArsenal_App.Pages.Purchases
             {
                 PurchaseID = id;
                 Purchase = await PurchaseController.GetPurchase(id);
-                PurchaseDetails = await PurchaseDetailsController.GetPurchaseDetailsByID(PurchaseID);
+                PurchaseDetails = await PurchaseDetailsController.GetPurchaseDetailsByID(Purchase.ID);
                 Products = await ProductController.GetProducts();
                 ProductCategories = await ProductCategoryController.GetProductCategories();
                 Lookups = await LookupController.GetLookup();
