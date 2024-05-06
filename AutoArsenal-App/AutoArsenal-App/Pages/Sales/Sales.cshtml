@@ -28,7 +28,7 @@
             <div class="searchBarButton" style="margin:10px;">
                 <div class="form-floating mt-2">
                     <input type="date" class="form-control" name="salesSearchDate" id="salesSearchDate" onchange="dateChange()" style="height:auto;" />
-                    <label for="salesSearchDate">Search by Date</label>
+                    <label for="salesSearchDate">Filter by Date</label>
                 </div>
             </div>
         </div>
@@ -73,7 +73,6 @@
                                     <td>@(sale.PaymentID == -1 ? "N/A" : sale.PaymentID)</td>
                                     <td>
                                         <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteSaleModal" onclick="deleteSale('@sale.ID','@(customer.FirstName + " " + customer.LastName)','@(employee.FirstName + " " + employee.LastName)')"><i class="bi bi-trash"></i></a>
                                         <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
                                     </td>
                                 </tr>

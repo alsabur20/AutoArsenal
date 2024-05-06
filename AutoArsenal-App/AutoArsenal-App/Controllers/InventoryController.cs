@@ -1,5 +1,6 @@
 ﻿using AutoArsenal_App.Models;
 using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 
@@ -60,25 +61,34 @@ namespace AutoArsenal_App.Controllers
             {
                 try
                 {
-                    connection.OpenAsync();
-                    string query = "INSERT INTO Inventory (StockInShop, StockInWarehouse, WarehouseId) OUTPUT INSERTED.Id VALUES(@StockInShop, @StockInWarehouse, @WarehouseId)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("sp_AddInventory", connection))
                     {
-                        command.Parameters.AddWithValue("@StockInShop", DBNull.Value);
-                        command.Parameters.AddWithValue("@StockInWarehouse", DBNull.Value);
-                        command.Parameters.AddWithValue("@WarehouseId", DBNull.Value);
-                        return await Task.FromResult(Convert.ToInt32(command.ExecuteScalar()));
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // Set parameter values from the provided inventory object
+                        command.Parameters.AddWithValue("@StockInShop", inventory.StockInShop);
+                        command.Parameters.AddWithValue("@StockInWarehouse", inventory.StockInWarehouse);
+                        command.Parameters.AddWithValue("@WarehouseId", inventory.WarehouseId);
+
+                        // Declare an OUTPUT parameter to capture the inserted ID
+                        SqlParameter outputParam = new SqlParameter("@Id", SqlDbType.Int);
+                        outputParam.Direction = ParameterDirection.Output;
+                        command.Parameters.Add(outputParam);
+
+                        // Execute the stored procedure
+                        await command.ExecuteNonQueryAsync();
+
+                        // Retrieve the inserted ID from the OUTPUT parameter
+                        return Convert.ToInt32(outputParam.Value);
                     }
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
                 }
-                finally
-                {
-                    connection.Close();
-                }
             }
         }
+
     }
 }

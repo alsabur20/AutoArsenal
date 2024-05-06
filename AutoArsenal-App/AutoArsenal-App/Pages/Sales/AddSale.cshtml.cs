@@ -104,7 +104,6 @@ namespace AutoArsenal_App.Pages.Sales
                 if (await PersonController.GetPersonId(Person) == -1)
                 {
                     await CustomerController.AddCustomer(Person, customer);
-                    TempData["Success"] = "Customer added successfully";
                 }
                 else
                 {

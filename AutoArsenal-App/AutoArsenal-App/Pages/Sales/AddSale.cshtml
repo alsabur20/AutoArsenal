@@ -37,8 +37,8 @@
                         New Sale <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
                     </h5>
                     <div class="d-flex align-items-center">
-                        <button class="btn btn-secondary mx-1" onclick="goBack()">Cancel</button>
-                        <form method="post" asp-page-handler="SaveSales">
+                        <a class="btn btn-secondary mx-1" href="/Sales/Sales">Cancel</a>
+                        <form method="post" asp-page-handler="SaveSales" onsubmit="return validateAndSubmit()">
                             <input type="hidden" asp-for="Sales" id="sales" />
                             <input type="hidden" asp-for="SaleDetails" id="saleDetails" />
                             <button type="submit" class="btn btn-primary mx-1" onclick="saveSales()">Save</button>
@@ -50,7 +50,7 @@
                         <div class="col-5">
                             <!-- Product name -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="productName" aria-label="Default select example">
+                                <select class="form-select" id="productName" aria-label="Default select example" onchange="loadQualities()">
                                     <option value="-1" selected>Select Product</option>
                                     @if (Model.Products != null)
                                     {
@@ -69,7 +69,7 @@
                             <!-- Customer Name -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="customerName" aria-label="Default select example"
-                                    onchange="loadContact()">
+                                        onchange="loadContact()">
                                     <option value="-1" selected>Select Customer</option>
                                     @if (Model.Customers != null && Model.Persons != null)
                                     {
@@ -88,7 +88,7 @@
                         <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
                             <!-- Add Customer Button -->
                             <button class="btn btn-lg btn-primary" data-bs-toggle="modal"
-                                data-bs-target="#createCustomerModal">
+                                    data-bs-target="#createCustomerModal">
                                 <i class="bi bi-plus"></i>
                             </button>
                         </div>
@@ -99,18 +99,6 @@
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="productCategory" aria-label="Default select example">
                                     <option value="-1" selected>Select Product Category</option>
-                                    @if (Model.ProductCategories != null)
-                                    {
-                                        foreach (var lookup in Model.Lookups)
-                                        {
-                                            if (lookup.Category == "Product_Category")
-                                            {
-                                                <option value="@lookup.ID">
-                                                    @lookup.Value
-                                                </option>
-                                            }
-                                        }
-                                    }
                                 </select>
                                 <label for="productCategory">Product Category</label>
                             </div>
@@ -128,11 +116,12 @@
                             <!-- Product Quantity -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="productQuantity"
-                                    placeholder="Product Quantity" value="0" min="1"
-                                    oninput="validity.valid||(value='');" />
+                                       placeholder="Product Quantity" value="0" min="1"
+                                       oninput="validity.valid||(value='');" />
                                 <label for="productQuantity">Product Quantity</label>
                             </div>
                         </div>
+                        <div class="col-6"></div>
                         <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
                             <!-- Add Product Button -->
                             <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
@@ -146,16 +135,20 @@
                             <!-- Total Amount -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="totalAmount" placeholder="Total Amount"
-                                    value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
+                                       value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
                                 <label for="totalAmount">Total Amount</label>
                             </div>
                         </div>
+                        <div class="col-7"></div>
                     </div>
-                    <div class="row">
+
+                    <hr />
+
+                    <div class="row ">
                         <div class="col">
                             <div class="table-responsive">
                                 <table id="salesTable"
-                                    class="table table-hover table-striped table-bordered text-center">
+                                       class="table table-hover table-striped table-bordered text-center">
                                     <thead class="table-dark">
                                         <tr>
                                             <th scope="col">#</th>
@@ -183,7 +176,7 @@
 
 <!-- Add customer Modal -->
 <div class="modal fade" id="createCustomerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="AddCustomer" id="addCustomerModal">
@@ -197,7 +190,7 @@
                             <!-- First Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="FirstName" placeholder="First Name"
-                                    asp-for="Person.FirstName" />
+                                       asp-for="Person.FirstName" />
                                 <label for="FirstName">First Name</label>
                                 <p class="invalid" id="firstNameError"></p>
                             </div>
@@ -206,7 +199,7 @@
                             <!-- Last Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="LastName" placeholder="Last Name"
-                                    asp-for="Person.LastName" />
+                                       asp-for="Person.LastName" />
                                 <label for="LastName">Last Name</label>
                                 <p class="invalid" id="lastNameError"></p>
                             </div>
@@ -215,7 +208,7 @@
                             <!-- Contact -->
                             <div class="form-floating mt-2">
                                 <input type="tel" class="form-control" id="Contact" placeholder="Contact"
-                                    asp-for="Person.Contact" />
+                                       asp-for="Person.Contact" />
                                 <label for="Contact">Contact</label>
                                 <p class="invalid" id="contactError"></p>
                             </div>
@@ -224,7 +217,7 @@
                             <!-- Gender -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Gender" aria-label="Default select example"
-                                    asp-for="Person.Gender">
+                                        asp-for="Person.Gender">
                                     <option value="-1" selected>Select Gender</option>
                                     <option value="1">Male</option>
                                     <option value="2">Female</option>
@@ -237,7 +230,7 @@
                             <!-- Address -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="Address" placeholder="Address"
-                                    asp-for="Person.StreetAddress" />
+                                       asp-for="Person.StreetAddress" />
                                 <label for="Address">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -246,7 +239,7 @@
                             <!-- City -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="City" aria-label="Default select example"
-                                    asp-for="Person.City">
+                                        asp-for="Person.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -261,7 +254,7 @@
                             <!-- Province -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Province" aria-label="Default select example"
-                                    asp-for="Person.Province">
+                                        asp-for="Person.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -276,7 +269,7 @@
                             <!-- Country -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Country" aria-label="Default select example"
-                                    asp-for="Person.Country">
+                                        asp-for="Person.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -288,7 +281,7 @@
                             <!-- IsTrustworthy -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="trusty" aria-label="Default select example"
-                                    asp-for="customer.IsTrustworthy">
+                                        asp-for="customer.IsTrustworthy">
                                     <option value="-1" selected>IsTrustworthy</option>
                                     <option value="0">No</option>
                                     <option value="1">Yes</option>
@@ -301,7 +294,7 @@
                             <!-- Discount -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="discount" placeholder="Discount" min="0"
-                                    oninput="validity.valid||(value='');" asp-for="customer.Discount" />
+                                       oninput="validity.valid||(value='');" asp-for="customer.Discount" />
                                 <label for="discount">Discount</label>
                                 <p class="invalid" id="discountError"></p>
                             </div>
@@ -310,7 +303,7 @@
                             <!-- Credit -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="credit" placeholder="Credit" min="0"
-                                    oninput="validity.valid||(value='');" asp-for="customer.Credit" />
+                                       oninput="validity.valid||(value='');" asp-for="customer.Credit" />
                                 <label for="credit">Credit</label>
                                 <p class="invalid" id="creditError"></p>
                             </div>
@@ -378,6 +371,29 @@
             }
         }
 
+        //load product Categories
+        function loadQualities(){
+            var productId = document.getElementById("productName").value;
+            var productCategory = document.getElementById("productCategory");
+            var categories = productCategories.filter(pc => pc.productId == productId && !pc.isDeleted);
+            
+            //clear previous options and add default value
+            productCategory.innerHTML = "";
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "-1";
+            defaultOption.text = "Select Product Category";
+            productCategory.add(defaultOption);
+
+
+            categories.forEach(c => {
+                var categoryType = lookups.find(l => l.id == c.category);
+                var option = document.createElement("option");
+                option.value = categoryType.id;
+                option.text = categoryType.value
+                productCategory.add(option);
+            });
+        }
+
         //add Product to a list and to the datatable also
         function addProduct() {
             var customerId = document.getElementById("customerName").value;
@@ -392,7 +408,7 @@
             var product = products.find(p => p.id == productId);
             var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
 
-            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1") {
+            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1" || productCategoryId === "-1") {
                 var message = "Please select a product, category, customer and enter a valid quantity."
                 alert(message);
                 return;
@@ -404,7 +420,6 @@
             var categoryType = lookups.find(l => l.id == productCategoryId).value;
             //add in the datatable and list and also handle existing ones
             var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
-            console.log(existingProductIndex);
             if (existingProductIndex !== -1) {
                 // Update the quantity of existing product
                 saleDetailsList[existingProductIndex].quantity += productQuantity;
@@ -437,11 +452,10 @@
 
             // Recalculate total amount
             var totalAmount = saleDetailsList.reduce((total, item) => {
-                var category = productCategories.find(pc => pc.productId == productId && pc.category == item.productCategoryId);
+                var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
                 return total + item.quantity * category.salePrice;
             }, 0);
             totalAmountElement.value = totalAmount.toFixed(2);
-            console.log(totalAmount)
         }
 
         // Remove Product from the list and datatable
@@ -466,7 +480,7 @@
 
             // Recalculate total amount
             var totalAmount = saleDetailsList.reduce((total, item) => {
-                var category = productCategories.find(pc => pc.category == item.productCategoryId);
+                var category = productCategories.find(pc => pc.id == item.productCategoryId);
                 return total + item.quantity * category.salePrice;
             }, 0);
             var totalAmountElement = document.getElementById("totalAmount");
@@ -476,11 +490,6 @@
 
         // Save Sales
         function saveSales() {
-            //handle if list is empty
-            if (saleDetailsList == null || saleDetailsList.length == 0) {
-                alert("Please add a product to the sale.");
-                return;
-            }
             var customer = document.getElementById("customerName").value;
             var temp = {
                 id: -1,
@@ -492,9 +501,19 @@
             };
             var sales = JSON.stringify(temp);
             var saleDetails = JSON.stringify(saleDetailsList);
-            console.log(sales, saleDetails)
             document.getElementById("sales").value = sales;
             document.getElementById("saleDetails").value = saleDetails;
+        }
+
+        // validate and submit
+        function validateAndSubmit() {
+            if (saleDetailsList && saleDetailsList.length > 0) {
+                saveSales();
+                return true;
+            } else {
+                alert("Please add at least one product to the sale.");
+                return false;
+            }
         }
     </script>
 
@@ -524,7 +543,7 @@
                 var errors = fields.some(function (field) {
                     if (field.input.value.trim() === "") {
                         field.error.textContent = field.errorMessage;
-                        field.error.style.display = 'block';
+                        field.error.style = 'display: block; color: red; font-size: 12px';
                         field.input.classList.add("is-invalid");
                         return true;
                     } else {

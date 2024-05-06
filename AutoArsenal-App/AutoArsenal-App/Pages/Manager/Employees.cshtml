@@ -530,9 +530,9 @@
             // Add event listener for input fields
             form.addEventListener("input", function () {
                 var errors = fields.some(function (field) {
-                    if (field.input.value.trim() === "") {
+                    if (field.input.value.trim() === "" || field.input.value === -1) {
                         field.error.textContent = field.errorMessage;
-                        field.error.style.display = 'block';
+                        field.error.style = 'display: block; font-size: 12px; color: red;';
                         field.input.classList.add("is-invalid");
                         return true;
                     } else {
