@@ -1,4 +1,5 @@
 ﻿using AutoArsenal_App.Models;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace AutoArsenal_App.Controllers
@@ -57,38 +58,45 @@ namespace AutoArsenal_App.Controllers
             }
         }
         //add person to db
-        public async static Task AddPerson(Person person)
+        public async static Task<int> AddPerson(Person person)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
-                    connection.Open();
-                    string query = "EXEC sp_AddPerson @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province";
+                    await connection.OpenAsync();
+                    string query = "EXEC sp_AddPerson @FirstName, @LastName, @Contact, @Gender, @Status, @StreetAddress, @Country, @City, @Province, @InsertedId OUTPUT";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@FirstName", person.FirstName);
                         command.Parameters.AddWithValue("@LastName", person.LastName);
                         command.Parameters.AddWithValue("@Contact", person.Contact);
                         command.Parameters.AddWithValue("@Gender", person.Gender);
-                        command.Parameters.AddWithValue("@Status", 8);
+                        command.Parameters.AddWithValue("@Status", 8); // Assuming default status is 8
                         command.Parameters.AddWithValue("@StreetAddress", person.StreetAddress);
                         command.Parameters.AddWithValue("@Country", person.Country);
                         command.Parameters.AddWithValue("@City", person.City);
                         command.Parameters.AddWithValue("@Province", person.Province);
+
+                        // Add the output parameter for inserted ID
+                        SqlParameter insertedIdParam = new SqlParameter("@InsertedId", SqlDbType.Int);
+                        insertedIdParam.Direction = ParameterDirection.Output;
+                        command.Parameters.Add(insertedIdParam);
+
+                        // Execute the command
                         await command.ExecuteNonQueryAsync();
+
+                        // Retrieve the inserted ID from the output parameter
+                        return Convert.ToInt32(insertedIdParam.Value);
                     }
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
                 }
-                finally
-                {
-                    connection.Close();
-                }
             }
         }
+
         //get person id
         public async static Task<int> GetPersonId(Person person)
         {

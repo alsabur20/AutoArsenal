@@ -9,7 +9,7 @@ namespace AutoArsenal_App.Pages.Manager
     {
         //for deleting
         [BindProperty]
-        public int DeleteID {  get; set; }
+        public int DeleteID { get; set; }
 
         //for viewing
         [BindProperty]
@@ -31,6 +31,19 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
+        }
+
+        public async Task<IActionResult> OnPostDeleteCustomer()
+        {
+            try
+            {
+                await PersonController.DeletePerson(DeleteID);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
+            return RedirectToPage("/Manager/Customers");
         }
     }
 }

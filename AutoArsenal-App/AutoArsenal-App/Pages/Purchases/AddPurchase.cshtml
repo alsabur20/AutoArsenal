@@ -20,7 +20,6 @@
     </nav>
 </div>
 <!-- End Page Title -->
-
 <!-- Error message -->
 @if (TempData["ErrorOnServer"] != null)
 {
@@ -30,7 +29,6 @@
     </div>
 }
 <!-- End Error message -->
-
 <!-- Add new Purchase Card -->
 <section class="section">
     <div class="row">
@@ -55,7 +53,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="productName" aria-label="Default select example"
-                                    onchange="loadManufacturer()">
+                                        onchange="loadManufacturer()">
                                     <option value="-1" selected>Select Product</option>
                                     @if (Model.Products != null)
                                     {
@@ -72,10 +70,12 @@
                         <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input class="form-control" id="manufacturerName" placeholder="Manufacturer Name"
-                                    disabled />
+                                       disabled />
                                 <label for="manufacturerName">Manufacturer Name</label>
                             </div>
                         </div>
+
+                        <div class="col-1"></div>
                     </div>
 
                     <div class="row">
@@ -83,7 +83,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="productCategory" aria-label="Default select example"
-                                    onchange="loadManufacturer()">
+                                        onchange="loadManufacturer()">
                                     <option value="-1" selected>Select Product Category</option>
                                     @if (Model.ProductCategories != null)
                                     {
@@ -103,11 +103,13 @@
                         <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="costPrice" placeholder="Cost Price"
-                                    value="0" min="0" oninput="validity.valid||(value='');"
-                                    onchange="loadTotalAmount()" />
+                                       value="0" min="0" oninput="validity.valid||(value='');"
+                                       onchange="loadTotalAmount()" />
                                 <label for="costPrice">Cost Price</label>
                             </div>
                         </div>
+
+                        <div class="col-1"></div>
                     </div>
 
                     <div class="row">
@@ -115,8 +117,8 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="productQuantity"
-                                    onchange="loadTotalAmount()" placeholder="Product Quantity" value="0" min="0"
-                                    oninput="validity.valid||(value='');" />
+                                       onchange="loadTotalAmount()" placeholder="Product Quantity" value="0" min="0"
+                                       oninput="validity.valid||(value='');" />
                                 <label for="productQuantity">Product Quantity</label>
                             </div>
                         </div>
@@ -125,10 +127,12 @@
                         <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="totalAmount" placeholder="Total Amount"
-                                    value="0.00" min="0" oninput="validity.valid||(value='');" disabled />
+                                       value="0.00" min="0" oninput="validity.valid||(value='');" disabled />
                                 <label for="totalAmount">Total Amount</label>
                             </div>
                         </div>
+
+                        <div class="col-1"></div>
                     </div>
 
                     <div class="row">
@@ -153,6 +157,8 @@
                             <!-- Add Product Button -->
                             <button type="button" class="btn btn-lg btn-primary" onclick="addProduct()">Add</button>
                         </div>
+
+                        <div class="col-6"></div>
                     </div>
 
                     <!-- Purchase Tables -->
@@ -160,7 +166,7 @@
                         <div class="col">
                             <div class="table-responsive">
                                 <table id="purchasesTable"
-                                    class="table table-hover table-striped table-bordered text-center">
+                                       class="table table-hover table-striped table-bordered text-center">
                                     <thead class="table-dark">
                                         <tr>
                                             <th scope="col">#</th>
@@ -197,7 +203,7 @@
             var table = $('#purchasesTable').DataTable({
                 paging: true,
                 lengthChange: false,
-                searching: true,
+                searching: false,
                 ordering: true,
                 info: true,
                 autoWidth: false,
@@ -210,10 +216,6 @@
                     search: "Search:",
                 }
             });
-        });
-        document.getElementById('searchBar').addEventListener('input', function () {
-            var searchText = this.value.trim();
-            table.search(searchText).draw();
         });
     </script>
 
@@ -243,11 +245,11 @@
             var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
             var manufacturer = category ? manufacturers.find(m => m.id == category.manufacturerId) : null;
 
-            console.log("Data",category);
+            console.log("Data", category);
 
             // Check if the same product of the same category exists in the purchase details list
             var existingIndex = purchaseDetailsList.findIndex(function (detail) {
-                return detail.categoryId == productCategoryId && detail.manufacturerId == (manufacturer ? manufacturer.id : null);
+                return detail.productCategoryId == productCategoryId && detail.manufacturerId == (manufacturer ? manufacturer.id : null);
             });
 
             if (existingIndex !== -1) {
@@ -256,8 +258,9 @@
             } else {
                 // Add new purchase detail
                 var purchaseDetail = {
+                    productId: -1,
                     quantity: productQuantity,
-                    categoryId: category.id,
+                    productCategoryId: category.id,
                     manufacturerId: manufacturer ? manufacturer.id : null,
                     unitPrice: costPrice,
                 };
@@ -292,7 +295,7 @@
                     '<button type="button" class="btn btn-danger" onclick="removeProduct(this)">Remove</button>'
                 ]).draw(false);
             }
-
+            console.log(purchaseDetailsList)
             // Clear the fields
             document.getElementById("productName").value = "-1";
             document.getElementById("productCategory").value = "-1";
@@ -372,6 +375,7 @@
 
             document.getElementById("purchases").value = JSON.stringify(temp);;
             document.getElementById("purchaseDetails").value = JSON.stringify(purchaseDetailsList);
+            console.log(purchaseDetailsList)
         }
     </script>
 
