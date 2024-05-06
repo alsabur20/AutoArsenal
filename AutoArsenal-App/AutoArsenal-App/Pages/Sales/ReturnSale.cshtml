@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Return Sale";
 }
+
 <!-- Page Title -->
 <div class="pagetitle">
     <h1>@ViewData["Title"]</h1>
@@ -28,4 +29,210 @@
     </div>
 }
 <!-- End Error message -->
-<h1>@Model.SaleId</h1>
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        @ViewData["Title"] <span> | @Model.DateOfSale </span>
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <form method="post" asp-page-handler="ReturnAll">
+                            <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>
+                            <button type="submit" class="btn btn-primary" mx-1>Return All</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Sale Id -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="saleId" placeholder="Sale ID"
+                                    value="@Model.SaleID" disabled />
+                                <label for="saleId">Sale ID</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Customer Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="customerName" placeholder="Customer Name"
+                                    value="@Model.CustomerName" disabled />
+                                <label for="customerName">Customer Name</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Sale Amount -->
+                            <div class="form-floating mt-2">
+                                <input class="form-control" id="totalAmount" placeholder="Total Amount" disabled />
+                                <label for="totalAmount">Total Amount</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="salesTable"
+                                    class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Product Name</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Amount</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        @if (Model.SaleDetails != null)
+                                        {
+                                            int count = 1;
+                                            foreach (var saleDetail in Model.SaleDetails)
+                                            {
+                                                if (Model.SaleID == saleDetail.SaleID)
+                                                {
+                                                    Models.ProductCategory productCategory = Model.ProductCategories.Find(p => p.ID == saleDetail.ProductCategoryID);
+                                                    Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
+                                                    string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
+                                                    <tr>
+                                                        <td>@(count++)</td>
+                                                        <td>@product.ProductName</td>
+                                                        <td>@category</td>
+                                                        <td>@saleDetail.Quantity</td>
+                                                        <td>@(saleDetail.Quantity * productCategory.SalePrice)</td>
+                                                        <td><a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                                data-bs-target="#returnSaleModal"
+                                                                onclick="returnSale('@Model.SaleID','@product.ProductName','@category','@saleDetail.Quantity')">
+                                                                <i class="bi bi-arrow-return-left"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    Model.Total += (saleDetail.Quantity * productCategory.SalePrice);
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                                <script>
+                                    document.getElementById("totalAmount").value = "@Model.Total";
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- Return Purchase -->
+<div class="modal fade" id="returnSaleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="ReturnSale">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-arrow-counterclockwise"></i> Return
+                        Sale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to undo this purchase?</p>
+                    <div class="row">
+                        <!-- Sale Id -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="saleID" placeholder="Sale ID" disabled />
+                                <label for="saleID">Sale Id</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Product Name -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="productName" placeholder="Product Name"
+                                    disabled />
+                                <label for="productName">Product Name</label>
+                            </div>
+                        </div>
+                        <!-- Product Category -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="pCategory" placeholder="Product Category"
+                                    disabled />
+                                <label for="pCategory">Product category</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- Sale Quantity -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="saleQuantity" placeholder="Sale Quantity"
+                                    disabled />
+                                <label for="saleQuantity">Sale Quantity</label>
+                            </div>
+                        </div>
+                        <!-- Return Quantity -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="returnQuantity"
+                                    placeholder="Return Quantity" />
+                                <label for="returnQuantity">Return Quantity</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Java Script Section -->
+@section Scripts {
+
+    <!-- Table Settings -->
+    <script>
+        $(document).ready(function () {
+            var table = $('#salesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+        });
+    </script>
+
+    <!-- Going Back button -->
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function returnSale(id, name, category, Quantity) {
+            document.getElementById("saleID").value = id;
+            document.getElementById("productName").value = name;
+            document.getElementById("pCategory").value = category;
+            document.getElementById("saleQuantity").value = Quantity;
+        }
+    </script>
+}
