@@ -59,45 +59,39 @@ namespace AutoArsenal_App.Pages.Sales
             }
         }
 
-        public async Task<IActionResult> OnPost()
-        {
-            try
-            {
+        // Return Data
+        [BindProperty]
+        public int category { get; set; }
+        [BindProperty]
+        public int originalQuantity { get; set; }
+        [BindProperty]
+        public int returnQuantity { get; set; }
 
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorOnServer"] = ex.Message;
-            }
-            return RedirectToPage("/Sales/Sales");
-        }
-        
         public async Task<IActionResult> OnPostReturnSale()
         {
             try
             {
-
+                await SaleController.UpdateSale(SaleID, originalQuantity - returnQuantity, category);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
             return RedirectToPage("/Sales/Sales");
-            return Page();
         }
 
         public async Task<IActionResult> OnPostReturnAll()
         {
             try
             {
-
+                await SaleController.DeleteSale(SaleID);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Sales/Sales");
 
+            return RedirectToPage("/Sales/Sales");
         }
     }
 }

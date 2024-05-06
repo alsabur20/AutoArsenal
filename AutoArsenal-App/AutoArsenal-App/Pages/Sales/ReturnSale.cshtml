@@ -40,6 +40,7 @@
                     <div class="d-flex align-items-center">
                         <form method="post" asp-page-handler="ReturnAll">
                             <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>
+                            <input type="hidden" name="SaleID" value="@Model.SaleID">
                             <button type="submit" class="btn btn-primary" mx-1>Return All</button>
                         </form>
                     </div>
@@ -104,7 +105,7 @@
                                                         <td>@(saleDetail.Quantity * productCategory.SalePrice)</td>
                                                         <td><a class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                                                 data-bs-target="#returnSaleModal"
-                                                                onclick="returnSale('@Model.SaleID','@product.ProductName','@category','@saleDetail.Quantity')">
+                                                                onclick="returnSale('@Model.SaleID','@product.ProductName','@category', '@productCategory.ID', '@saleDetail.Quantity')">
                                                                 <i class="bi bi-arrow-return-left"></i>
                                                             </a>
                                                         </td>
@@ -134,6 +135,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="ReturnSale">
+                <input type="hidden" name="SaleID" value="@Model.SaleID">
+                <input type="hidden" id="procategory" asp-for="category" />
+                <input type="hidden" id="original" asp-for="originalQuantity" />
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-arrow-counterclockwise"></i> Return
                         Sale</h5>
@@ -180,7 +185,7 @@
                         <!-- Return Quantity -->
                         <div class="col-5">
                             <div class="form-floating mt-2">
-                                <input type="number" class="form-control" id="returnQuantity"
+                                <input type="number" class="form-control" asp-for="returnQuantity" id="returnQuantity"
                                     placeholder="Return Quantity" />
                                 <label for="returnQuantity">Return Quantity</label>
                             </div>
@@ -228,11 +233,14 @@
             window.history.back();
         }
 
-        function returnSale(id, name, category, Quantity) {
+        function returnSale(id, name, category, categoryId, Quantity) {
             document.getElementById("saleID").value = id;
             document.getElementById("productName").value = name;
             document.getElementById("pCategory").value = category;
             document.getElementById("saleQuantity").value = Quantity;
+
+            document.getElementById("procategory").value = categoryId;
+            document.getElementById("original").value = Quantity;
         }
     </script>
 }

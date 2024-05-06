@@ -53,6 +53,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
         // Add sale
         public async static Task<int> AddSaleAndGetId(Sale sale)
         {
@@ -85,6 +86,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
         // Get sale by ID
         public async static Task<Sale> GetSale(int id)
         {
@@ -129,6 +131,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
         // Delete sale
         public async static Task DeleteSale(int id)
         {
@@ -137,10 +140,38 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "Update Sale SET IsDeleted = '1' WHERE Id = @Id";
+                    string query = "Update Sale SET IsDeleted = 1 WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", id);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        // Update sale
+        public async static Task UpdateSale(int id, int quantity, int category)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "Update SaleDetails SET Quantity = @Quantity WHERE SaleId = @SaleId AND ProductCategoryId = @categoryID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Quantity", quantity);
+                        command.Parameters.AddWithValue("@SaleId", id);
+                        command.Parameters.AddWithValue("@categoryID", category);
                         await command.ExecuteNonQueryAsync();
                     }
                 }

@@ -24,18 +24,5 @@ namespace AutoArsenal_App.Pages.Sales
                 TempData["ErrorOnServer"] = ex.Message;
             }
         }
-        public async Task<IActionResult> OnPostDeleteSale()
-        {
-            try
-            {
-                await SaleController.DeleteSale(DeleteId);
-                return RedirectToPage("/Sales/Sales");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Sales/Sales");
-            }
-        }
     }
 }
