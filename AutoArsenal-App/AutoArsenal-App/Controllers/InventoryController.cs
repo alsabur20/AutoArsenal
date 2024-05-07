@@ -33,9 +33,9 @@ namespace AutoArsenal_App.Controllers
                                 Inventory item = new Inventory
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    StockInShop = reader.IsDBNull(reader.GetOrdinal("StockInShop")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("StockInShop")),
-                                    StockInWarehouse = reader.IsDBNull(reader.GetOrdinal("StockInWarehouse")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("StockInWarehouse")),
-                                    WarehouseId = reader.IsDBNull(reader.GetOrdinal("WarehouseId")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("WarehouseId"))
+                                    StockInShop = reader.IsDBNull(reader.GetOrdinal("StockInShop")) ? -1 : reader.GetInt32(reader.GetOrdinal("StockInShop")),
+                                    StockInWarehouse = reader.IsDBNull(reader.GetOrdinal("StockInWarehouse")) ? -1 : reader.GetInt32(reader.GetOrdinal("StockInWarehouse")),
+                                    WarehouseId = reader.IsDBNull(reader.GetOrdinal("WarehouseId")) ? -1 : reader.GetInt32(reader.GetOrdinal("WarehouseId"))
                                 };
                                 inventory.Add(item);
                             }

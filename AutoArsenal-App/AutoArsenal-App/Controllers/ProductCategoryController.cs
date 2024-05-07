@@ -154,5 +154,51 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        // get productcategory by id
+        public async static Task<ProductCategory> GetProductCategoryById(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"SELECT * FROM ProductCategory WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                ProductCategory item = new ProductCategory
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    ProductId = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    ManufacturerId = reader.GetInt32(reader.GetOrdinal("ManufacturerId")),
+                                    InventoryId = reader.GetInt32(reader.GetOrdinal("InventoryId")),
+                                    SalePrice = reader.GetDouble(reader.GetOrdinal("SalePrice")),
+                                    Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
+                                    Category = reader.GetInt32(reader.GetOrdinal("Category")),
+                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
+                                };
+                                return await Task.FromResult(item);
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

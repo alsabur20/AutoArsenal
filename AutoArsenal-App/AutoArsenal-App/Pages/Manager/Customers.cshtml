@@ -64,16 +64,7 @@
             <!-- Table with stripped rows -->
             <table id="customersTable" class="table table-hover table-striped table-bordered text-center">
                 <thead class="table-dark">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Gender</th>
-                        <th scope="col">Contact</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Trustworthy</th>
-                        <th scope="col">Credit</th>
-                        <th scope="col">Actions</th>
-                    </tr>
+                    <!-- Dynamically generated headers will be added here -->
                 </thead>
                 <tbody class="table-group-divider">
                     <!-- Data will be loaded automatically -->
@@ -83,6 +74,7 @@
         </div>
     </div>
 </div>
+
 
 
 <!--Delete Confirmation Modal-->
@@ -120,7 +112,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             loadCustomers("Active");
         });
-        //loading customers based on filter
+
         const lookups = @Html.Raw(Json.Serialize(Model.Lookups));
         const persons = @Html.Raw(Json.Serialize(Model.Persons));
         const customers = @Html.Raw(Json.Serialize(Model.Customers));
@@ -137,8 +129,24 @@
         });
 
         function loadCustomers(status) {
-            const customersTable = document.getElementById("customersTable").getElementsByTagName("tbody")[0];
-            customersTable.innerHTML = "";
+            const customersTable = document.getElementById("customersTable");
+            const customersTableBody = customersTable.getElementsByTagName("tbody")[0];
+            const customersTableHeader = customersTable.getElementsByTagName("thead")[0];
+            customersTableBody.innerHTML = "";
+
+            // Dynamically adjust table headers based on status
+            customersTableHeader.innerHTML = `
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Gender</th>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">Trustworthy</th>
+                                    <th scope="col">Credit</th>
+                                    ${status === "Active" ? '<th scope="col">Actions</th>' : ''}
+                                </tr>
+                            `;
 
             const filteredCustomers = [];
             customers.forEach(customer => {
@@ -148,41 +156,54 @@
                     filteredCustomers.push(customer);
                 }
             });
-            console.log(filteredCustomers)
-            displayCustomers(filteredCustomers);
+            displayCustomers(filteredCustomers, status);
         }
-        function displayCustomers(customers) {
-            const customersTable = document.getElementById("customersTable").getElementsByTagName("tbody")[0];
 
-            //empty handling
+        function displayCustomers(customers, status) {
+            const customersTableBody = document.getElementById("customersTable").getElementsByTagName("tbody")[0];
+
+            // empty handling
             if (customers.length === 0) {
                 const row = document.createElement("tr");
-                row.innerHTML = `<td colspan="8">No data available</td>`;
-                customersTable.appendChild(row);
+                row.innerHTML = `<td colspan="${status === 'Active' ? '8' : '7'}">No data available</td>`;
+                customersTableBody.appendChild(row);
                 return;
             }
-            customersTable.innerHTML = "";
+
+            customersTableBody.innerHTML = "";
             customers.forEach((customer, index) => {
                 const person = persons.find(person => person.id === customer.id);
                 const statusType = lookups.find(lookup => lookup.id === person.status).value;
                 const gender = lookups.find(lookup => lookup.id === person.gender).value;
                 const row = document.createElement("tr");
-                row.innerHTML = `
-                                                <th>${index + 1}</th>
-                                                <td>${person.firstName + ' ' + person.lastName}</td>
-                                                <td>${gender}</td>
-                                                <td>${person.contact}</td>
-                                                <td>${person.streetAddress + ', ' + person.city + ', ' + person.province + ', ' + person.country}</td>
-                                                <td>${customer.isTrustworthy ? '<span class="badge bg-success text-white" style="font-weight:bolder; font-size:14px;padding:6px;    ">Yes</span>' : '<span class="badge bg-danger text-white" style="font-weight:bolder; font-size:14px;padding:6px;">No</span>'}</td>
-                                                <td>${customer.credit}</td>
-                                                <td>
-                                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" onclick="deleteCustomer('${customer.id}','${person.firstName}','${person.lastName}')"><i class="bi bi-trash"></i></button>
-                                                </td>
-                                                `;
-                customersTable.appendChild(row);
+
+                if (statusType === "Active") {
+                    row.innerHTML = `
+                                        <th>${index + 1}</th>
+                                        <td>${person.firstName + ' ' + person.lastName}</td>
+                                        <td>${gender}</td>
+                                        <td>${person.contact}</td>
+                                        <td>${person.streetAddress + ', ' + person.city + ', ' + person.province + ', ' + person.country}</td>
+                                        <td>${customer.isTrustworthy ? '<span class="badge bg-success text-white" style="font-weight:bolder; font-size:14px;padding:6px;">Yes</span>' : '<span class="badge bg-danger text-white" style="font-weight:bolder; font-size:14px;padding:6px;">No</span>'}</td>
+                                        <td>${customer.credit}</td>
+                                        <td>
+                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" onclick="deleteCustomer('${customer.id}','${person.firstName}','${person.lastName}')"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    `;
+                } else {
+                    row.innerHTML = `
+                                        <th>${index + 1}</th>
+                                        <td>${person.firstName + ' ' + person.lastName}</td>
+                                        <td>${gender}</td>
+                                        <td>${person.contact}</td>
+                                        <td>${person.streetAddress + ', ' + person.city + ', ' + person.province + ', ' + person.country}</td>
+                                        <td>${customer.isTrustworthy ? '<span class="badge bg-success text-white" style="font-weight:bolder; font-size:14px;padding:6px;">Yes</span>' : '<span class="badge bg-danger text-white" style="font-weight:bolder; font-size:14px;padding:6px;">No</span>'}</td>
+                                        <td>${customer.credit}</td>
+                                    `;
+                }
+                customersTableBody.appendChild(row);
             });
         }
-
     </script>
 
     <script>
@@ -190,7 +211,7 @@
             var table = $("#customersTable").DataTable({
                 paging: true,
                 lengthChange: false,
-                searching: true, // Disable DataTables default search
+                searching: true,
                 ordering: true,
                 info: true,
                 autoWidth: false,

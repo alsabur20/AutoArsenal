@@ -25,8 +25,6 @@
     </div>
 }
 <!-- End Error message -->
-
-
 <!-- Search Bar -->
 <div class="card">
     <div class="card-body">
@@ -51,12 +49,11 @@
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Gender</th>
+                        <th scope="col">Name</th>
                         <th scope="col">Designation</th>
-                        <th scope="col">Contact</th>
+                        <th scope="col">Salary</th>
                         <th scope="col">Joining Date</th>
+                        <th scope="col">Contact</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -74,21 +71,25 @@
 
                                 <tr>
                                     <td>@(count++)</td>
-                                    <td>@person.FirstName</td>
-                                    <td>@person.LastName</td>
-                                    <td>@gender</td>
+                                    <td>@(person.FirstName + " " + person.LastName)</td>
                                     <td>@designation</td>
+                                    <td>@employee.Salary</td>
+                                    <td>@employee.JoiningDate.ToString("dd MMMM, yyyy")</td>
                                     <td>@person.Contact</td>
-                                    <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
                                     <td>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#editEmployeeModal"
-                                            onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
+                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                           data-bs-target="#viewEmployeeModal"
+                                           onclick="viewEmployee('@person.FirstName','@person.LastName','@person.Contact', '@gender','@employee.JoiningDate.ToString("MMM dd, yyyy")','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@designation')">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                           data-bs-target="#editEmployeeModal"
+                                           onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
                                             <i class="bi bi-pencil"></i>
-                                        </button>
+                                        </a>
                                         <a class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteEmployeeModal"
-                                            onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
+                                           data-bs-target="#deleteEmployeeModal"
+                                           onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
@@ -112,7 +113,7 @@
 <!-- End Table -->
 <!-- Add employee modal -->
 <div class="modal fade" id="createEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="AddEmployee" id="addEmployeeModal">
@@ -126,7 +127,7 @@
                             <!-- First Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="FirstName" placeholder="First Name"
-                                    asp-for="Person.FirstName" />
+                                       asp-for="Person.FirstName" />
                                 <label for="FirstName">First Name</label>
                                 <p class="invalid" id="firstNameError"></p>
                             </div>
@@ -135,7 +136,7 @@
                             <!-- Last Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="LastName" placeholder="Last Name"
-                                    asp-for="Person.LastName" />
+                                       asp-for="Person.LastName" />
                                 <label for="LastName">Last Name</label>
                                 <p class="invalid" id="lastNameError"></p>
                             </div>
@@ -144,7 +145,7 @@
                             <!-- Contact -->
                             <div class="form-floating mt-2">
                                 <input type="tel" class="form-control" id="Contact" placeholder="Contact"
-                                    asp-for="Person.Contact" />
+                                       asp-for="Person.Contact" />
                                 <label for="Contact">Contact</label>
                                 <p class="invalid" id="contactError"></p>
                             </div>
@@ -153,7 +154,7 @@
                             <!-- Gender -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Gender" aria-label="Default select example"
-                                    asp-for="Person.Gender">
+                                        asp-for="Person.Gender">
                                     <option value="-1" selected>Select Gender</option>
                                     <option value="1">Male</option>
                                     <option value="2">Female</option>
@@ -166,7 +167,7 @@
                             <!-- Joining Date -->
                             <div class="form-floating mt-2">
                                 <input type="date" class="form-control" id="JoiningDate" placeholder="Joining Date"
-                                    asp-for="Employee.JoiningDate" />
+                                       asp-for="Employee.JoiningDate" />
                                 <label for="JoiningDate">Joining Date</label>
                                 <p class="invalid" id="joiningDateError"></p>
                             </div>
@@ -175,7 +176,7 @@
                             <!-- Address -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="Address" placeholder="Address"
-                                    asp-for="Person.StreetAddress" />
+                                       asp-for="Person.StreetAddress" />
                                 <label for="Address">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -184,7 +185,7 @@
                             <!-- City -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="City" aria-label="Default select example"
-                                    asp-for="Person.City">
+                                        asp-for="Person.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -199,7 +200,7 @@
                             <!-- Province -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Province" aria-label="Default select example"
-                                    asp-for="Person.Province">
+                                        asp-for="Person.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -214,7 +215,7 @@
                             <!-- Country -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Country" aria-label="Default select example"
-                                    asp-for="Person.Country">
+                                        asp-for="Person.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -226,7 +227,7 @@
                             <!-- Salary -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="Salary" placeholder="Salary" min="0"
-                                    oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
+                                       oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
                                 <label for="Salary">Salary</label>
                                 <p class="invalid" id="salaryError"></p>
                             </div>
@@ -235,7 +236,7 @@
                             <!-- Role -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Role" aria-label="Default select example"
-                                    asp-for="Employee.Role">
+                                        asp-for="Employee.Role">
                                     <option value="-1" selected>Select Role</option>
                                     @if (Model.Lookups != null)
                                     {
@@ -264,9 +265,93 @@
     </div>
 </div>
 <!-- End Add Employee Modal -->
+<!-- View employee modal -->
+<div class="modal fade" id="viewEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-eye"></i> View Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- First Name -->
+                        <div class="form-floating mt-2">
+                            <p>First Name: <b id="vFirstName"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Last Name -->
+                        <div class="form-floating mt-2">
+                            <p>Last Name: <b id="vLastName"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Contact -->
+                        <div class="form-floating mt-2">
+                            <p>Contact: <b id="vContact"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Gender -->
+                        <div class="form-floating mt-2">
+                            <p>Gender: <b id="vGender"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Joining Date -->
+                        <div class="form-floating mt-2">
+                            <p>Joining Date: <b id="vJoiningDate"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Address -->
+                        <div class="form-floating mt-2">
+                            <p>Address: <b id="vAddress"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- City -->
+                        <div class="form-floating mt-2">
+                            <p>City: <b id="vCity"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Province -->
+                        <div class="form-floating mt-2">
+                            <p>Province: <b id="vProvince"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Country -->
+                        <div class="form-floating mt-2">
+                            <p>Country: <b id="vCountry"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Salary -->
+                        <div class="form-floating mt-2">
+                            <p>Salary: <b id="vSalary"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Role -->
+                        <div class="form-floating mt-2">
+                            <p>Role: <b id="vRole"></b></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End View Employee Modal -->
 <!--Edit employee modal-->
 <div class="modal fade" id="editEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="EditEmployee" id="editEmployeeModal">
@@ -282,7 +367,7 @@
                             <!-- First Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="editFirstName" placeholder="First Name"
-                                    asp-for="Person.FirstName" />
+                                       asp-for="Person.FirstName" />
                                 <label for="editFirstName">First Name</label>
                                 <p class="invalid" id="editfirstNameError"></p>
                             </div>
@@ -291,7 +376,7 @@
                             <!-- Last Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="editLastName" placeholder="Last Name"
-                                    asp-for="Person.LastName" />
+                                       asp-for="Person.LastName" />
                                 <label for="editLastName">Last Name</label>
                                 <p class="invalid" id="editlastNameError"></p>
                             </div>
@@ -300,7 +385,7 @@
                             <!-- Contact -->
                             <div class="form-floating mt-2">
                                 <input type="tel" class="form-control" id="editContact" placeholder="Contact"
-                                    asp-for="Person.Contact" />
+                                       asp-for="Person.Contact" />
                                 <label for="editContact">Contact</label>
                                 <p class="invalid" id="editcontactError"></p>
                             </div>
@@ -309,7 +394,7 @@
                             <!-- Gender -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editGender" aria-label="Default select example"
-                                    asp-for="Person.Gender">
+                                        asp-for="Person.Gender">
                                     <option value="-1" selected>Select Gender</option>
                                     <option value="1">Male</option>
                                     <option value="2">Female</option>
@@ -322,7 +407,7 @@
                             <!-- Joining Date -->
                             <div class="form-floating mt-2">
                                 <input type="date" class="form-control" id="editJoiningDate" placeholder="Joining Date"
-                                    asp-for="Employee.JoiningDate" />
+                                       asp-for="Employee.JoiningDate" />
                                 <label for="editJoiningDate">Joining Date</label>
                                 <p class="invalid" id="editjoiningDateError"></p>
                             </div>
@@ -331,7 +416,7 @@
                             <!-- Address -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="editAddress" placeholder="Address"
-                                    asp-for="Person.StreetAddress" />
+                                       asp-for="Person.StreetAddress" />
                                 <label for="editAddress">Address</label>
                                 <p class="invalid" id="editaddressError"></p>
                             </div>
@@ -340,7 +425,7 @@
                             <!-- City -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editCity" aria-label="Default select example"
-                                    asp-for="Person.City">
+                                        asp-for="Person.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -355,7 +440,7 @@
                             <!-- Province -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editProvince" aria-label="Default select example"
-                                    asp-for="Person.Province">
+                                        asp-for="Person.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -370,7 +455,7 @@
                             <!-- Country -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editCountry" aria-label="Default select example"
-                                    asp-for="Person.Country">
+                                        asp-for="Person.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -382,7 +467,7 @@
                             <!-- Salary -->
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="editSalary" placeholder="Salary" min="0"
-                                    oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
+                                       oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
                                 <label for="editSalary">Salary</label>
                                 <p class="invalid" id="editsalaryError"></p>
                             </div>
@@ -391,7 +476,7 @@
                             <!-- Role -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editRole" aria-label="Default select example"
-                                    asp-for="Employee.Role">
+                                        asp-for="Employee.Role">
                                     <option value="-1" selected>Select Role</option>
                                     @if (Model.Lookups != null)
                                     {
@@ -422,7 +507,7 @@
 <!-- End Edit Product Modal -->
 <!--Delete Confirmation Modal-->
 <div class="modal fade" id="deleteEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="DeleteEmployee">
@@ -447,13 +532,25 @@
     </div>
 </div>
 <!--End Delete Confirmation Modal-->
-
-
-
 <!-- Java Script Section -->
 @section Scripts {
     <!-- Deletion -->
     <script>
+        //Viewing
+        function viewEmployee(firstName, lastName, contact, gender, joiningDate, streetAddress, city, province, country, salary, role) {
+            document.getElementById("vFirstName").textContent = firstName;
+            document.getElementById("vLastName").textContent = lastName;
+            document.getElementById("vContact").textContent = contact;
+            document.getElementById("vGender").textContent = gender;
+            document.getElementById("vJoiningDate").textContent = joiningDate;
+            document.getElementById("vAddress").textContent = streetAddress;
+            document.getElementById("vCity").textContent = city;
+            document.getElementById("vProvince").textContent = province;
+            document.getElementById("vCountry").textContent = country;
+            document.getElementById("vSalary").textContent = salary;
+            document.getElementById("vRole").textContent = role;
+        }
+
 
         //Deleting
         function deleteEmployee(id, firstName, lastName) {

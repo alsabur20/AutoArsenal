@@ -82,7 +82,9 @@ namespace AutoArsenal_App.Pages.Products
                 int pId = await ProductController.AddProduct(product);
                 foreach (var pc in productCategories)
                 {
-                    Inventory inventory = new Inventory();
+                    Inventory inventory = new();
+                    inventory.StockInShop = 0;
+                    inventory.StockInWarehouse = 0;
                     pc.ProductId = pId;
                     pc.InventoryId = await InventoryController.AddInventory(inventory);
                     await ProductCategoryController.AddProductCategory(pc);
