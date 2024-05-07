@@ -1,0 +1,365 @@
+﻿@page
+@model AutoArsenal_App.Pages.Stock.StockModel
+@{
+    ViewData["Title"] = "Stock";
+}
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->
+<!-- Search Card -->
+<div class="card">
+    <div class="card-body">
+        <h5>Filters</h5>
+        <div class="row mb-3">
+            <div id="panelSearch" class="d-flex justify-content-between align-items-center">
+                <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                    <input class="form-control w-100" type="search" placeholder="Search" aria-label="Search" />
+                </form>
+                <button class="btn btn-secondary mx-2" id="clearFilters">Clear Filters</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <select class="form-select" id="warehouseFilter" aria-label="Default select example" onchange="filterProducts()">
+                        <option value="-1" selected>Select Warehouse</option>
+                        @if (Model.Warehouses != null)
+                        {
+                            foreach (Models.Warehouse warehouse in Model.Warehouses)
+                            {
+                                <option value="@warehouse.ID">@warehouse.Name</option>
+                            }
+                        }
+                    </select>
+                    <label for="warehouseFilter">Warehouse</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating mt-2">
+                    <select class="form-select" id="categoryFilter" aria-label="Default select example" onchange="filterProducts()">
+                        <option value="-1" selected>Select Category</option>
+                        @if (Model.Lookups != null)
+                        {
+                            foreach (Models.Lookup lookup in Model.Lookups)
+                            {
+                                if (lookup.Category == "Product_Category")
+                                {
+                                    <option value="@lookup.ID">@lookup.Value</option>
+                                }
+                            }
+                        }
+                    </select>
+                    <label for="categoryFilter">Category</label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- End Search Card -->
+<!-- Table -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Stock</h5>
+        <div class="table-responsive">
+            <table id="stockTable" class="table table-hover table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Stock In Shop</th>
+                        <th scope="col">Stock In Warehouse</th>
+                        <th scope="col">Warehouse</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- End Table -->
+<!-- Edit Modal -->
+
+<div class="modal fade" id="editStockModal" tabindex="-1" aria-labelledby="editStockModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="MoveStock">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStockModalLabel"><i class="bi bi-pencil"></i> Edit Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- hidden id for editing-->
+                    <input type="hidden" id="productCategoryId" asp-for="ProductCategoryId" />
+                    <div class="row mb-3">
+                        <!-- Product Name -->
+                        <div class="col">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="productName" placeholder="Product Name" disabled>
+                                <label for="productName">Product Name</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Product Category -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="productCategory" placeholder="Product Name" disabled>
+                                <label for="productCategory">Product Category</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <!-- Stock In Shop -->
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="stockInShop" placeholder="Stock In Shop" disabled>
+                                <label for="stockInShop">Stock In Shop</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Stock In Warehouse -->
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="stockInWarehouse" placeholder="Stock In Warehouse" disabled>
+                                <label for="stockInWarehouse">Stock In Warehouse</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- add a card for moving stock -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-truck"></i> Move Stock</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-2">
+                                        <select class="form-select" id="moveStockFrom" aria-label="Default select example" onchange="fromOnChange()" asp-for="From">
+                                            <!-- wille be loaded dynamically -->
+                                        </select>
+                                        <label for="moveStockFrom">From</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-2">
+                                        <select class="form-select" id="moveStockTo" aria-label="Default select example" asp-for="To">
+                                            <!-- wille be loaded dynamically -->
+                                        </select>
+                                        <label for="moveStockTo">To</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mt-2">
+                                        <input type="number" class="form-control" id="quantity" placeholder="Quantity" step="1" min="1" oninput="validity.valid||(value='');" asp-for="Quantity">
+                                        <label for="quantity">Quantity</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- End Edit Modal -->
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            filterProducts();
+
+        });
+
+        // lists
+        const lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+        const products = @Html.Raw(Json.Serialize(Model.Products));
+        const productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+        const warehouses = @Html.Raw(Json.Serialize(Model.Warehouses));
+        const inventories = @Html.Raw(Json.Serialize(Model.Inventories));
+
+        var options = [];
+
+        // table
+        const table = $('#stockTable').DataTable({
+            paging: true,
+            lengthChange: false,
+            searching: true,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            language: {
+                emptyTable: "No data available",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                zeroRecords: "No matching records found",
+                search: "Search:",
+            }
+        });
+
+        $('#searchBar input').on('input', function () {
+            var searchText = this.value.trim();
+            table.search(searchText).draw();
+        });
+
+        // clear filter
+        document.getElementById('clearFilters').addEventListener('click', function () {
+            // Reset warehouse filter
+            $('#warehouseFilter').val("-1");
+
+            // Reset category filter
+            $('#categoryFilter').val("-1");
+
+            // Re-filter products
+            filterProducts();
+        });
+
+        // filter the products
+        function filterProducts() {
+            // clear the table
+            table.clear().draw();
+
+            products.forEach(product => {
+                var fProductCategories = productCategories.filter(pc => pc.productId === product.id);
+                fProductCategories.forEach(pc => {
+                    var inventory = inventories.find(i => i.id === pc.inventoryId);
+                    var warehouse = warehouses.find(w => w.id === (inventory ? inventory.warehouseId : null));
+                    var category = lookups.find(l => l.id === pc.category);
+
+                    var shouldDisplay = true;
+
+                    // Check if warehouse filter is applied
+                    if ($('#warehouseFilter').val() !== "-1" && inventory && inventory.warehouseId.toString() !== $('#warehouseFilter').val()) {
+                        shouldDisplay = false;
+                    }
+
+                    // Check if category filter is applied
+                    if ($('#categoryFilter').val() !== "-1" && category && category.id.toString() !== $('#categoryFilter').val()) {
+                        shouldDisplay = false;
+                    }
+
+                    if (shouldDisplay) {
+                        table.row.add([
+                            table.rows().count() + 1,
+                            product.productName,
+                            category ? category.value : 'N/A',
+                            inventory ? (inventory.stockInShop == -1 ? 0 : inventory.stockInShop) : 0,
+                            inventory ? (inventory.stockInWarehouse == -1 ? 0 : inventory.stockInWarehouse) : 0,
+                            warehouse ? warehouse.name : 'N/A',
+                            '<a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editStockModal" onclick="editStock(' + pc.id + ')"><i class="bi bi-pencil"></i></a>'
+                        ]).draw();
+                    }
+                });
+            });
+        }
+
+        var type = null;
+        var w = null;
+        // edit
+        function editStock(productCategoryId) {
+            var pCategory = productCategories.find(pc => pc.id === productCategoryId);
+            var product = products.find(p => p.id === pCategory.productId);
+            var category = lookups.find(l => l.id === pCategory.category).value
+            var inventory = inventories.find(i => i.id === pCategory.inventoryId);
+
+            console.log(inventory)
+            document.getElementById('productCategoryId').value = productCategoryId;
+            document.getElementById('productName').value = product.productName;
+            document.getElementById('productCategory').value = category;
+            document.getElementById('stockInShop').value = inventory.stockInShop > 0 ? inventory.stockInShop : 0;
+            document.getElementById('stockInWarehouse').value = inventory.stockInWarehouse > 0 ? inventory.stockInWarehouse : 0;
+            // move stock
+            var from = document.getElementById('moveStockFrom');
+            var to = document.getElementById('moveStockTo');
+
+            // if stock is in shop
+            if (inventory.stockInShop >= 0 && inventory.stockInWarehouse == -1) {
+                from.innerHTML = '<option value="-1" selected>Select Place</option>';
+                from.innerHTML += '<option value="0">Shop</option>';
+                type = 1;
+            }
+            // if stock is in warehouse
+            else if (inventory.stockInShop == -1 && inventory.stockInWarehouse >= 0) {
+                var warehouse = warehouses.find(w => w.id == inventory.warehouseId);
+                from.innerHTML = '<option value="-1" selected>Select Place</option>';
+                from.innerHTML += '<option value="' + inventory.warehouseId + '">' + warehouse.name + '</option>';
+                type = 2;
+            }
+            // if stock is in both shop and warehouse
+            else if (inventory.stockInShop >= 0 && inventory.stockInWarehouse >= 0) {
+                var warehouse = warehouses.find(w => w.id == inventory.warehouseId);
+                from.innerHTML = '<option value="-1" selected>Select Place</option>';
+                from.innerHTML += '<option value="0">Shop</option>';
+                from.innerHTML += '<option value="' + warehouse.id + '">' + warehouse.name + '</option>';
+                type = 3;
+                w = warehouse.id;
+            }
+            to.disabled = true;
+        }
+        function fromOnChange() {
+            var from = document.getElementById('moveStockFrom');
+            var to = document.getElementById('moveStockTo');
+
+            console.log(warehouses)
+            var fromValue = from.value;
+
+            if (fromValue == -1) {
+                to.innerHTML = '';
+                to.innerHTML = '<option value="-1" selected>Select Place</option>';
+                to.disabled = true;
+                return;
+            }
+            if (type == 1) {
+                to.disabled = false;
+                to.innerHTML = '';
+                to.innerHTML = '<option value="-1" selected>Select Place</option>';
+                warehouses.forEach(w => {
+                    to.innerHTML += '<option value="' + w.id + '" selected>' + w.name + '</option>';
+                });
+            } else if (type == 2) {
+                to.disabled = false;
+                to.innerHTML = '';
+                to.innerHTML = '<option value="-1" selected>Select Place</option>';
+                to.innerHTML += '<option value="0" selected>Shop</option>';
+            } else if (type == 3) {
+                var warehouse = warehouses.find(wa => wa.id == w);
+                var fValue = from.value;
+                if (fValue == 0) {
+                    to.disabled = false;
+                    to.innerHTML = '';
+                    to.innerHTML = '<option value="-1" selected>Select Place</option>';
+                    to.innerHTML += '<option value="' + warehouse.id + '" selected>' + warehouse.name + '</option>';
+                }
+                else if (fValue > 0) {
+                    to.disabled = false;
+                    to.innerHTML = '';
+                    to.innerHTML = '<option value="-1" selected>Select Place</option>';
+                    to.innerHTML += '<option value="0" selected>Shop</option>';
+                }
+            }
+        }
+
+
+    </script>
+}
