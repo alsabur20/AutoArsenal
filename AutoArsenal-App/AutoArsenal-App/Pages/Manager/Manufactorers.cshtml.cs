@@ -10,32 +10,23 @@ namespace AutoArsenal_App.Pages.Manager
 {
     public class ManufacturersModel : PageModel
     {
-   
-
-        // For creating and editing
-        [BindProperty]
-        public Manufacturer Manufacturer { get; set; }
-
         //for deleting
         [BindProperty]
         public int DeleteID { get; set; }
 
         //for creating and editing
         [BindProperty]
-        public Person Person { get; set; }
-        [BindProperty]
-        public Employee Employee { get; set; }
+        public Manufacturer manufacturer { get; set; }
 
         //for viewing
         [BindProperty]
-        public List<Lookup> Lookups { get; set; }
-        [BindProperty]
-        public List<Person> Persons { get; set; }
+        public List<Manufacturer> manufacturers { get; set; }
 
         [BindProperty]
         public List<string> Cities { get; set; }
         [BindProperty]
         public List<string> Provinces { get; set; }
+
 
         public async void OnGet()
         {
@@ -70,7 +61,7 @@ namespace AutoArsenal_App.Pages.Manager
 
             try
             {
-                // Additional logic for fetching manufacturer data can be added here if needed
+                manufacturers = await ManufacturerController.GetManufacturers();
             }
             catch (Exception ex)
             {
@@ -82,14 +73,29 @@ namespace AutoArsenal_App.Pages.Manager
         {
             try
             {
-                // Additional logic for adding a manufacturer can be added here
+                await ManufacturerController.AddManufacturer(manufacturer);
+
                 TempData["Success"] = "Manufacturer added successfully";
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Manager/Manufacturers");
+            return Page();
+        }
+        
+        // For editing
+        public async Task<IActionResult> OnPostEditManufacturer()
+        {
+            try
+            {
+                await ManufacturerController.UpdateManufacturer(manufacturer);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
+            return Page(); ;
         }
 
         // For deleting
@@ -97,29 +103,14 @@ namespace AutoArsenal_App.Pages.Manager
         {
             try
             {
-                // Additional logic for deleting a manufacturer can be added here
-                return RedirectToPage("/Manager/Manufacturers");
+                await ManufacturerController.DeleteManufacturer(DeleteID);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Manager/Manufacturers");
             }
+            return Page(); ;
         }
 
-        // For editing
-        public async Task<IActionResult> OnPostEditManufacturer()
-        {
-            try
-            {
-                // Additional logic for editing a manufacturer can be added here
-                return RedirectToPage("/Manager/Manufacturers");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Manager/Manufacturers");
-            }
-        }
     }
 }

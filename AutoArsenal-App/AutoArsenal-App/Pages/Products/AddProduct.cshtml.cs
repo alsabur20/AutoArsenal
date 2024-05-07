@@ -32,6 +32,36 @@ namespace AutoArsenal_App.Pages.Products
         {
             try
             {
+                Cities = new List<string> {
+                "Karachi",
+                "Lahore",
+                "Layyah",
+                "Islamabad",
+                "Faisalabad",
+                "Rawalpindi",
+                "Multan",
+                "Gujranwala",
+                "Peshawar",
+                "Quetta",
+                "Sialkot",
+                "Hyderabad",
+                "Bahawalpur",
+                "Sargodha",
+                "Abbottabad",
+                "Sukkur",
+                "NawabShah",
+                "Mingora",
+                "Mirpur Khas",
+                "Sheikhupura",
+                "Jhang"};
+
+                Provinces = new List<string>{
+                "Punjab",
+                "Sindh",
+                "Khyber Pakhtunkhwa",
+                "Balochistan",
+                "Gilgit-Baltistan" };
+
                 Inventories = await InventoryController.GetInventory();
                 Manufacturers = await ManufacturerController.GetManufacturers();
                 Lookups = await LookupController.GetLookup();
@@ -63,6 +93,28 @@ namespace AutoArsenal_App.Pages.Products
                 TempData["ErrorOnServer"] = ex.Message + ex.StackTrace;
             }
             return RedirectToPage("/Products/AllProducts");
+        }
+
+        // For Adding Manufacturer
+        [BindProperty]
+        public Manufacturer manufacturer { get; set; }
+        [BindProperty]
+        public List<string> Cities { get; set; }
+        [BindProperty]
+        public List<string> Provinces { get; set; }
+        public async Task<IActionResult> OnPostAddManufacturer()
+        {
+            try
+            {
+                await ManufacturerController.AddManufacturer(manufacturer);
+
+                TempData["Success"] = "Manufacturer added successfully";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorOnServer"] = ex.Message;
+            }
+            return Page();
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿@page
 @model AutoArsenal_App.Pages.Manager.ManufacturersModel
 @{
-    ViewData["Title"] = "Employees";
+    ViewData["Title"] = "Manufacturers";
 }
-
 
 <!-- Page Title -->
 <div class="pagetitle">
@@ -18,6 +17,7 @@
     </nav>
 </div>
 <!-- End Page Title -->
+
 <!-- Error message -->
 @if (TempData["ErrorOnServer"] != null)
 {
@@ -27,68 +27,63 @@
     </div>
 }
 <!-- End Error message -->
+
 <!-- Search Bar -->
 <div class="card">
     <div class="card-body">
-        <div id="panelSearch"
-             class="d-flex justify-content-between align-items-center">
+        <div id="panelSearch" class="d-flex justify-content-between align-items-center">
             <div class="searchBarButton" style="margin:10px;">
-                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">Create New</a>
+                <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createManufacturerModal">Create
+                    New</a>
             </div>
             <form class="form-inline flex-grow-1 mr-2" id="searchBar">
-                <input class="form-control w-100"
-                       type="search"
-                       placeholder="Search"
-                       aria-label="Search" />
+                <input class="form-control w-100" type="search" placeholder="Search" aria-label="Search" />
             </form>
         </div>
     </div>
 </div>
 <!-- End Search Bar -->
+
 <!-- Table -->
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Employees</h5>
+        <h5 class="card-title">@ViewData["Title"]</h5>
         <div class="table-responsive">
             <!-- Table with stripped rows -->
             <table id="empTable" class="table table-hover table-striped table-bordered text-center">
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Gender</th>
-                        <th scope="col">Designation</th>
-                        <th scope="col">Joining Date</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Contact</th>
+                        <th scope="col">Address</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
-                @* <tbody class="table-group-divider">
-                    @if (Model.Manufacturer != null && Model.Persons != null && Model.Lookups != null)
+                <tbody class="table-group-divider">
+                    @if (Model.manufacturers != null)
                     {
                         int count = 1;
-                        @foreach (var employee in Model.Employees)
+                        @foreach (var manu in Model.manufacturers)
                         {
-                            Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
-                            if (person.Status == 8)
+                            if (!manu.IsDeleted)
                             {
-                                string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
-                                string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
-
                                 <tr>
                                     <td>@(count++)</td>
-                                    <td>@person.FirstName</td>
-                                    <td>@person.LastName</td>
-                                    <td>@gender</td>
-                                    <td>@designation</td>
-                                    <td>@employee.JoiningDate.Value.ToString("dd MMMM, yyyy")</td>
+                                    <td>@manu.Name</td>
+                                    <td>@manu.Contact</td>
+                                    <td>@manu.StreetAddress @manu.City, @manu.Province, @manu.Country </td>
                                     <td>
-                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#editEmployeeModal" onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#editManufacturerModal"
+                                            onclick="editManufacturer('@manu.Name','@manu.Contact','@manu.StreetAddress','@manu.City','@manu.Province','@manu.Country')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEmployeeModal" onclick="deleteEmployee('@employee.ID','@person.FirstName','@person.LastName')">
+                                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteManufacturerModal"
+                                            onclick="deleteEmployee('@manu.ID', '@manu.Name')">
                                             <i class="bi bi-trash"></i>
-                                        </a>
+                                        </button>
                                     </td>
                                 </tr>
                             }
@@ -101,72 +96,52 @@
                         </tr>
                     }
 
-                </tbody> *@
+                </tbody>
             </table>
             <!-- End Table with stripped rows -->
         </div>
     </div>
 </div>
 <!-- End Table -->
-<!-- Add employee modal -->
-<div class="modal fade" id="createEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+
+<!-- Add Manufacturer Modal -->
+<div class="modal fade" id="createManufacturerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="AddEmployee" id="addEmployeeModal">
+            <form method="post" asp-page-handler="AddManufacturer">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Employee</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Manufacturer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- First Name -->
+                            <!-- Name -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="FirstName" placeholder="First Name" asp-for="Person.FirstName" />
-                                <label for="FirstName">First Name</label>
-                                <p class="invalid" id="firstNameError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Last Name -->
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="LastName" placeholder="Last Name" asp-for="Person.LastName" />
-                                <label for="LastName">Last Name</label>
-                                <p class="invalid" id="lastNameError"></p>
+                                <input type="text" class="form-control" id="name" placeholder="Name"
+                                    asp-for="manufacturer.Name" />
+                                <label for="name">Name</label>
+                                <p class="invalid" id="nameError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Contact -->
                             <div class="form-floating mt-2">
-                                <input type="tel" class="form-control" id="Contact" placeholder="Contact" asp-for="Person.Contact" />
+                                <input type="tel" class="form-control" id="Contact" placeholder="Contact"
+                                    asp-for="manufacturer.Contact" />
                                 <label for="Contact">Contact</label>
                                 <p class="invalid" id="contactError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <!-- Gender -->
-                            <div class="form-floating mt-2">
-                                <select class="form-select" id="Gender" aria-label="Default select example" asp-for="Person.Gender">
-                                    <option value="-1" selected>Select Gender</option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
-                                </select>
-                                <label for="Gender">Gender</label>
-                                <p class="invalid" id="genderError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Joining Date -->
-                            <div class="form-floating mt-2">
-                                <input type="date" class="form-control" id="JoiningDate" placeholder="Joining Date" asp-for="Employee.JoiningDate" />
-                                <label for="JoiningDate">Joining Date</label>
-                                <p class="invalid" id="joiningDateError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
                             <!-- Address -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="Address" placeholder="Address" asp-for="Person.StreetAddress" />
+                                <input type="text" class="form-control" id="Address" placeholder="Address"
+                                    asp-for="manufacturer.StreetAddress" />
                                 <label for="Address">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -174,7 +149,8 @@
                         <div class="col-md-6">
                             <!-- City -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="City" aria-label="Default select example" asp-for="Person.City">
+                                <select class="form-select" id="City" aria-label="Default select example"
+                                    asp-for="manufacturer.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -188,7 +164,8 @@
                         <div class="col-md-6">
                             <!-- Province -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="Province" aria-label="Default select example" asp-for="Person.Province">
+                                <select class="form-select" id="Province" aria-label="Default select example"
+                                    asp-for="manufacturer.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -202,40 +179,13 @@
                         <div class="col-md-6">
                             <!-- Country -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="Country" aria-label="Default select example" asp-for="Person.Country">
+                                <select class="form-select" id="Country" aria-label="Default select example"
+                                    asp-for="manufacturer.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
                                 <label for="Country">Country</label>
                                 <p class="invalid" id="countryError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Salary -->
-                            <div class="form-floating mt-2">
-                                <input type="number" class="form-control" id="Salary" placeholder="Salary" min="0" oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
-                                <label for="Salary">Salary</label>
-                                <p class="invalid" id="salaryError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Role -->
-                            <div class="form-floating mt-2">
-                                <select class="form-select" id="Role" aria-label="Default select example" asp-for="Employee.Role">
-                                    <option value="-1" selected>Select Role</option>
-                                    @if (Model.Lookups != null)
-                                    {
-                                        foreach (var lookup in Model.Lookups)
-                                        {
-                                            if (lookup.Category == "Employee_Type")
-                                            {
-                                                <option value="@lookup.ID">@lookup.Value</option>
-                                            }
-                                        }
-                                    }
-                                </select>
-                                <label for="Role">Role</label>
-                                <p class="invalid" id="roleError"></p>
                             </div>
                         </div>
                     </div>
@@ -249,76 +199,54 @@
         </div>
     </div>
 </div>
-<!-- End Add Employee Modal -->
-<!--Edit employee modal-->
-<div class="modal fade" id="editEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
+
+<!-- Edit Manufacturer -->
+<div class="modal fade" id="editManufacturerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="EditEmployee" id="editEmployeeModal">
+            <form method="post" asp-page-handler="EditManufacturer">
+                <input type="hidden" id="editId" asp-for="manufacturer.ID" />
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i> Edit Employee</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i>Edit Manufacturer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <!-- Hidden input for storing id for editing -->
-                            <input type="hidden" id="editId" asp-for="Person.ID" />
-                            <!-- First Name -->
+                            <!-- Name -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editFirstName" placeholder="First Name" asp-for="Person.FirstName" />
-                                <label for="editFirstName">First Name</label>
-                                <p class="invalid" id="editfirstNameError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Last Name -->
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editLastName" placeholder="Last Name" asp-for="Person.LastName" />
-                                <label for="editLastName">Last Name</label>
-                                <p class="invalid" id="editlastNameError"></p>
+                                <input type="text" class="form-control" id="editName" placeholder="Name" disabled />
+                                <label for="editName">Name</label>
+                                <p class="invalid" id="nameError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Contact -->
                             <div class="form-floating mt-2">
-                                <input type="tel" class="form-control" id="editContact" placeholder="Contact" asp-for="Person.Contact" />
+                                <input type="tel" class="form-control" id="editContact" placeholder="Contact"
+                                    asp-for="manufacturer.Contact" />
                                 <label for="editContact">Contact</label>
-                                <p class="invalid" id="editcontactError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Gender -->
-                            <div class="form-floating mt-2">
-                                <select class="form-select" id="editGender" aria-label="Default select example" asp-for="Person.Gender">
-                                    <option value="-1" selected>Select Gender</option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
-                                </select>
-                                <label for="editGender">Gender</label>
-                                <p class="invalid" id="editgenderError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Joining Date -->
-                            <div class="form-floating mt-2">
-                                <input type="date" class="form-control" id="editJoiningDate" placeholder="Joining Date" asp-for="Employee.JoiningDate" />
-                                <label for="editJoiningDate">Joining Date</label>
-                                <p class="invalid" id="editjoiningDateError"></p>
+                                <p class="invalid" id="contactError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Address -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editAddress" placeholder="Address" asp-for="Person.StreetAddress" />
+                                <input type="text" class="form-control" id="editAddress" placeholder="Address"
+                                    asp-for="manufacturer.StreetAddress" />
                                 <label for="editAddress">Address</label>
-                                <p class="invalid" id="editaddressError"></p>
+                                <p class="invalid" id="addressError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- City -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editCity" aria-label="Default select example" asp-for="Person.City">
+                                <select class="form-select" id="editCity" aria-label="Default select example"
+                                    asp-for="manufacturer.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -326,13 +254,14 @@
                                     }
                                 </select>
                                 <label for="editCity">City</label>
-                                <p class="invalid" id="editcityError"></p>
+                                <p class="invalid" id="cityError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Province -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editProvince" aria-label="Default select example" asp-for="Person.Province">
+                                <select class="form-select" id="editProvince" aria-label="Default select example"
+                                    asp-for="manufacturer.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -340,46 +269,19 @@
                                     }
                                 </select>
                                 <label for="editProvince">Province</label>
-                                <p class="invalid" id="editprovinceError"></p>
+                                <p class="invalid" id="provinceError"></p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <!-- Country -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="editCountry" aria-label="Default select example" asp-for="Person.Country">
+                                <select class="form-select" id="editCountry" aria-label="Default select example"
+                                    asp-for="manufacturer.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
                                 <label for="editCountry">Country</label>
-                                <p class="invalid" id="editcountryError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Salary -->
-                            <div class="form-floating mt-2">
-                                <input type="number" class="form-control" id="editSalary" placeholder="Salary" min="0" oninput="validity.valid||(value='');" asp-for="Employee.Salary" />
-                                <label for="editSalary">Salary</label>
-                                <p class="invalid" id="editsalaryError"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- Role -->
-                            <div class="form-floating mt-2">
-                                <select class="form-select" id="editRole" aria-label="Default select example" asp-for="Employee.Role">
-                                    <option value="-1" selected>Select Role</option>
-                                    @if (Model.Lookups != null)
-                                    {
-                                        foreach (var lookup in Model.Lookups)
-                                        {
-                                            if (lookup.Category == "Employee_Type")
-                                            {
-                                                <option value="@lookup.ID">@lookup.Value</option>
-                                            }
-                                        }
-                                    }
-                                </select>
-                                <label for="editRole">Role</label>
-                                <p class="invalid" id="editroleError"></p>
+                                <p class="invalid" id="countryError"></p>
                             </div>
                         </div>
                     </div>
@@ -387,29 +289,31 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="editBtn">Save</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-<!-- End Edit Product Modal -->
+
+
 <!--Delete Confirmation Modal-->
-<div class="modal fade" id="deleteEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="deleteManufacturerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="DeleteEmployee">
+            <form method="post" asp-page-handler="DeleteManufacturer">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Delete Employee</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Delete Manufacturer
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Hidden input to store id for deletion-->
                     <input type="hidden" id="deleteId" asp-for="DeleteID" />
+
                     <!-- Confirmation Message-->
                     <p>Are you sure you want to delete this employee?</p>
-                    <!-- Selected Employee Name-->
-                    <p>Employee Name: <b id="deleteTitle"></b></p>
+                    <p>Manufacturer Name: <b id="deleteTitle"></b></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -420,30 +324,26 @@
     </div>
 </div>
 <!--End Delete Confirmation Modal-->
-@section Scripts {
-    <script>
 
+
+<!-- Java Script Section -->
+@section Scripts {
+    <!-- Deletion -->
+    <script>
         //Deleting
-        function deleteEmployee(id, firstName, lastName) {
+        function deleteManufacturer(id, name) {
             document.getElementById("deleteId").value = id;
-            document.getElementById("deleteTitle").textContent = firstName + ' ' + lastName;
+            document.getElementById("deleteTitle").textContent = name;
         }
+
         //Editing
-        function editEmployee(personId, firstName, lastName, contact, gender, joiningDate, streetAddress, city, province, country, salary, role) {
-            document.getElementById("editId").value = personId;
-            document.getElementById("editFirstName").value = firstName;
-            document.getElementById("editLastName").value = lastName;
+        function editManufacturer(name, contact, address, city, province, country) {
+            document.getElementById("editName").value = name;
             document.getElementById("editContact").value = contact;
-            document.getElementById("editGender").value = gender;
-            var parts = joiningDate.split(/[\s/:]+/); // Split the date string by spaces, slashes, and colons
-            var formattedDate = new Date(parts[2], parts[1] - 1, parts[0]); // Construct a new Date object
-            document.getElementById("editJoiningDate").value = formattedDate.toISOString().split('T')[0]; // Set the value to the input element
-            document.getElementById("editAddress").value = streetAddress;
-            document.getElementById("editCity").value = city == "" ? -1 : city;
-            document.getElementById("editProvince").value = province == "" ? -1 : province;
-            document.getElementById("editCountry").value = country == "" ? -1 : country;
-            document.getElementById("editSalary").value = salary;
-            document.getElementById("editRole").value = role;
+            document.getElementById("editAddress").value = address;
+            document.getElementById("editCity").value = city;
+            document.getElementById("editProvince").value = province;
+            document.getElementById("editCountry").value = country;
         }
 
         // Adjust the DataTables initialization
@@ -452,7 +352,7 @@
                 paging: true,
                 lengthChange: false,
                 searching: true, // Disable DataTables default search
-                ordering: false,
+                ordering: true,
                 info: true,
                 autoWidth: false,
                 language: {
@@ -471,148 +371,52 @@
                 table.search(searchText).draw();
             });
         });
-        // Form validation and submission
-        document.addEventListener("DOMContentLoaded", function () {
+    </script>
 
-            var form = document.querySelector("#addEmployeeModal");
+
+    <!-- Add Modal Validations and Submission -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector("#createManufacturerModal form");
             var submitButton = form.querySelector("#addBtn");
-            var firstName = form.querySelector("#FirstName");
-            var lastName = form.querySelector("#LastName");
-            var contact = form.querySelector("#Contact");
-            var gender = form.querySelector("#Gender");
-            var joiningDate = form.querySelector("#JoiningDate");
-            var address = form.querySelector("#Address");
-            var city = form.querySelector("#City");
-            var province = form.querySelector("#Province");
-            var country = form.querySelector("#Country");
-            var salary = form.querySelector("#Salary");
-            var role = form.querySelector("#Role");
+
+            // Define input fields and their corresponding error elements
+            var fields = [
+                { input: form.querySelector("#name"), error: document.querySelector("#nameError"), errorMessage: "Name is required" },
+                { input: form.querySelector("#Contact"), error: document.querySelector("#contactError"), errorMessage: "Contact is required" },
+                { input: form.querySelector("#Address"), error: document.querySelector("#addressError"), errorMessage: "Address is required" },
+                { input: form.querySelector("#City"), error: document.querySelector("#cityError"), errorMessage: "City is required" },
+                { input: form.querySelector("#Province"), error: document.querySelector("#provinceError"), errorMessage: "Province is required" },
+                { input: form.querySelector("#Country"), error: document.querySelector("#countryError"), errorMessage: "Country is required" }
+            ];
 
             // Add event listener for input fields
             form.addEventListener("input", function () {
-                var errors = false;
+                var errors = fields.some(function (field) {
+                    if (field.input.value.trim() === "" || field.input.value === "-1") {
+                        field.error.textContent = field.errorMessage;
+                        field.error.style = 'display: block; font-size: 12px; color: red;';
+                        field.input.classList.add("is-invalid");
+                        return true;
+                    } else {
+                        field.error.textContent = "";
+                        field.error.style.display = 'none';
+                        field.input.classList.remove("is-invalid");
+                        return false;
+                    }
+                });
 
-                if (firstName.value.trim() === "") {
-                    document.querySelector("#firstNameError").textContent = "First Name is required";
-                    document.querySelector("#firstNameError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    firstName.classList.add("is-invalid");
-                } else {
-                    firstName.classList.remove("is-invalid");
-                    document.querySelector("#firstNameError").textContent = "";
-                }
-
-                if (lastName.value.trim() === "") {
-                    document.querySelector("#lastNameError").textContent = "Last Name is required";
-                    document.querySelector("#lastNameError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    lastName.classList.add("is-invalid");
-                } else {
-                    lastName.classList.remove("is-invalid");
-                    document.querySelector("#lastNameError").textContent = "";
-                }
-
-                if (contact.value.trim() === "") {
-                    document.querySelector("#contactError").textContent = "Contact is required";
-                    document.querySelector("#contactError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    contact.classList.add("is-invalid");
-                } else {
-                    contact.classList.remove("is-invalid");
-                    document.querySelector("#contactError").textContent = "";
-                }
-
-                if (gender.value == -1) {
-                    document.querySelector("#genderError").textContent = "Gender is required";
-                    document.querySelector("#genderError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    gender.classList.add("is-invalid");
-                } else {
-                    gender.classList.remove("is-invalid");
-                    document.querySelector("#genderError").textContent = "";
-                }
-
-                if (joiningDate.value.trim() === "") {
-                    document.querySelector("#joiningDateError").textContent = "Joining Date is required";
-                    document.querySelector("#joiningDateError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    joiningDate.classList.add("is-invalid");
-                } else {
-                    joiningDate.classList.remove("is-invalid");
-                    document.querySelector("#joiningDateError").textContent = "";
-                }
-
-                if (address.value.trim() === "") {
-                    document.querySelector("#addressError").textContent = "Address is required";
-                    document.querySelector("#addressError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    address.classList.add("is-invalid");
-                } else {
-                    address.classList.remove("is-invalid");
-                    document.querySelector("#addressError").textContent = "";
-                }
-
-                if (city.value == -1) {
-                    document.querySelector("#cityError").textContent = "City is required";
-                    document.querySelector("#cityError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    city.classList.add("is-invalid");
-                } else {
-                    city.classList.remove("is-invalid");
-                    document.querySelector("#cityError").textContent = "";
-                }
-
-                if (province.value == -1) {
-                    document.querySelector("#provinceError").textContent = "Province is required";
-                    document.querySelector("#provinceError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    province.classList.add("is-invalid");
-                } else {
-                    province.classList.remove("is-invalid");
-                    document.querySelector("#provinceError").textContent = "";
-                }
-
-                if (country.value == -1) {
-                    document.querySelector("#countryError").textContent = "Country is required";
-                    document.querySelector("#countryError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    country.classList.add("is-invalid");
-                } else {
-                    country.classList.remove("is-invalid");
-                    document.querySelector("#countryError").textContent = "";
-                }
-
-                if (salary.value.trim() === "") {
-                    document.querySelector("#salaryError").textContent = "Salary is required";
-                    document.querySelector("#salaryError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    salary.classList.add("is-invalid");
-                } else {
-                    salary.classList.remove("is-invalid");
-                    document.querySelector("#salaryError").textContent = "";
-                }
-
-                if (role.value == -1) {
-                    document.querySelector("#roleError").textContent = "Role is required";
-                    document.querySelector("#roleError").style = 'display: block; font-size: 12px; color: red; ';
-                    errors = true;
-                    role.classList.add("is-invalid");
-                } else {
-                    role.classList.remove("is-invalid");
-                    document.querySelector("#roleError").textContent = "";
-                }
-
-                if (errors) {
-                    submitButton.disabled = true;
-                } else {
-                    submitButton.disabled = false;
-                }
-
+                submitButton.disabled = errors;
             });
         });
+    </script>
+
+
+    <!-- Clearing form -->
+    <script>
         // Function to clear form fields
-        function clearFormFields(formName) {
-            var form = document.querySelector(formName);
+        function clearFormFields(formId) {
+            var form = document.querySelector(formId);
             form.reset();
             var errorMessages = form.querySelectorAll(".invalid");
             errorMessages.forEach(function (errorMessage) {
@@ -623,15 +427,11 @@
             inputFields.forEach(function (inputField) {
                 inputField.classList.remove("is-invalid");
             });
-            var selectFields = form.querySelectorAll("select");
-            selectFields.forEach(function (selectField) {
-                selectField.classList.remove("is-invalid");
-            });
         }
 
         // Event listener for modal close button
-        $('#createEmployeeModal').on('hidden.bs.modal', function (e) {
-            clearFormFields('#createEmployeeModal');
+        $('#createManufacturerModal').on('hidden.bs.modal', function (e) {
+            clearFormFields('#createManufacturerModal form');
         });
     </script>
 }

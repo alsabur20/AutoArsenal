@@ -87,8 +87,68 @@ namespace AutoArsenal_App.Controllers
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
                 }
+                finally
+                {
+                    connection.Close();
+                }
             }
         }
 
+        // Updating Quantity
+        public async static Task UpdateInventory(int id, int Quantity)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"UPDATE Inventory SET StockInShop = StockInShop  + @Quantity WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        command.Parameters.AddWithValue("@Quantity", Quantity);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                { 
+                    connection.Close(); 
+                }
+            }
+        }
+
+        // Removing Quantity
+        public async static Task RemovingItemsFromInventory(int id, int Quantity)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"UPDATE Inventory 
+                                    SET StockInShop = CASE WHEN StockInShop >= @Quantity THEN StockInShop - @Quantity ELSE 0 END,
+                                        StockInWarehouse = CASE WHEN StockInShop < @Quantity AND StockInWarehouse >= @Quantity - StockInShop THEN StockInWarehouse - (@Quantity - StockInShop) ELSE StockInWarehouse END
+                                    WHERE Id = @Id; ";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        command.Parameters.AddWithValue("@Quantity", Quantity);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
