@@ -48,7 +48,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
-        public static string GetLookupValue(int id)
+        public async static Task<string> GetLookupValue(int id)
         {
             string lookupValue = string.Empty;
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
@@ -66,7 +66,42 @@ namespace AutoArsenal_App.Controllers
                             {
                                 lookupValue = reader.GetString(reader.GetOrdinal("Value"));
                             }
-                            return lookupValue;
+                            return await Task.FromResult(lookupValue);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        // Getting Id
+        public async static Task<int> GetLookupId(string value, string category)
+        {
+            int Id = 0;
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT Id FROM Lookup WHERE Value = @value AND Category = @category";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Value", value);
+                        command.Parameters.AddWithValue("@Category", category);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                            }
+                            return await Task.FromResult(Id);
                         }
                     }
                 }

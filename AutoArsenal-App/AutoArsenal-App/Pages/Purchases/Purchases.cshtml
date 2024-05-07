@@ -179,6 +179,8 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="ReturnPurchase">
+                <input type="hidden" id="prchId" asp-for"PurchaseId" />
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">
                         <i class="bi bi-arrow-counterclockwise"></i> Return Purchase
@@ -205,15 +207,7 @@
                                     disabled />
                                 <label for="purchaseDate">Purchase Date</label>
                             </div>
-                        </div>
-                        <!-- Purchase Amount -->
-                        <div class="col-5">
-                            <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="purchaseAmount" placeholder="Amount"
-                                    disabled />
-                                <label for="purchaseAmount">Amount</label>
-                            </div>
-                        </div>
+                        </div>                        
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -226,7 +220,7 @@
 </div>
 
 
-<!-- Java Script Section -->
+<!-- JAVASCRIPT SECTION -->
 @section Scripts {
         <script>
             $(document).ready(function () {
@@ -272,10 +266,11 @@
             }
 
             // Return Purchase
-            function returnPurchase(purchaseID, date, paymentID) {
+            function returnPurchase(purchaseID, date) {
                 document.getElementById("purchaseID").value = purchaseID;
-                document.getElementById("purchaseDate").textContent = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
-                document.getElementById("purchaseAmount").value = payments.find(p => p.ID == paymentID).TotalAmount;
+                document.getElementById("purchaseDate").value = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+                
+                document.getElementById("prchId").value = purchaseID;
             }
 
         </script>

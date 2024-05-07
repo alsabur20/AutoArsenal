@@ -30,6 +30,9 @@ PurchaseDetailsController.Initialize(builder.Configuration);
 PaymentController.Initialize(builder.Configuration);
 PaymentDetailsController.Initialize(builder.Configuration);
 
+ReturnController.Initialize(builder.Configuration);
+ReturnDetailsController.Initialize(builder.Configuration);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -55,11 +55,37 @@ namespace AutoArsenal_App.Pages.Purchases
         }
 
         // Return Purchase
+        [BindProperty]
+        public int PurchaseId { get; set; }
+
         public async Task<IActionResult> OnPostReturnPurchase()
         {
             try
             {
+                List<ProductCategory> ProductCategories = await ProductCategoryController.GetProductCategories();
+                List<PurchaseDetails> purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
 
+                int type = await LookupController.GetLookupId("Sale", "Type");
+                int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
+                
+                foreach (var prch in purchaseDetails)
+                {
+                    if (PurchaseId == prch.PurchaseID)
+                    {
+                        ReturnDetails rtrn = new ReturnDetails();
+                        rtrn.ReturnID = id;
+                        rtrn.ProductCategoryID = prch.ProductCategoryID;
+                        rtrn.ReturnQuantity = prch.Quantity;
+                        await ReturnDetailsController.AddReturnDetails(rtrn);                        
+
+                        ProductCategory prod = ProductCategories.Find(pc => pc.ID == prch.ProductCategoryID);
+                        Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
+                        inventory.StockInWarehouse -= prch.Quantity;
+                        await InventoryController.UpdateInventory(inventory);
+                    }
+                }
+
+                await PurchaseController.DeletePurchase(PurchaseId);
             }
             catch (Exception ex)
             {

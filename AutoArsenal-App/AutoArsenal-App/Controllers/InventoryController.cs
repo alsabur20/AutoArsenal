@@ -87,6 +87,10 @@ namespace AutoArsenal_App.Controllers
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
                 }
+                finally
+                {
+                    connection.Close();
+                }
             }
         }
         // update

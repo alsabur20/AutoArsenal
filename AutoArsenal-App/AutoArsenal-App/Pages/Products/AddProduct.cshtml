@@ -208,6 +208,105 @@
         </div>
     </div>
 </div>
+
+
+<!-- Add Manufacturer Modal -->
+<div class="modal fade" id="createManufacturerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddManufacturer">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Manufacturer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="name" placeholder="Name"
+                                    asp-for="manufacturer.Name" />
+                                <label for="name">Name</label>
+                                <p class="invalid" id="nameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Contact -->
+                            <div class="form-floating mt-2">
+                                <input type="tel" class="form-control" id="Contact" placeholder="Contact"
+                                    asp-for="manufacturer.Contact" />
+                                <label for="Contact">Contact</label>
+                                <p class="invalid" id="contactError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Address -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Address" placeholder="Address"
+                                    asp-for="manufacturer.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="addressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- City -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="City" aria-label="Default select example"
+                                    asp-for="manufacturer.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="City">City</label>
+                                <p class="invalid" id="cityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Province -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Province" aria-label="Default select example"
+                                    asp-for="manufacturer.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="Province">Province</label>
+                                <p class="invalid" id="provinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Country -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Country" aria-label="Default select example"
+                                    asp-for="manufacturer.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="Country">Country</label>
+                                <p class="invalid" id="countryError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- JAVASCRIPT SECTION -->
 @section Scripts {
     <script>
         // Document ready function to initialize DataTable
