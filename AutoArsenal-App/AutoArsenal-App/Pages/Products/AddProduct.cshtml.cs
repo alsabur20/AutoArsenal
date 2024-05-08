@@ -1,11 +1,13 @@
 using AutoArsenal_App.Controllers;
 using AutoArsenal_App.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
 namespace AutoArsenal_App.Pages.Products
 {
+    [Authorize(Roles = "Manager")]
     public class AddProductModel : PageModel
     {
         // For deleting
