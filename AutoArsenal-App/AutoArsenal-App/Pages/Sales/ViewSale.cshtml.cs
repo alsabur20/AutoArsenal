@@ -1,11 +1,13 @@
 using AutoArsenal_App.Controllers;
 using AutoArsenal_App.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AutoArsenal_App.Pages.Sales
 {
+    [Authorize(Roles = "Manager")]
     public class ViewSaleModel : PageModel
     {
         [BindProperty]

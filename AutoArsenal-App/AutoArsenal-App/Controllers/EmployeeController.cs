@@ -113,5 +113,44 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        public async static Task<Employee> GetEmployeeByCredential(int credentialId)
+        {
+            Employee employee = new Employee();
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT * FROM Employee WHERE CredentialsId = @CredentialsId";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@CredentialsId", credentialId);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                employee = new Employee
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    JoiningDate = reader.GetDateTime(reader.GetOrdinal("JoiningDate")),
+                                    Role = reader.GetInt32(reader.GetOrdinal("Role")),
+                                    CredentialsId = reader.IsDBNull(reader.GetOrdinal("CredentialsId")) ? -1 : reader.GetInt32(reader.GetOrdinal("CredentialsId")),
+                                    Salary = reader.GetDouble(reader.GetOrdinal("Salary")),
+                                };
+                            }
+                            return await Task.FromResult(employee);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }
