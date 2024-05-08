@@ -11,7 +11,7 @@ namespace AutoArsenal_App.Controllers
         {
             Configuration = configuration;
         }
-        public async static Task<List<ReturnDetails>> GetReturns()
+        public async static Task<List<ReturnDetails>> GetReturnDetails()
         {
             List<ReturnDetails> returnDetails = new List<ReturnDetails>();
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))

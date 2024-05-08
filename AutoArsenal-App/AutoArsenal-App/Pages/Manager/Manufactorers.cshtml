@@ -81,7 +81,7 @@
                                         </button>
                                         <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
                                             data-bs-target="#deleteManufacturerModal"
-                                            onclick="deleteEmployee('@manu.ID', '@manu.Name')">
+                                            onclick="deleteManufacturer('@manu.ID', '@manu.Name')">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -312,7 +312,7 @@
                     <input type="hidden" id="deleteId" asp-for="DeleteID" />
 
                     <!-- Confirmation Message-->
-                    <p>Are you sure you want to delete this employee?</p>
+                    <p>Are you sure you want to delete this manufacturer?</p>
                     <p>Manufacturer Name: <b id="deleteTitle"></b></p>
                 </div>
                 <div class="modal-footer">

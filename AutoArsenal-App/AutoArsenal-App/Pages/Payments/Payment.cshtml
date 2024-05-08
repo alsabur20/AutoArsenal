@@ -1,0 +1,128 @@
+﻿@page
+@model AutoArsenal_App.Pages.Payments.PaymentModel
+@{
+    ViewData["Title"] = "Payments";
+}
+<!-- Page Navigation -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            Error: @TempData["ErrorOnServer"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+}
+<!-- End Error message -->
+
+<!-- Search Card -->
+<div class="card">
+    <div class="card-body">
+        <div id="panelSearch" class="d-flex justify-content-between align-items-center">
+            <form class="form-inline flex-grow-1 mr-2" id="searchBar">
+                <input class="form-control w-100" type="search" placeholder="Search" aria-label="Search" />
+            </form>
+            <div class="searchBarButton" style="margin:10px;">
+                <div class="form-floating mt-2">
+                    <input type="date" class="form-control" name="returnSearchDate" id="returnSearchDate"
+                        onchange="dateChange()" style="height:auto;" />
+                    <label for="purchaseSearchDate">Search by Date</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@ViewData["Title"]</h5>
+        <div class="table-responsive">
+            <table id="returnsTable" class="table table-hover table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Payment ID</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Remaining Amount</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @if (Model.payments != null)
+                    {
+                        int count = 1;
+                        @foreach (var pay in Model.payments)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td>@pay.ID</td>
+                                <td>@pay.TotalAmount</td>
+                                <td>@Model.remain[count - 1]</td>
+                                <td>@Model.status[count - 1]</td>
+                                <td>
+                                    <a asp-page="/Payments/ViewPaymentDetails" asp-route-id="@pay.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                </td>
+                            </tr>
+                            count++;
+                        }
+                    }
+                    else
+                    {
+                            <tr>
+                                <td colspan="7">No records found</td>
+                            </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- JAVASCRIPT SECTION -->
+@section Scripts {
+        <script>
+            $(document).ready(function () {
+                var table = $('#returnsTable').DataTable({
+                    paging: true,
+                    lengthChange: false,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    language: {
+                        emptyTable: "No data available",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)",
+                        zeroRecords: "No matching records found",
+                        search: "Search:",
+                    }
+                });
+
+                $('#searchBar input').on('input', function () {
+                    var searchText = this.value.trim();
+                    table.search(searchText).draw();
+                });
+            });
+
+            function dateChange() {
+                var date = document.getElementById("returnSearchDate").value;
+                var table = $('#returnsTable').DataTable();
+                table.column(4).search(date).draw();
+            }
+        </script>
+
+}

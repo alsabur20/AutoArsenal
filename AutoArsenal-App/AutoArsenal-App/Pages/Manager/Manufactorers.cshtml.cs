@@ -81,7 +81,7 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return Page();
+            return RedirectToPage("/Manager/Manufactorers");
         }
         
         // For editing
@@ -95,7 +95,7 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return Page(); ;
+            return RedirectToPage("/Manager/Manufactorers");
         }
 
         // For deleting
@@ -109,7 +109,7 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return Page(); ;
+            return RedirectToPage("/Manager/Manufactorers");
         }
 
     }

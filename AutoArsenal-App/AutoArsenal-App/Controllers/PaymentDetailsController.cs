@@ -29,10 +29,10 @@ namespace AutoArsenal_App.Controllers
                             {
                                 PaymentDetails item = new PaymentDetails
                                 {
-                                    PaymentID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    PaidAmount = reader.GetFloat(reader.GetOrdinal("Amount")),
+                                    PaymentID = reader.GetInt32(reader.GetOrdinal("PaymentId")),
+                                    PaidAmount = reader.GetDouble(reader.GetOrdinal("Amount")),
                                     PaymentMethod = reader.GetInt32(reader.GetOrdinal("PaymentMethod")),
-                                    PaymentAccount = reader.GetString(reader.GetOrdinal("PaymentAccount")),
+                                    PaymentAccount = reader.IsDBNull(reader.GetOrdinal("PaymentAccount")) ? (string)null : reader.GetString(reader.GetOrdinal("PaymentAccount")),
                                     PaymentType = reader.GetInt32(reader.GetOrdinal("PaymentType")),
                                     DateOfPayment = reader.GetDateTime(reader.GetOrdinal("DateOfPayment"))
                                 };
@@ -54,5 +54,30 @@ namespace AutoArsenal_App.Controllers
             }
         }
 
+        // Get Remaining Amount
+        public async static Task<double> GetRemaining(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"SELECT SUM(Amount) FROM PaymentDetails WHERE PaymentId = @id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@id", id);
+                        return await Task.FromResult(Convert.ToDouble(command.ExecuteScalar()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

@@ -5,5 +5,6 @@
         public int ID { get; set; }
         public DateTime DateOfReturn { get; set; }
         public int ReturnType { get; set; }
+        public int AddedBy { get; set; }
     }
 }

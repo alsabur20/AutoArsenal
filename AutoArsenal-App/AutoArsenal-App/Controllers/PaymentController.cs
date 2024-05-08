@@ -30,7 +30,7 @@ namespace AutoArsenal_App.Controllers
                                 Payment item = new Payment
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    TotalAmount = reader.GetFloat(reader.GetOrdinal("Amount"))
+                                    TotalAmount = reader.GetDouble(reader.GetOrdinal("Amount"))
                                 };
                                 payments.Add(item);
                             }
