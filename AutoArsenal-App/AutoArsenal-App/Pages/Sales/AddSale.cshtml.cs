@@ -10,22 +10,22 @@ namespace AutoArsenal_App.Pages.Sales
     {
         [BindProperty]
         public string Sales { get; set; }
-        
+
         [BindProperty]
         public string SaleDetails { get; set; }
-        
+
         [BindProperty]
         public List<Product> Products { get; set; }
-        
+
         [BindProperty]
         public List<ProductCategory> ProductCategories { get; set; }
-        
+
         [BindProperty]
         public List<Lookup> Lookups { get; set; }
-        
+
         [BindProperty]
         public List<Person> Persons { get; set; }
-        
+
         [BindProperty]
         public List<Customer> Customers { get; set; }
 
@@ -33,7 +33,7 @@ namespace AutoArsenal_App.Pages.Sales
         // Adding Customer 
         [BindProperty]
         public Person Person { get; set; }
-        
+
         [BindProperty]
         public Customer customer { get; set; }
 
@@ -41,6 +41,8 @@ namespace AutoArsenal_App.Pages.Sales
         public List<string> Cities { get; set; }
         [BindProperty]
         public List<string> Provinces { get; set; }
+        [BindProperty]
+        public List<Inventory> Inventories { get; set; }
 
         public async void OnGet()
         {
@@ -79,6 +81,7 @@ namespace AutoArsenal_App.Pages.Sales
                 Lookups = await LookupController.GetLookup();
                 Persons = await PersonController.GetPersons();
                 Customers = await CustomerController.GetCustomers();
+                Inventories = await InventoryController.GetInventory();
             }
             catch (Exception ex)
             {
@@ -130,14 +133,25 @@ namespace AutoArsenal_App.Pages.Sales
                 sale.EmployeeID = 1;
                 sale.PaymentID = null;
 
-                int saleID = await SaleController.AddSaleAndGetId(sale);
 
                 // Set the SaleID for all sale details
                 foreach (var sd in saleDetails)
                 {
+                    ProductCategory pc = await ProductCategoryController.GetProductCategoryById(sd.ProductCategoryID);
+                    Inventory inventory = await InventoryController.GetInventoryById(pc.InventoryId);
+                    if (inventory.StockInShop < sd.Quantity)
+                    {
+                        TempData["ErrorOnServer"] = "Not enough stock in shop";
+                        return RedirectToPage("/Sales/AddSale");
+                    }
+                    inventory.StockInShop -= sd.Quantity;
+                    await InventoryController.UpdateInventory(inventory);
+                }
+                int saleID = await SaleController.AddSaleAndGetId(sale);
+                foreach (var sd in saleDetails)
+                {
                     sd.SaleID = saleID;
                 }
-
                 // Add all sale details in a batch
                 await SaleDetailsController.AddSaleDetails(saleDetails);
             }
