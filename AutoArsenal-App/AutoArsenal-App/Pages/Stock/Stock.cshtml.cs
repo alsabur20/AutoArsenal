@@ -72,6 +72,7 @@ namespace AutoArsenal_App.Pages.Stock
                         int stockInWarehouse = inventory.StockInWarehouse;
                         if (From == 0)
                         {
+                            // stock check validations
                             if (stockInShop < Quantity)
                             {
                                 TempData["ErrorOnServer"] = "Not enough stock in shop";
