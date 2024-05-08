@@ -37,7 +37,7 @@ namespace AutoArsenal_App.Pages.Sales
 
         [BindProperty]
         public double Total { get; set; }
-        
+
         public async void OnGet(int id)
         {
             try
@@ -67,16 +67,16 @@ namespace AutoArsenal_App.Pages.Sales
         public int originalQuantity { get; set; }
         [BindProperty]
         public int returnQuantity { get; set; }
-        
+
         public async Task<IActionResult> OnPostReturnSale()
         {
             try
             {
                 ProductCategories = await ProductCategoryController.GetProductCategories();
-                
+
                 int type = await LookupController.GetLookupId("Sale", "Type");
                 int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
-                
+
                 ReturnDetails rtrn = new ReturnDetails();
                 rtrn.ReturnID = id;
                 rtrn.ProductCategoryID = category;
@@ -85,8 +85,9 @@ namespace AutoArsenal_App.Pages.Sales
                 await ReturnDetailsController.AddReturnDetails(rtrn);
 
                 ProductCategory prod = ProductCategories.Find(pc => pc.ID == category);
-                await InventoryController.UpdateInventory(prod.ID, returnQuantity);
-
+                Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
+                inventory.StockInShop += returnQuantity;
+                await InventoryController.UpdateInventory(inventory);
                 await SaleController.UpdateSale(SaleID, originalQuantity - returnQuantity, category);
             }
             catch (Exception ex)
@@ -111,10 +112,12 @@ namespace AutoArsenal_App.Pages.Sales
                         rtrn.ReturnID = id;
                         rtrn.ProductCategoryID = saleDetail.ProductCategoryID;
                         rtrn.ReturnQuantity = saleDetail.Quantity;
-                        await ReturnDetailsController.AddReturnDetails(rtrn);                        
-                        
+                        await ReturnDetailsController.AddReturnDetails(rtrn);
+
                         ProductCategory prod = ProductCategories.Find(pc => pc.ID == saleDetail.ProductCategoryID);
-                        await InventoryController.UpdateInventory(prod.InventoryId, saleDetail.Quantity);
+                        Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
+                        inventory.StockInShop += saleDetail.Quantity;
+                        await InventoryController.UpdateInventory(inventory);
                     }
                 }
 

@@ -43,6 +43,7 @@
                         <form method="post" asp-page-handler="SavePurchases">
                             <input type="hidden" asp-for="Purchases" id="purchases" />
                             <input type="hidden" asp-for="PurchaseDetails" id="purchaseDetails" />
+                            <input type="hidden" asp-for=" WarehouseId" id="warehouse" />
                             <button type="submit" class="btn btn-primary mx-1" onclick="savePurchases()">Save</button>
                         </form>
                     </div>
@@ -140,14 +141,8 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="deliverOption" aria-label="Default select example">
-                                    <option value="-1" selected>Shop</option>
-                                    @if (Model.Warehouses != null)
-                                    {
-                                        foreach (var house in Model.Warehouses)
-                                        {
-                                            <option value="@house.ID"> @house.Name </option>
-                                        }
-                                    }
+                                    <option value="0" selected>Shop</option>
+
                                 </select>
                                 <label for="deliverOption">Deliver To</label>
                             </div>
@@ -224,6 +219,7 @@
         // Load data from server-side Model into client-side variables
         var products = @Html.Raw(Json.Serialize(Model.Products));
         var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+        var inventories = @Html.Raw(Json.Serialize(Model.Inventories));
         var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
         var warehouses = @Html.Raw(Json.Serialize(Model.Warehouses));
         var manufacturers = @Html.Raw(Json.Serialize(Model.Manufacturers));
@@ -335,6 +331,22 @@
             var product = products.find(p => p.id == productId);
             var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
             var manufacturer = category ? manufacturers.find(m => m.id == category.manufacturerId) : null;
+            var inventory = inventories.find(i => i.id == category.inventoryId);
+            if (inventory) {
+                var warehouse = warehouses.find(w => w.id == inventory.warehouseId);
+                if (warehouse) {
+                    document.getElementById("deliverOption").innerHTML = '';
+                    document.getElementById("deliverOption").innerHTML += '<option value="0">Shop</option>';
+                    document.getElementById("deliverOption").innerHTML += '<option value="' + warehouse.id + '">' + warehouse.name + '</option>';
+                }
+                else {
+                    document.getElementById("deliverOption").innerHTML = '';
+                    document.getElementById("deliverOption").innerHTML += '<option value="0">Shop</option>';
+                    warehouses.forEach(w => {
+                        document.getElementById("deliverOption").innerHTML += '<option value="' + w.id + '">' + w.name + '</option>';
+                    })
+                }
+            }
 
             document.getElementById("manufacturerName").value = manufacturer ? manufacturer.name : "";
         }
@@ -375,6 +387,7 @@
 
             document.getElementById("purchases").value = JSON.stringify(temp);;
             document.getElementById("purchaseDetails").value = JSON.stringify(purchaseDetailsList);
+            document.getElementById("warehouse").value = document.getElementById("deliverOption").value;
             console.log(purchaseDetailsList)
         }
     </script>

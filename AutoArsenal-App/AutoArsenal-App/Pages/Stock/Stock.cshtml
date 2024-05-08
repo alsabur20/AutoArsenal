@@ -241,7 +241,7 @@
             table.clear().draw();
 
             products.forEach(product => {
-                var fProductCategories = productCategories.filter(pc => pc.productId === product.id);
+                var fProductCategories = productCategories.filter(pc => pc.productId === product.id && !pc.isDeleted);
                 fProductCategories.forEach(pc => {
                     var inventory = inventories.find(i => i.id === pc.inventoryId);
                     var warehouse = warehouses.find(w => w.id === (inventory ? inventory.warehouseId : null));

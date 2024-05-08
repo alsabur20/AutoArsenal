@@ -51,7 +51,7 @@ namespace AutoArsenal_App.Pages.Purchases
             {
                 
             }
-            return RedirectToPage();
+            return RedirectToPage("/Purchases/Purchases");
         }
 
         // Return Purchase
@@ -78,8 +78,24 @@ namespace AutoArsenal_App.Pages.Purchases
                         rtrn.ReturnQuantity = prch.Quantity;
                         await ReturnDetailsController.AddReturnDetails(rtrn);                        
 
-                        ProductCategory prod = ProductCategories.Find(pc => pc.ID == prch.ProductCategoryID);                        
-                        await InventoryController.RemovingItemsFromInventory(prod.InventoryId, prch.Quantity);
+                        ProductCategory prod = ProductCategories.Find(pc => pc.ID == prch.ProductCategoryID);
+                        Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
+                        if(prch.Quantity > inventory.StockInShop + inventory.StockInWarehouse)
+                        {
+                            TempData["ErrorOnServer"] = "Quantity to return is greater than stock.";
+                            return RedirectToPage("/Purchases/Purchases");
+                        }
+                        else if(prch.Quantity <= inventory.StockInShop)
+                        {
+                            inventory.StockInShop -= prch.Quantity;
+                        }
+                        else if (prch.Quantity > inventory.StockInShop && prch.Quantity < inventory.StockInShop + inventory.StockInWarehouse)
+                        {
+                            int shopStock = inventory.StockInShop;
+                            inventory.StockInShop = 0;
+                            inventory.StockInWarehouse -= prch.Quantity - shopStock;
+                        }
+                        await InventoryController.UpdateInventory(inventory);
                     }
                 }
 
@@ -89,7 +105,7 @@ namespace AutoArsenal_App.Pages.Purchases
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage();
+            return RedirectToPage("/Purchases/Purchases");
         }
     }
 }

@@ -97,7 +97,7 @@
                         <div class="col-5">
                             <!-- Product Category -->
                             <div class="form-floating mt-2">
-                                <select class="form-select" id="productCategory" aria-label="Default select example">
+                                <select class="form-select" id="productCategory" aria-label="Default select example" onchange="loadQuantity()">
                                     <option value="-1" selected>Select Product Category</option>
                                 </select>
                                 <label for="productCategory">Product Category</label>
@@ -121,7 +121,14 @@
                                 <label for="productQuantity">Product Quantity</label>
                             </div>
                         </div>
-                        <div class="col-6"></div>
+                        <div class="col-6">
+                            <!-- Product Stock -->
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="productStock"
+                                       placeholder="Available Quantity" disabled />
+                                <label for="productStock">Available Quantity</label>
+                            </div>
+                        </div>
                         <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
                             <!-- Add Product Button -->
                             <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
@@ -356,6 +363,7 @@
         var products = @Html.Raw(Json.Serialize(Model.Products));
         var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
         var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+        var inventories = @Html.Raw(Json.Serialize(Model.Inventories));
         var saleDetailsList = null;
 
 
@@ -371,12 +379,23 @@
             }
         }
 
+        // Load Available Stock
+        function loadQuantity() {
+            var productId = document.getElementById("productName").value;
+            var productCategory = document.getElementById("productCategory").value;
+            var pCategory = productCategories.find(pc => pc.productId == productId && pc.category == productCategory);
+            var inventory = inventories.find(i => i.id == pCategory.inventoryId);
+
+            var productStock = document.getElementById("productStock");
+            productStock.value = inventory.stockInShop;
+        }
+
         //load product Categories
-        function loadQualities(){
+        function loadQualities() {
             var productId = document.getElementById("productName").value;
             var productCategory = document.getElementById("productCategory");
             var categories = productCategories.filter(pc => pc.productId == productId && !pc.isDeleted);
-            
+
             //clear previous options and add default value
             productCategory.innerHTML = "";
             var defaultOption = document.createElement("option");

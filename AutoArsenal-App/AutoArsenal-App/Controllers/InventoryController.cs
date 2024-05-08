@@ -93,60 +93,65 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
-
-        // Updating Quantity
-        public async static Task UpdateInventory(int id, int Quantity)
+        // update
+        public async static Task UpdateInventory(Inventory inventory)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
-                    connection.Open();
-                    string query = @"UPDATE Inventory SET StockInShop = StockInShop  + @Quantity WHERE Id = @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("sp_UpdateInventory", connection))
                     {
-                        command.Parameters.AddWithValue("@Id", id);
-                        command.Parameters.AddWithValue("@Quantity", Quantity);
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // Set parameter values from the provided inventory object
+                        command.Parameters.AddWithValue("@Id", inventory.ID);
+                        command.Parameters.AddWithValue("@StockInShop", inventory.StockInShop);
+                        command.Parameters.AddWithValue("@StockInWarehouse", inventory.StockInWarehouse);
+                        command.Parameters.AddWithValue("@WarehouseId", inventory.WarehouseId);
+
+                        // Execute the stored procedure
                         await command.ExecuteNonQueryAsync();
                     }
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
-                }
-                finally
-                { 
-                    connection.Close(); 
                 }
             }
         }
-
-        // Removing Quantity
-        public async static Task RemovingItemsFromInventory(int id, int Quantity)
+        public async static Task<Inventory> GetInventoryById(int id)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
-                    connection.Open();
-                    string query = @"UPDATE Inventory 
-                                    SET StockInShop = CASE WHEN StockInShop >= @Quantity THEN StockInShop - @Quantity ELSE 0 END,
-                                        StockInWarehouse = CASE WHEN StockInShop < @Quantity AND StockInWarehouse >= @Quantity - StockInShop THEN StockInWarehouse - (@Quantity - StockInShop) ELSE StockInWarehouse END
-                                    WHERE Id = @Id; ";
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("sp_GetInventoryById", connection))
                     {
+                        command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@Id", id);
-                        command.Parameters.AddWithValue("@Quantity", Quantity);
-                        await command.ExecuteNonQueryAsync();
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            if (reader.Read())
+                            {
+                                return new Inventory
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    StockInShop = reader.IsDBNull(reader.GetOrdinal("StockInShop")) ? -1 : reader.GetInt32(reader.GetOrdinal("StockInShop")),
+                                    StockInWarehouse = reader.IsDBNull(reader.GetOrdinal("StockInWarehouse")) ? -1 : reader.GetInt32(reader.GetOrdinal("StockInWarehouse")),
+                                    WarehouseId = reader.IsDBNull(reader.GetOrdinal("WarehouseId")) ? -1 : reader.GetInt32(reader.GetOrdinal("WarehouseId"))
+                                };
+                            }
+                            return null;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message + ex.StackTrace);
-                }
-                finally
-                {
-                    connection.Close();
                 }
             }
         }
