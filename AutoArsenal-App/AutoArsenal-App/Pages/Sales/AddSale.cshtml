@@ -423,12 +423,18 @@
 									}
 								}
 
-								// Load Available Stock
-								function loadQuantity() {
-									var productId = document.getElementById("productName").value;
-									var productCategory = document.getElementById("productCategory").value;
-									var pCategory = productCategories.find(pc => pc.productId == productId && pc.category == productCategory);
-									var inventory = inventories.find(i => i.id == pCategory.inventoryId);
+        // Load Available Stock
+        function loadQuantity() {
+            var productId = document.getElementById("productName").value;
+            var productCategory = document.getElementById("productCategory").value;
+            var pCategory = productCategories.find(pc => pc.productId == productId && pc.category == productCategory);
+            var inventory = inventories.find(i => i.id == pCategory.inventoryId);
+
+            // handle if not found
+            if (!inventory) {
+                alert("Product not found in inventory.");
+                return;
+            }
 
 									var productStock = document.getElementById("productStock");
 									productStock.value = inventory.stockInShop;

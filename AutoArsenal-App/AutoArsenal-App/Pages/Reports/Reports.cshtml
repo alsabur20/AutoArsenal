@@ -1,0 +1,201 @@
+﻿@page
+@model AutoArsenal_App.Pages.Reports.ReportsModel
+@{
+    ViewData["Title"] = "Reports";
+}
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<!-- End Error message -->
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-6">
+                <div class="card" style="height: 13rem">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div style="padding-left: 10px; flex-grow: 1;">
+                            <h1 class="text-center">100</h1>
+                        </div>
+                        <div class="ms-auto">
+                            <a class="btn btn-sm btn-primary d-block mb-2">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a class="btn btn-sm btn-success d-block">
+                                <i class="bi bi-save"></i> Save
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <h4 style="color: GrayText">Total Sales</h4>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-6">
+                <div class="card" style="height: 13rem">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div style="padding-left: 10px; flex-grow: 1;">
+                            <h1 class="text-center">100</h1>
+                        </div>
+                        <div class="ms-auto">
+                            <a class="btn btn-sm btn-primary d-block mb-2">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a class="btn btn-sm btn-success d-block">
+                                <i class="bi bi-save"></i> Save
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <h4 style="color: GrayText">Total Products</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card" style="height: 13rem">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div style="padding-left: 10px; flex-grow: 1;">
+                            <h1 class="text-center">100</h1>
+                        </div>
+                        <div class="ms-auto">
+                            <a class="btn btn-sm btn-primary d-block mb-2">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a class="btn btn-sm btn-success d-block">
+                                <i class="bi bi-save"></i> Save
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <h4 style="color: GrayText">No.; of Employees</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card" style="height: 13rem">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div style="padding-left: 10px; flex-grow: 1;">
+                            <h1 class="text-center">100</h1>
+                        </div>
+                        <div class="ms-auto">
+                            <a class="btn btn-sm btn-primary d-block mb-2">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <a class="btn btn-sm btn-success d-block">
+                                <i class="bi bi-save"></i> Save
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <h4 style="color: GrayText">No. of Customers</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Bar Chart<span> | Quarterly Sales</span>
+                </h5>
+                <div id="barChart"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End Bar Chart -->
+</div>
+<div class="row">
+    <!-- Line Chart -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Line Chart<span> | Profit/Loss </span></h5>
+                <div id="lineChart"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End Line Chart -->
+    <!-- Donut Chart -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Donut Chart</h5>
+                <div id="donutChart"></div>
+            </div>
+        </div>
+    </div>
+    <!-- End Donut Chart -->
+</div>
+
+<!-- JavaScript for Charts -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Dummy data for charts
+        const dummyData = [10, 20, 30, 40, 50];
+
+        // Bar Chart
+        new ApexCharts(document.querySelector("#barChart"), {
+            series: [{
+                name: 'Series 1',
+                data: dummyData,
+            }],
+            chart: {
+                type: 'bar',
+                height: 350,
+            },
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            },
+        }).render();
+
+        // Line Chart
+        new ApexCharts(document.querySelector("#lineChart"), {
+            series: [{
+                name: 'Series 1',
+                data: dummyData,
+            }],
+            chart: {
+                type: 'line',
+                height: 350,
+            },
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+            },
+        }).render();
+
+        // Donut Chart
+        new ApexCharts(document.querySelector("#donutChart"), {
+            series: dummyData,
+            chart: {
+                type: 'donut',
+                height: 350,
+                toolbar: { show: true }
+            },
+            labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
+        }).render();
+    });
+</script>
+<!-- End JavaScript for Charts -->

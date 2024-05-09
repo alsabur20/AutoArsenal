@@ -45,7 +45,10 @@ namespace AutoArsenal_App.Pages.Account
                         return RedirectToPage("../Index");
                     }
                     else
-                        return RedirectToPage("../Index");
+                    {
+                        TempData["ErrorOnServer"] += "Invalid Role..!!";
+                        return RedirectToPage("../Account/Login");
+                    }
                 }
                 TempData["ErrorOnServer"] += "Invalid Credentials..!!";
                 return RedirectToPage();
