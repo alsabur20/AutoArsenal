@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace AutoArsenal_App.Pages.Sales
 {
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "Manager,Cashier")]
     public class AddSaleModel : PageModel
     {
         [BindProperty]
@@ -46,6 +47,7 @@ namespace AutoArsenal_App.Pages.Sales
         [BindProperty]
         public List<Inventory> Inventories { get; set; }
 
+        private string employeeId;
         public async void OnGet()
         {
             // For Adding Customers
@@ -131,8 +133,21 @@ namespace AutoArsenal_App.Pages.Sales
                 Sale sale = JsonConvert.DeserializeObject<Sale>(Sales);
                 List<SaleDetails> saleDetails = JsonConvert.DeserializeObject<List<SaleDetails>>(SaleDetails);
 
+                // get employee id from session
+                ClaimsPrincipal currentUser = this.User;
+
+                Claim userIdClaim = currentUser.FindFirst("UserId");
+
+                if (userIdClaim != null)
+                {
+                    // Get the value of the UserId claim
+                    employeeId = userIdClaim.Value;
+
+                    // Now you can use the userIdValue wherever you need it
+                }
+
                 sale.DateOfSale = DateTime.Now;
-                sale.EmployeeID = 1;
+                sale.EmployeeID = Convert.ToInt32(employeeId);
                 sale.PaymentID = null;
 
 

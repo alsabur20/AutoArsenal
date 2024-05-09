@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AutoArsenal_App.Pages.Sales
 {
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "Manager,Cashier")]
     public class SalesModel : PageModel
     {
         [BindProperty]
