@@ -79,5 +79,37 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
+        // Adding payment details
+        public async static Task AddPaymentDetails(PaymentDetails pay)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"INSERT INTO PaymentDetails (PaymentId, Amount, PaymentMethod, PaymentAccount, PaymentType, DateOfPayment) 
+                                    VALUES (@id, @Amount, @PaymentMethod, @PaymentAccount, @PaymentType, @DateOfPayment)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@id", pay.PaymentID);
+                        command.Parameters.AddWithValue("@Amount", pay.PaidAmount);
+                        command.Parameters.AddWithValue("@PaymentMethod", pay.PaymentMethod);
+                        command.Parameters.AddWithValue("@PaymentAccount", pay.PaymentAccount);
+                        command.Parameters.AddWithValue("@PaymentType", pay.PaymentType);
+                        command.Parameters.AddWithValue("@DateOfPayment", pay.DateOfPayment);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

@@ -84,15 +84,7 @@ namespace AutoArsenal_App.Pages.Sales
                 Persons = await PersonController.GetPersons();
                 Customers = await CustomerController.GetCustomers();
                 Inventories = await InventoryController.GetInventory();
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorOnServer"] = ex.Message;
-            }
-
-            // For Adding Sale
-            try
-            {
+            
                 Products = await ProductController.GetProducts();
                 ProductCategories = await ProductCategoryController.GetProductCategories();
             }
@@ -124,6 +116,13 @@ namespace AutoArsenal_App.Pages.Sales
             return RedirectToPage("/Sales/AddSale");
         }
 
+        // Integrating payment
+        [BindProperty]
+        public PaymentDetails pay { get; set; }
+
+        [BindProperty]
+        public double total { get; set; }
+
         public async Task<IActionResult> OnPostSaveSales()
         {
             try
@@ -131,10 +130,18 @@ namespace AutoArsenal_App.Pages.Sales
                 Sale sale = JsonConvert.DeserializeObject<Sale>(Sales);
                 List<SaleDetails> saleDetails = JsonConvert.DeserializeObject<List<SaleDetails>>(SaleDetails);
 
+                pay.PaymentID = await PaymentController.AddPaymentAndGetID(total);
+                pay.PaymentType = await LookupController.GetLookupId("Sale", "Type");
+                pay.DateOfPayment = DateTime.Now;
+                if(pay.PaymentAccount == null)
+                {
+                    pay.PaymentAccount = "Cash";
+                }
+                await PaymentDetailsController.AddPaymentDetails(pay);
+
                 sale.DateOfSale = DateTime.Now;
                 sale.EmployeeID = 1;
-                sale.PaymentID = null;
-
+                sale.PaymentID = pay.PaymentID;
 
                 // Set the SaleID for all sale details
                 foreach (var sd in saleDetails)
@@ -149,13 +156,14 @@ namespace AutoArsenal_App.Pages.Sales
                     inventory.StockInShop -= sd.Quantity;
                     await InventoryController.UpdateInventory(inventory);
                 }
+                
                 int saleID = await SaleController.AddSaleAndGetId(sale);
                 foreach (var sd in saleDetails)
                 {
                     sd.SaleID = saleID;
                 }
-                // Add all sale details in a batch
                 await SaleDetailsController.AddSaleDetails(saleDetails);
+
             }
             catch (Exception ex)
             {

@@ -50,5 +50,32 @@ namespace AutoArsenal_App.Controllers
             }
         }
 
+        public async static Task<int> AddPaymentAndGetID(double amount)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Payment (Amount) OUTPUT INSERTED.Id VALUES (@amount)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@amount", amount);
+
+                        // Execute the command and get the inserted id
+                        return (int)await command.ExecuteScalarAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
     }
 }

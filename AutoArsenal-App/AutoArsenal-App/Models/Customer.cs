@@ -4,7 +4,6 @@
     {
         public int ID { get; set; }
         public bool IsTrustworthy { get; set; }
-        public double Discount { get; set; }
         public double Credit { get; set; }
     }
 }
