@@ -1,0 +1,142 @@
+﻿@page
+@model AutoArsenal_App.Pages.Payments.ViewPaymentDetailsModel
+@{
+    ViewData["Title"] = "View Payment Details";
+}
+<!-- Page Title -->
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="./Payment">Payments</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+<!-- End Page Title -->
+
+<!-- Error message -->
+@if (TempData["ErrorOnServer"] != null)
+{
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            Error: @TempData["ErrorOnServer"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+}
+<!-- End Error message -->
+
+<!-- Table Section -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title">
+                        @ViewData["Title"]
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <!-- Payment Id -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="payId" placeholder="Payment ID"
+                                    value="@Model.PayId" disabled />
+                                <label for="payId">Payment ID</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <!-- Payment Type -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="paymentType" placeholder="Payment Type"
+                                    value="@Model.PayType" disabled />
+                                <label for="paymentType">Payment Type</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Table -->
+                    <div class="row mt-4">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table id="payDetailsTable"
+                                    class="table table-hover table-striped table-bordered text-center">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Payment Method</th>
+                                            <th scope="col">Payment Account</th>
+                                            <th scope="col">Paid Amount</th>
+                                            <th scope="col">Date Of Payment</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        @if (Model.paymentDetails != null)
+                                        {
+                                            int count = 1;
+                                            foreach (var payDetail in Model.paymentDetails)
+                                            {
+                                                if (Model.PayId == payDetail.PaymentID)
+                                                {
+                                                    string method = Model.lookups.Find(lk => lk.ID == payDetail.PaymentMethod).Value;                                                    
+                                                    <tr>
+                                                        <td>@(count++)</td>
+                                                        <td>@method</td>
+                                                        <td>@payDetail.PaymentAccount</td>
+                                                        <td>@payDetail.PaidAmount</td>
+                                                        <td>@payDetail.DateOfPayment</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Java Script Section -->
+@section Scripts {
+
+        <!-- Table Settings -->
+        <script>
+            $(document).ready(function () {
+                var table = $('#payDetailsTable').DataTable({
+                    paging: true,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    language: {
+                        emptyTable: "No data available",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        infoEmpty: "Showing 0 to 0 of 0 entries",
+                        infoFiltered: "(filtered from _MAX_ total entries)",
+                        zeroRecords: "No matching records found",
+                        search: "Search:",
+                    }
+                });
+            });
+        </script>
+
+        <!-- Going Back button -->
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+}

@@ -30,7 +30,7 @@ namespace AutoArsenal_App.Controllers
                                 Payment item = new Payment
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    TotalAmount = reader.GetFloat(reader.GetOrdinal("Amount"))
+                                    TotalAmount = reader.GetDouble(reader.GetOrdinal("Amount"))
                                 };
                                 payments.Add(item);
                             }
@@ -38,6 +38,33 @@ namespace AutoArsenal_App.Controllers
                         }
                     }
 
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        public async static Task<int> AddPaymentAndGetID(double amount)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "INSERT INTO Payment (Amount) OUTPUT INSERTED.Id VALUES (@amount)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@amount", amount);
+
+                        // Execute the command and get the inserted id
+                        return (int)await command.ExecuteScalarAsync();
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -31,6 +31,7 @@ namespace AutoArsenal_App.Controllers
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     DateOfReturn = reader.GetDateTime(reader.GetOrdinal("DateOfReturn")),
                                     ReturnType = reader.GetInt32(reader.GetOrdinal("ReturnType")),
+                                    AddedBy = reader.GetInt32(reader.GetOrdinal("AddedBy"))
                                 };
                                 returns.Add(r1);
                             }

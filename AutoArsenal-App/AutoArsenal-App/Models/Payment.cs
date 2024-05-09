@@ -4,6 +4,6 @@
     {
         public int ID { get; set; }
 
-        public float TotalAmount { get; set; }
+        public double TotalAmount { get; set; }
     }
 }
