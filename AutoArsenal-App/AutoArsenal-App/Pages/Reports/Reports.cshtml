@@ -32,7 +32,7 @@
                 <div class="card" style="height: 13rem">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div style="padding-left: 10px; flex-grow: 1;">
-                            <h1 class="text-center">100</h1>
+                            <h1 class="text-center" id="totalSales"></h1>
                         </div>
                         <div class="ms-auto">
                             <a class="btn btn-sm btn-primary d-block mb-2">
@@ -150,52 +150,65 @@
     <!-- End Donut Chart -->
 </div>
 
-<!-- JavaScript for Charts -->
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Dummy data for charts
-        const dummyData = [10, 20, 30, 40, 50];
+@section Scripts {
+    <script>
+        const sales = @Html.Raw(Json.Serialize(Model.Sales));
+        const saleDetails = @Html.Raw(Json.Serialize(Model.SaleDetails));
 
-        // Bar Chart
-        new ApexCharts(document.querySelector("#barChart"), {
-            series: [{
-                name: 'Series 1',
-                data: dummyData,
-            }],
-            chart: {
-                type: 'bar',
-                height: 350,
-            },
-            xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            },
-        }).render();
+        function calculateTotalSales() {
+            let totalSales = 0;
+            sales.forEach(sale => {
+                var sDetails = saleDetails.filter(sd => sd.saleId == sale.id);
 
-        // Line Chart
-        new ApexCharts(document.querySelector("#lineChart"), {
-            series: [{
-                name: 'Series 1',
-                data: dummyData,
-            }],
-            chart: {
-                type: 'line',
-                height: 350,
-            },
-            xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-            },
-        }).render();
+                totalSales += sale.totalAmount;
+            });
+            return totalSales;
+        }
 
-        // Donut Chart
-        new ApexCharts(document.querySelector("#donutChart"), {
-            series: dummyData,
-            chart: {
-                type: 'donut',
-                height: 350,
-                toolbar: { show: true }
-            },
-            labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
-        }).render();
-    });
-</script>
-<!-- End JavaScript for Charts -->
+        document.addEventListener("DOMContentLoaded", () => {
+            // Dummy data for charts
+            const dummyData = [10, 20, 30, 40, 50];
+
+            // Bar Chart
+            new ApexCharts(document.querySelector("#barChart"), {
+                series: [{
+                    name: 'Series 1',
+                    data: dummyData,
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                },
+            }).render();
+
+            // Line Chart
+            new ApexCharts(document.querySelector("#lineChart"), {
+                series: [{
+                    name: 'Series 1',
+                    data: dummyData,
+                }],
+                chart: {
+                    type: 'line',
+                    height: 350,
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+                },
+            }).render();
+
+            // Donut Chart
+            new ApexCharts(document.querySelector("#donutChart"), {
+                series: dummyData,
+                chart: {
+                    type: 'donut',
+                    height: 350,
+                    toolbar: { show: true }
+                },
+                labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
+            }).render();
+        });
+    </script>
+}
