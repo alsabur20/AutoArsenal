@@ -55,6 +55,7 @@
                         <th scope="col">Employee</th>
                         <th scope="col">Customer</th>
                         <th scope="col">Date</th>
+                        <th scope="col">Paid</th>
                         <th scope="col">Payment ID</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -75,9 +76,11 @@
                                     <td>@(employee.FirstName + " " + employee.LastName)</td>
                                     <td>@(customer.FirstName + " " + customer.LastName)</td>
                                     <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                    <td>@(sale.PaymentID == -1 ? "N/A" : sale.PaymentID)</td>
+                                    <td>@Model.remainings[count - 1]</td>
+                                    <td>@sale.PaymentID</td>
                                     <td>
                                         <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal" onclick="addPayment('@sale.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
                                         <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
                                     </td>
                                 </tr>
@@ -97,6 +100,10 @@
     </div>
 </div>
 <!-- End Table -->
+
+
+<!-- Modals ->
+
 <!--Delete Confirmation Modal-->
 <div class="modal fade" id="deleteSaleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -124,6 +131,78 @@
     </div>
 </div>
 <!--End Delete Confirmation Modal-->
+
+<!-- Add Payment -->
+<div class="modal fade" id="addPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddPayment">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i> Add Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <!-- Payment Id -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
+                                        asp-for="SaleID" disabled />
+                                    <label for="paymentID">Payment Id</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Total Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
+                                        disabled />
+                                    <label for="totalAmount">Total Amount</label>
+                                </div>
+                            </div>
+                            <!-- Paid Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                        disabled />
+                                    <label for="paidAmount">Paid Amount</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Pending amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="pendingAmount"
+                                        placeholder="Pending Amount" disabled />
+                                    <label for="pendingAmount">Pending Amount</label>
+                                </div>
+                            </div>
+                            <!-- Amount -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
+                                        value="0" min="1" oninput="validity.valid||(value='');" />
+                                    <label for="amount">Enter Amount</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <!-- Scripts -->
 @section Scripts {
     <script>
@@ -162,6 +241,25 @@
             document.getElementById("displayDeleteId").textContent = id;
             document.getElementById("customerName").textContent = customerName;
             document.getElementById("employeeName").textContent = employeeName;
+        }
+    </script>
+
+    <script>
+        var payments = @Html.Raw(Json.Serialize(Model.Payments));
+        
+        // Add Payment
+        function addPayment(paymentID, remaining) {
+            document.getElementById("paymentID").value = paymentID;
+            document.getElementById("paidAmount").value = remaining;
+                
+            var payment = payments.find(pd => pd.id == paymentID);
+            
+            if (payment) {
+                document.getElementById("totalAmount").value = payment.totalAmount;
+                document.getElementById("pendingAmount").value = payment.totalAmount - remaining;
+            } else {
+                console.error("Payment details not found for payment ID: " + paymentID);
+            }
         }
     </script>
 }

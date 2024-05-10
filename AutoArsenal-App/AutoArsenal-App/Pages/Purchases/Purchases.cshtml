@@ -73,12 +73,12 @@
                                         <td>@purchase.ID</td>
                                         <td>@(employee.FirstName + " " + employee.LastName)</td>
                                         <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                        <td>@(purchase.PaymentID == -1 ? "N/A" : purchase.PaymentID)</td>
+                                        <td>@purchase.PaymentID</td>
                                         <td>
                                             <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
                                                 class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
                                             <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
-                                                onclick="addPayment('@purchase.PaymentID')"><i class="bi bi-wallet"></i></a>
+                                                onclick="addPayment('@purchase.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
                                             <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
                                                 data-bs-target="#returnPurchaseModal"
                                                 onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')"><i
@@ -191,7 +191,7 @@
                     <p>Are you sure you want to undo this purchase?</p>
                     <div class="row">
                         <!-- Purchase Id -->
-                        <div class="col-5">
+                        <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="purchaseID" placeholder="Purchase ID"
                                     disabled />
@@ -201,7 +201,7 @@
                     </div>
                     <div class="row">
                         <!-- Purchase Date -->
-                        <div class="col-5">
+                        <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="datetime" class="form-control" id="purchaseDate" placeholder="Purchase Date"
                                     disabled />
@@ -260,9 +260,18 @@
             var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
 
             // Add Payment
-            function addPayment(paymentID) {
+            function addPayment(paymentID, remaining) {
                 document.getElementById("paymentID").value = paymentID;
+                document.getElementById("paidAmount").value = remaining;
 
+                var payment = payments.find(pd => pd.id == paymentID);
+
+                if (payment) {
+                    document.getElementById("totalAmount").value = payment.totalAmount;
+                    document.getElementById("pendingAmount").value = payment.totalAmount - remaining;
+                } else {
+                    console.error("Payment details not found for payment ID: " + paymentID);
+                }
             }
 
             // Return Purchase
