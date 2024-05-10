@@ -185,5 +185,52 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        public async static Task UpdateSaleStatus()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("dbo.UpdateSaleStatus", connection))
+                    {
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        // get total sales
+        public static double GetTotalSales()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT SUM(SD.Quantity*PC.SalePrice) FROM Sale S JOIN SaleDetails SD ON S.Id = SD.SaleId JOIN ProductCategory PC ON SD.ProductCategoryId = PC.Id JOIN Product P ON PC.ProductId = P.Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        return (double)command.ExecuteScalar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

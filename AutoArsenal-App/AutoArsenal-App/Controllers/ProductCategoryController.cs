@@ -200,5 +200,29 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        // get count of productcategory
+        public static int GetProductCategoryCount()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = @"SELECT COUNT(*) FROM ProductCategory";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        return Convert.ToInt32(command.ExecuteScalar());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

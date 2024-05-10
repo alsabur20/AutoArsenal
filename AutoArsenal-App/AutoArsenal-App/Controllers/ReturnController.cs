@@ -50,18 +50,19 @@ namespace AutoArsenal_App.Controllers
             }
         }
 
-        public async static Task<int> AddReturnAndGetId(DateTime date, int Type)
+        public async static Task<int> AddReturnAndGetId(Return rtn)
         {
             using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
             {
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO [Return] (DateOfReturn, ReturnType) OUTPUT INSERTED.Id VALUES (@date, @type)";
+                    string query = "INSERT INTO [Return] (DateOfReturn, ReturnType, AddedBy) OUTPUT INSERTED.Id VALUES (@date, @type, @AddedBy)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        command.Parameters.AddWithValue("@date", date);
-                        command.Parameters.AddWithValue("@type", Type);
+                        command.Parameters.AddWithValue("@date", rtn.DateOfReturn);
+                        command.Parameters.AddWithValue("@type", rtn.ReturnType);
+                        command.Parameters.AddWithValue("@AddedBy", rtn.AddedBy);
 
                         // Execute the command and get the inserted id
                         return (int)await command.ExecuteScalarAsync();

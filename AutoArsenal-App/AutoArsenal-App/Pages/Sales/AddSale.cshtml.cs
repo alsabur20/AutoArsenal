@@ -38,7 +38,7 @@ namespace AutoArsenal_App.Pages.Sales
         public Person Person { get; set; }
 
         [BindProperty]
-        public Customer customer { get; set; }
+        public Customer Customer { get; set; }
 
         [BindProperty]
         public List<string> Cities { get; set; }
@@ -102,7 +102,7 @@ namespace AutoArsenal_App.Pages.Sales
                 Person.Status = 8;
                 if (await PersonController.GetPersonId(Person) == -1)
                 {
-                    await CustomerController.AddCustomer(Person, customer);
+                    await CustomerController.AddCustomer(Person, Customer);
                 }
                 else
                 {
@@ -120,10 +120,10 @@ namespace AutoArsenal_App.Pages.Sales
 
         // Integrating payment
         [BindProperty]
-        public PaymentDetails pay { get; set; }
+        public PaymentDetails Pay { get; set; }
 
         [BindProperty]
-        public double total { get; set; }
+        public double Total { get; set; }
 
         public async Task<IActionResult> OnPostSaveSales()
         {
@@ -145,18 +145,18 @@ namespace AutoArsenal_App.Pages.Sales
                     // Now you can use the userIdValue wherever you need it
                 }
 
-                pay.PaymentID = await PaymentController.AddPaymentAndGetID(total);
-                pay.PaymentType = await LookupController.GetLookupId("Sale", "Type");
-                pay.DateOfPayment = DateTime.Now;
-                if(pay.PaymentAccount == null)
+                Pay.PaymentID = await PaymentController.AddPaymentAndGetID(Total);
+                Pay.PaymentType = await LookupController.GetLookupId("Sale", "Type");
+                Pay.DateOfPayment = DateTime.Now;
+                if(Pay.PaymentAccount == null)
                 {
-                    pay.PaymentAccount = "Cash";
+                    Pay.PaymentAccount = "Cash";
                 }
-                await PaymentDetailsController.AddPaymentDetails(pay);
+                await PaymentDetailsController.AddPaymentDetails(Pay);
 
                 sale.DateOfSale = DateTime.Now;
                 sale.EmployeeID = Convert.ToInt32(employeeId);
-                sale.PaymentID = pay.PaymentID;
+                sale.PaymentID = Pay.PaymentID;
 
                 // Set the SaleID for all sale details
                 foreach (var sd in saleDetails)

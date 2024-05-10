@@ -82,5 +82,29 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        // ount customers
+        public static int GetCustomerCount()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT COUNT(*) FROM Customer";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        return (int)command.ExecuteScalar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

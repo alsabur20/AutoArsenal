@@ -32,7 +32,7 @@
                 <div class="card" style="height: 13rem">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div style="padding-left: 10px; flex-grow: 1;">
-                            <h1 class="text-center" id="totalSales"></h1>
+                            <h1 class="text-center" id="totalSales">Rs. @Model.TotalSales </h1>
                         </div>
                         <div class="ms-auto">
                             <a class="btn btn-sm btn-primary d-block mb-2">
@@ -53,7 +53,7 @@
                 <div class="card" style="height: 13rem">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div style="padding-left: 10px; flex-grow: 1;">
-                            <h1 class="text-center">100</h1>
+                            <h1 class="text-center" id="totalProducts">@Model.ProductCount</h1>
                         </div>
                         <div class="ms-auto">
                             <a class="btn btn-sm btn-primary d-block mb-2">
@@ -75,7 +75,7 @@
                 <div class="card" style="height: 13rem">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div style="padding-left: 10px; flex-grow: 1;">
-                            <h1 class="text-center">100</h1>
+                            <h1 class="text-center" id="numberOfEmployees">@Model.EmployeeCount</h1>
                         </div>
                         <div class="ms-auto">
                             <a class="btn btn-sm btn-primary d-block mb-2">
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                     <div class="card-footer text-center">
-                        <h4 style="color: GrayText">No.; of Employees</h4>
+                        <h4 style="color: GrayText">No. of Employees</h4>
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                 <div class="card" style="height: 13rem">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div style="padding-left: 10px; flex-grow: 1;">
-                            <h1 class="text-center">100</h1>
+                            <h1 class="text-center" id="numberOfCustomers">@Model.CustomerCount</h1>
                         </div>
                         <div class="ms-auto">
                             <a class="btn btn-sm btn-primary d-block mb-2">
@@ -118,15 +118,31 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">
-                    Bar Chart<span> | Quarterly Sales</span>
-                </h5>
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="card-title">
+                            Quarterly Sales<span id="yearSpan"> | @DateTime.Now.Year</span>
+                        </h5>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="decrementYear()">-</button>
+                            </span>
+                            <input type="number" class="form-control" min="2000" step="1" value="2024" id="yearBox" style="width:5rem;" readonly onmousew heel="return false;" />
+                            <span class="input-group-text">
+                                <button type="button" class="btn btn-sm btn-success" onclick="incrementYear()">+</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
                 <div id="barChart"></div>
             </div>
         </div>
     </div>
     <!-- End Bar Chart -->
 </div>
+
 <div class="row">
     <!-- Line Chart -->
     <div class="col-md-6">
@@ -152,37 +168,64 @@
 
 @section Scripts {
     <script>
+        var barChart = null;
+        var donutChart = null;
         const sales = @Html.Raw(Json.Serialize(Model.Sales));
         const saleDetails = @Html.Raw(Json.Serialize(Model.SaleDetails));
+        const products = @Html.Raw(Json.Serialize(Model.Products));
+        const productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+        const employees = @Html.Raw(Json.Serialize(Model.Employees));
+        const customers = @Html.Raw(Json.Serialize(Model.Customers));
+        const persons = @Html.Raw(Json.Serialize(Model.Persons));
 
-        function calculateTotalSales() {
-            let totalSales = 0;
-            sales.forEach(sale => {
-                var sDetails = saleDetails.filter(sd => sd.saleId == sale.id);
-
-                totalSales += sale.totalAmount;
+        // Function to calculate the total sale amount for each transaction
+        function calculateTotalSaleAmount(saleId) {
+            let totalSaleAmount = 0;
+            const saleDetail = saleDetails.filter(detail => detail.saleID === saleId);
+            if (!saleDetail) return 0;
+            saleDetail.forEach(detail => {
+                const productCategory = productCategories.find(category => category.id === detail.productCategoryID);
+                if (!productCategory) return 0;
+                totalSaleAmount += detail.quantity * productCategory.salePrice;
             });
-            return totalSales;
+            return totalSaleAmount;
+        }
+        function calculateQuarterlySales(year) {
+            const quarterlySales = {
+                "Jan-March": 0,
+                "April-June": 0,
+                "July-Sept": 0,
+                "Oct-Dec": 0
+            };
+
+            sales.forEach(sale => {
+                const saleYear = new Date(sale.dateOfSale).getFullYear();
+                if (saleYear === year) {
+                    const saleMonth = new Date(sale.dateOfSale).getMonth();
+                    const saleAmount = calculateTotalSaleAmount(sale.id);
+                    if (saleMonth >= 0 && saleMonth < 3) {
+                        quarterlySales["Jan-March"] += saleAmount;
+                    } else if (saleMonth >= 3 && saleMonth < 6) {
+                        quarterlySales["April-June"] += saleAmount;
+                    } else if (saleMonth >= 6 && saleMonth < 9) {
+                        quarterlySales["July-Sept"] += saleAmount;
+                    } else {
+                        quarterlySales["Oct-Dec"] += saleAmount;
+                    }
+                }
+            });
+
+            return quarterlySales;
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            let currentYear = new Date().getFullYear();
+            filterDataByYear(currentYear);
+            document.getElementById('yearSpan').innerText = " | " + currentYear;
+
+            renderDonutChart();
             // Dummy data for charts
             const dummyData = [10, 20, 30, 40, 50];
-
-            // Bar Chart
-            new ApexCharts(document.querySelector("#barChart"), {
-                series: [{
-                    name: 'Series 1',
-                    data: dummyData,
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 350,
-                },
-                xaxis: {
-                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                },
-            }).render();
 
             // Line Chart
             new ApexCharts(document.querySelector("#lineChart"), {
@@ -199,16 +242,100 @@
                 },
             }).render();
 
-            // Donut Chart
-            new ApexCharts(document.querySelector("#donutChart"), {
-                series: dummyData,
-                chart: {
-                    type: 'donut',
-                    height: 350,
-                    toolbar: { show: true }
-                },
-                labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
-            }).render();
         });
+
+        function renderDonutChart() {
+            var data = employeesAndTheirCount();
+            let labels = Object.keys(data);
+            let values = Object.values(data);
+            let chartContainer = document.getElementById("donutChart");
+            donutChart = new ApexCharts(chartContainer, {
+                series: values,
+                chart: {
+                    type: "donut",
+                    height: 350,
+                    toolbar: { show: true },
+                },
+                labels: labels,
+            });
+
+            donutChart.render();
+        }
+        function employeesAndTheirCount() {
+            //key: employee name value: count ofsales made by him//her
+            let e = {};
+            sales.forEach(sale => {
+                var person = persons.find(p => p.id == sale.employeeID);
+                var name = person.firstName + " " + person.lastName;
+
+                if (e[name]) {
+                    e[name] += 1;
+                } else {
+                    e[name] = 1;
+                }
+            });
+            return e;
+        }
+
+        // Increment the year value
+        function incrementYear() {
+            let yearBox = document.getElementById("yearBox");
+            let currentValue = parseInt(yearBox.value);
+            yearBox.value = currentValue + 1;
+            filterDataByYear(currentValue + 1);
+        }
+
+        // Decrement the year value
+        function decrementYear() {
+            let yearBox = document.getElementById("yearBox");
+            let currentValue = parseInt(yearBox.value);
+            yearBox.value = currentValue - 1;
+            filterDataByYear(currentValue - 1);
+        }
+
+
+        function filterDataByYear(year) {
+            const quarterlySales = calculateQuarterlySales(year);
+
+            // Update the year displayed in the year span
+            document.getElementById('yearSpan').innerText = " | " + year;
+
+            // Extract x and y values from quarterlySales object
+            const xValues = Object.keys(quarterlySales);
+            const yValues = Object.values(quarterlySales);
+
+            // Render the bar chart with filtered data
+            renderBarChart(xValues, yValues);
+        }
+
+        //function for loading barchart
+        function renderBarChart(xValues, yValues) {
+            const chartContainer = document.querySelector("#barChart");
+            // Check if all quarters have 0 sales
+            const totalSales = yValues.reduce((acc, curr) => acc + curr, 0);
+
+            if (totalSales === 0) {
+                chartContainer.innerHTML = "<div class='text-center'>Not enough data</div>";
+            } else {
+                if (barChart) {
+                    barChart.destroy();
+                }
+                barChart = new ApexCharts(chartContainer, {
+                    series: [{
+                        name: "Sale",
+                        data: yValues,
+                    }],
+                    chart: {
+                        type: "bar",
+                        height: 350,
+                    },
+                    colors: ['#FE7E00'], // Ensure the color is specified as an array of strings
+                    xaxis: {
+                        categories: xValues,
+                    },
+                });
+                barChart.render();
+            }
+        }
     </script>
 }

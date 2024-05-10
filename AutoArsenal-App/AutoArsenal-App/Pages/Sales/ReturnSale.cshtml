@@ -38,8 +38,8 @@
                         @ViewData["Title"] <span> | @Model.DateOfSale </span>
                     </h5>
                     <div class="d-flex align-items-center">
+                        <a type="button" class="btn btn-secondary mx-1" asp-page="./Sales">Go Back</a>
                         <form method="post" asp-page-handler="ReturnAll">
-                            <button class="btn btn-secondary mx-1" onclick="goBack()">Go Back</button>
                             <input type="hidden" name="SaleID" value="@Model.SaleID">
                             <button type="submit" class="btn btn-primary" mx-1>Return All</button>
                         </form>
@@ -51,7 +51,7 @@
                             <!-- Sale Id -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="saleId" placeholder="Sale ID"
-                                    value="@Model.SaleID" disabled />
+                                       value="@Model.SaleID" disabled />
                                 <label for="saleId">Sale ID</label>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                             <!-- Customer Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="customerName" placeholder="Customer Name"
-                                    value="@Model.CustomerName" disabled />
+                                       value="@Model.CustomerName" disabled />
                                 <label for="customerName">Customer Name</label>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                         <div class="col">
                             <div class="table-responsive">
                                 <table id="salesTable"
-                                    class="table table-hover table-striped table-bordered text-center">
+                                       class="table table-hover table-striped table-bordered text-center">
                                     <thead class="table-dark">
                                         <tr>
                                             <th scope="col">#</th>
@@ -92,7 +92,7 @@
                                             int count = 1;
                                             foreach (var saleDetail in Model.SaleDetails)
                                             {
-                                                if (Model.SaleID == saleDetail.SaleID)
+                                                if (Model.SaleID == saleDetail.SaleID && saleDetail.Quantity > 0)
                                                 {
                                                     Models.ProductCategory productCategory = Model.ProductCategories.Find(p => p.ID == saleDetail.ProductCategoryID);
                                                     Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
@@ -103,9 +103,10 @@
                                                         <td>@category</td>
                                                         <td>@saleDetail.Quantity</td>
                                                         <td>@(saleDetail.Quantity * productCategory.SalePrice)</td>
-                                                        <td><a class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                                data-bs-target="#returnSaleModal"
-                                                                onclick="returnSale('@Model.SaleID','@product.ProductName','@category', '@productCategory.ID', '@saleDetail.Quantity')">
+                                                        <td>
+                                                            <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                               data-bs-target="#returnSaleModal"
+                                                               onclick="returnSale('@Model.SaleID','@product.ProductName','@category', '@productCategory.ID', '@saleDetail.Quantity')">
                                                                 <i class="bi bi-arrow-return-left"></i>
                                                             </a>
                                                         </td>
@@ -131,17 +132,19 @@
 
 <!-- Return Purchase -->
 <div class="modal fade" id="returnSaleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="ReturnSale">
+            <form method="post" asp-page-handler="ReturnSale" onsubmit="return validateReturn()">
                 <input type="hidden" name="SaleID" value="@Model.SaleID">
-                <input type="hidden" id="procategory" asp-for="category" />
-                <input type="hidden" id="original" asp-for="originalQuantity" />
+                <input type="hidden" id="procategory" asp-for="Category" />
+                <input type="hidden" id="original" asp-for="OriginalQuantity" />
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-arrow-counterclockwise"></i> Return
-                        Sale</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        <i class="bi bi-arrow-counterclockwise"></i> Return
+                        Sale
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -160,7 +163,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="productName" placeholder="Product Name"
-                                    disabled />
+                                       disabled />
                                 <label for="productName">Product Name</label>
                             </div>
                         </div>
@@ -168,7 +171,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="pCategory" placeholder="Product Category"
-                                    disabled />
+                                       disabled />
                                 <label for="pCategory">Product category</label>
                             </div>
                         </div>
@@ -178,15 +181,15 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="saleQuantity" placeholder="Sale Quantity"
-                                    disabled />
+                                       disabled />
                                 <label for="saleQuantity">Sale Quantity</label>
                             </div>
                         </div>
                         <!-- Return Quantity -->
                         <div class="col-5">
                             <div class="form-floating mt-2">
-                                <input type="number" class="form-control" asp-for="returnQuantity" id="returnQuantity"
-                                    placeholder="Return Quantity" />
+                                <input type="number" class="form-control" asp-for="ReturnQuantity" id="returnQuantity"
+                                       placeholder="Return Quantity" />
                                 <label for="returnQuantity">Return Quantity</label>
                             </div>
                         </div>
@@ -229,10 +232,6 @@
 
     <!-- Going Back button -->
     <script>
-        function goBack() {
-            window.history.back();
-        }
-
         function returnSale(id, name, category, categoryId, Quantity) {
             document.getElementById("saleID").value = id;
             document.getElementById("productName").value = name;
@@ -241,6 +240,24 @@
 
             document.getElementById("procategory").value = categoryId;
             document.getElementById("original").value = Quantity;
+        }
+
+        // validate form submission for return
+        function validateReturn() {
+            var returnQuantity = document.getElementById("returnQuantity").value;
+            var originalQuantity = document.getElementById("original").value;
+
+            if (returnQuantity == "" || returnQuantity == null || returnQuantity == 0) {
+                alert("Please enter the quantity to return.");
+                return false;
+            }
+
+            if (returnQuantity > originalQuantity) {
+                alert("Return quantity cannot be greater than the original quantity.");
+                return false;
+            }
+
+            return true;
         }
     </script>
 }

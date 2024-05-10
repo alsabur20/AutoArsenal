@@ -3,6 +3,7 @@ using AutoArsenal_App.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 
 namespace AutoArsenal_App.Pages.Sales
@@ -62,35 +63,57 @@ namespace AutoArsenal_App.Pages.Sales
             }
         }
 
+        private string employeeId = "";
         // Return Data
         [BindProperty]
-        public int category { get; set; }
+        public int Category { get; set; }
         [BindProperty]
-        public int originalQuantity { get; set; }
+        public int OriginalQuantity { get; set; }
         [BindProperty]
-        public int returnQuantity { get; set; }
+        public int ReturnQuantity { get; set; }
 
         public async Task<IActionResult> OnPostReturnSale()
         {
             try
             {
+                ClaimsPrincipal currentUser = this.User;
+
+                Claim userIdClaim = currentUser.FindFirst("UserId");
+
+                if (userIdClaim != null)
+                {
+                    // Get the value of the UserId claim
+                    employeeId = userIdClaim.Value;
+
+                    // Now you can use the userIdValue wherever you need it
+                }
                 ProductCategories = await ProductCategoryController.GetProductCategories();
 
                 int type = await LookupController.GetLookupId("Sale", "Type");
-                int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
+                Return rtn = new()
+                {
+                    ReturnType = type,
+                    DateOfReturn = DateTime.Now,
+                    AddedBy = int.Parse(employeeId)
+                };
+                int id = await ReturnController.AddReturnAndGetId(rtn);
 
-                ReturnDetails rtrn = new ReturnDetails();
-                rtrn.ReturnID = id;
-                rtrn.ProductCategoryID = category;
-                rtrn.ReturnQuantity = returnQuantity;
+
+                ReturnDetails rtrn = new ReturnDetails
+                {
+                    ReturnID = id,
+                    ProductCategoryID = Category,
+                    ReturnQuantity = ReturnQuantity
+                };
 
                 await ReturnDetailsController.AddReturnDetails(rtrn);
 
-                ProductCategory prod = ProductCategories.Find(pc => pc.ID == category);
+                ProductCategory prod = ProductCategories.Find(pc => pc.ID == Category);
                 Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
-                inventory.StockInShop += returnQuantity;
+                inventory.StockInShop += ReturnQuantity;
                 await InventoryController.UpdateInventory(inventory);
-                await SaleController.UpdateSale(SaleID, originalQuantity - returnQuantity, category);
+                await SaleController.UpdateSale(SaleID, OriginalQuantity - ReturnQuantity, Category);
+                await SaleController.UpdateSaleStatus();
             }
             catch (Exception ex)
             {
@@ -105,15 +128,23 @@ namespace AutoArsenal_App.Pages.Sales
             {
                 ProductCategories = await ProductCategoryController.GetProductCategories();
                 int type = await LookupController.GetLookupId("Sale", "Type");
-                int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
+                Return rtn = new()
+                {
+                    ReturnType = type,
+                    DateOfReturn = DateTime.Now,
+                    AddedBy = int.Parse(employeeId)
+                };
+                int id = await ReturnController.AddReturnAndGetId(rtn);
                 foreach (var saleDetail in SaleDetails)
                 {
                     if (SaleID == saleDetail.SaleID)
                     {
-                        ReturnDetails rtrn = new ReturnDetails();
-                        rtrn.ReturnID = id;
-                        rtrn.ProductCategoryID = saleDetail.ProductCategoryID;
-                        rtrn.ReturnQuantity = saleDetail.Quantity;
+                        ReturnDetails rtrn = new ReturnDetails
+                        {
+                            ReturnID = id,
+                            ProductCategoryID = saleDetail.ProductCategoryID,
+                            ReturnQuantity = saleDetail.Quantity
+                        };
                         await ReturnDetailsController.AddReturnDetails(rtrn);
 
                         ProductCategory prod = ProductCategories.Find(pc => pc.ID == saleDetail.ProductCategoryID);

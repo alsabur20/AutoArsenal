@@ -1,427 +1,429 @@
 ﻿@page
 @model AutoArsenal_App.Pages.Sales.AddSaleModel
 @{
-	ViewData["Title"] = "Add Sale";
+    ViewData["Title"] = "Add Sale";
 }
 <!-- Page Title -->
 <div class="pagetitle">
-	<h1>@ViewData["Title"]</h1>
-	<nav aria-label="breadcrumb">
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item active" aria-current="page">
-				<a asp-page="../Index">Home</a>
-			</li>
-			<li class="breadcrumb-item active" aria-current="page">
-				<a asp-page="./Sales">Sales</a>
-			</li>
-			<li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
-		</ol>
-	</nav>
+    <h1>@ViewData["Title"]</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="../Index">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a asp-page="./Sales">Sales</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+        </ol>
+    </nav>
 </div>
 <!-- End Page Title -->
 <!-- Error message -->
 @if (TempData["ErrorOnServer"] != null)
 {
-							<div class="alert alert-danger alert-dismissible fade show" role="alert">
-								Error: @TempData["ErrorOnServer"]
-								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-							</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Error: @TempData["ErrorOnServer"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 <!-- End Error message -->
 <section class="section">
-	<div class="row">
-		<div class="col-lg-12">
-						<form method="post" asp-page-handler="SaveSales" onsubmit="return validateAndSubmit()">
-			<div class="card">
-				<div class="card-header d-flex justify-content-between">
-					<h5 class="card-title">
-						New Sale <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
-					</h5>
-					<div class="d-flex align-items-center">
-						<a class="btn btn-secondary mx-1" href="/Sales/Sales">Cancel</a>
-							<input type="hidden" asp-for="Sales" id="sales" />
-							<input type="hidden" asp-for="SaleDetails" id="saleDetails" />
-							<button type="submit" class="btn btn-primary mx-1" onclick="saveSales()">Save</button>                        
-					</div>
-				</div>
-				<div class="card-body">
-					<div class="row">
-						<div class="col-5">
-							<!-- Product name -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="productName" aria-label="Default select example"
-									onchange="loadQualities()">
-									<option value="-1" selected>Select Product</option>
-										@if (Model.Products != null)
-										{
-											foreach (var product in Model.Products)
-											{
-																							<option value="@product.ID">
-													@product.ProductName
-																							</option>
-											}
-										}
-								</select>
-								<label for="productName">Product Name</label>
-							</div>
-						</div>
-						<div class="col-6">
-							<!-- Customer Name -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="customerName" aria-label="Default select example"
-									onchange="loadContact()">
-									<option value="-1" selected>Select Customer</option>
-										@if (Model.Customers != null && Model.Persons != null)
-										{
-											foreach (Models.Customer customer in Model.Customers)
-											{
-												Models.Person person = Model.Persons.Find(p => p.ID == customer.ID);
-																							<option value="@customer.ID">
-													@(person.FirstName + " " + person.LastName)
-																							</option>
-											}
-										}
-								</select>
-								<label for="customerName">Customer Name</label>
-							</div>
-						</div>
-						<div class="col-1 text-end d-flex align-items-center" style="height: 100%">
-							<!-- Add Customer Button -->
-							<button class="btn btn-lg btn-primary" data-bs-toggle="modal"
-								data-bs-target="#createCustomerModal">
-								<i class="bi bi-plus"></i>
-							</button>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-5">
-							<!-- Product Category -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="productCategory" aria-label="Default select example"
-									onchange="loadQuantity()">
-									<option value="-1" selected>Select Product Category</option>
-								</select>
-								<label for="productCategory">Product Category</label>
-							</div>
-						</div>
-						<div class="col-6">
-							<div class="form-floating mt-2">
-								<input class="form-control" id="customerContact" disabled />
-								<label for="customerContact">Customer Contact</label>
-							</div>
-						</div>
-						<div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
-					</div>
-					<div class="row">
-						<div class="col-5">
-							<!-- Product Quantity -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="productQuantity"
-									placeholder="Product Quantity" value="0" min="1"
-									oninput="validity.valid||(value='');" />
-								<label for="productQuantity">Product Quantity</label>
-							</div>
-						</div>
-						<div class="col-6">
-							<!-- Product Stock -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="productStock"
-									placeholder="Available Quantity" disabled />
-								<label for="productStock">Available Quantity</label>
-							</div>
-						</div>
-						<!-- Add Product Button -->
-						<div class="col-1 text-end d-flex align-items-center" style="height: 100%">
-							<a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
-						</div>
-					</div>
+    <div class="row">
+        <div class="col-lg-12">
+            <form method="post" asp-page-handler="SaveSales" onsubmit="return validateAndSubmit()">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5 class="card-title">
+                            New Sale <span>| @DateTime.Now.ToString("MMM dd, yyyy")</span>
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <a class="btn btn-secondary mx-1" href="/Sales/Sales">Cancel</a>
+                            <input type="hidden" asp-for="Sales" id="sales" />
+                            <input type="hidden" asp-for="SaleDetails" id="saleDetails" />
+                            <button type="submit" class="btn btn-primary mx-1" onclick="saveSales()">Save</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Product name -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="productName" aria-label="Default select example"
+                                            onchange="loadQualities()">
+                                        <option value="-1" selected>Select Product</option>
+                                        @if (Model.Products != null)
+                                        {
+                                            foreach (var product in Model.Products)
+                                            {
+                                                <option value="@product.ID">
+                                                    @product.ProductName
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <label for="productName">Product Name</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <!-- Customer Name -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="customerName" aria-label="Default select example"
+                                            onchange="loadContact()">
+                                        <option value="-1" selected>Select Customer</option>
+                                        @if (Model.Customers != null && Model.Persons != null)
+                                        {
+                                            foreach (Models.Customer customer in Model.Customers)
+                                            {
+                                                Models.Person person = Model.Persons.Find(p => p.ID == customer.ID);
+                                                <option value="@customer.ID">
+                                                    @(person.FirstName + " " + person.LastName)
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                    <label for="customerName">Customer Name</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
+                                <!-- Add Customer Button -->
+                                <button class="btn btn-lg btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#createCustomerModal">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Product Category -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="productCategory" aria-label="Default select example"
+                                            onchange="loadQuantity()">
+                                        <option value="-1" selected>Select Product Category</option>
+                                    </select>
+                                    <label for="productCategory">Product Category</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-floating mt-2">
+                                    <input class="form-control" id="customerContact" disabled />
+                                    <label for="customerContact">Customer Contact</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Product Quantity -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="productQuantity"
+                                           placeholder="Product Quantity" value="0" min="1"
+                                           oninput="validity.valid||(value='');" />
+                                    <label for="productQuantity">Product Quantity</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <!-- Product Stock -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="productStock"
+                                           placeholder="Available Quantity" disabled />
+                                    <label for="productStock">Available Quantity</label>
+                                </div>
+                            </div>
+                            <!-- Add Product Button -->
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%">
+                                <a class="btn btn-lg btn-primary" onclick="addProduct()">Add</a>
+                            </div>
+                        </div>
 
-					<hr />
-					<!-- Entering payment area -->
-					<div class="row">
-						<div class="col-5">
-							<!-- Payment Method -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="methodType" aria-label="Default select example"
-									asp-for="pay.PaymentMethod">
-									<option value="-1" selected>Select Payment Method</option>
-										@if (Model.Lookups != null)
-										{
-											foreach (var lk in Model.Lookups)
-											{
-												if (lk.Category == "Payment_Method")
-												{
-																														<option value="@lk.ID"> @lk.Value </option>
-												}
-											}
-										}
-								</select>
-								<label for="methodType">Payment Method</label>
-							</div>
-						</div>
-						<div class="col-5">
-							<!-- Payment Account -->
-							<div class="form-floating mt-2">
-								<input type="text" class="form-control" id="account" placeholder="Payment Account"
-									asp-for="pay.PaymentAccount" />
-								<label for="account">Payment Account</label>
-							</div>
-						</div>
-						<div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
-					</div>
-					<div class="row">
-						<div class="col-5">
-							<!-- Discount -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="discount" placeholder="Discount"
-									value="0.00" min="0" oninput="validity.valid||(value='');"
-									onchange="addDiscount()" />
-								<label for="discount">Discount</label>
-							</div>
-						</div>
-						<div class="col-5">
-							<!-- Total Amount -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="totalAmount" placeholder="Total Amount"
-									value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
-								<label for="totalAmount">Total Amount</label>
-							</div>
-							<input type="hidden" id="totalValue" asp-for="total" />
-						</div>
-						<div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
-					</div>
-					<div class="row">
-						<div class="col-5">
-							<!-- Paid Amount -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="paidAmount" placeholder="Paid Amount"
-									value="0.00" min="0" oninput="validity.valid||(value='');"
-									asp-for="pay.PaidAmount" />
-								<label for="paidAmount">Paid Amount</label>
-							</div>
-						</div>
-					</div>
-					</form>
-					<hr />
-					<!-- Table -->
-					<div class="row ">
-						<div class="col">
-							<div class="table-responsive">
-								<table id="salesTable"
-									class="table table-hover table-striped table-bordered text-center">
-									<thead class="table-dark">
-										<tr>
-											<th scope="col">#</th>
-											<th scope="col">Product Name</th>
-											<th scope="col">Category</th>
-											<th scope="col">Sale Price</th>
-											<th scope="col">Quantity</th>
-											<th scope="col">Amount</th>
-											<th scope="col">Actions</th>
-										</tr>
-									</thead>
-									<tbody class="table-group-divider">
-										<!-- Will be loaded later -->
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                        <hr />
+                        <!-- Entering payment area -->
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Payment Method -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="methodType" aria-label="Default select example"
+                                            asp-for="Pay.PaymentMethod">
+                                        <option value="-1" selected>Select Payment Method</option>
+                                        @if (Model.Lookups != null)
+                                        {
+                                            foreach (var lk in Model.Lookups)
+                                            {
+                                                if (lk.Category == "Payment_Method")
+                                                {
+                                                    <option value="@lk.ID"> @lk.Value </option>
+                                                }
+                                            }
+                                        }
+                                    </select>
+                                    <label for="methodType">Payment Method</label>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <!-- Payment Account -->
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="account" placeholder="Payment Account"
+                                           asp-for="Pay.PaymentAccount" />
+                                    <label for="account">Payment Account</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Discount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="discount" placeholder="Discount"
+                                           value="0.00" min="0" oninput="validity.valid||(value='');"
+                                           onchange="addDiscount()" />
+                                    <label for="discount">Discount</label>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <!-- Total Amount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="totalAmount" placeholder="Total Amount"
+                                           value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
+                                    <label for="totalAmount">Total Amount</label>
+                                </div>
+                                <input type="hidden" id="totalValue" asp-for="Total" />
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Paid Amount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                           value="0.00" min="0" oninput="validity.valid||(value='');"
+                                           asp-for="Pay.PaidAmount" />
+                                    <label for="paidAmount">Paid Amount</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <hr />
+            <!-- Table -->
+            <div class="row ">
+                <div class="col">
+                    <div class="table-responsive">
+                        <table id="salesTable"
+                               class="table table-hover table-striped table-bordered text-center">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Sale Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <!-- Will be loaded later -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
 </section>
 
 
 <!-- Add customer Modal -->
 <div class="modal fade" id="createCustomerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-	aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<form method="post" asp-page-handler="AddCustomer" id="addCustomerModal">
-				<div class="modal-header">
-					<h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Customer</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-md-6">
-							<!-- First Name -->
-							<div class="form-floating mt-2">
-								<input type="text" class="form-control" id="FirstName" placeholder="First Name"
-									asp-for="Person.FirstName" />
-								<label for="FirstName">First Name</label>
-								<p class="invalid" id="firstNameError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Last Name -->
-							<div class="form-floating mt-2">
-								<input type="text" class="form-control" id="LastName" placeholder="Last Name"
-									asp-for="Person.LastName" />
-								<label for="LastName">Last Name</label>
-								<p class="invalid" id="lastNameError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Contact -->
-							<div class="form-floating mt-2">
-								<input type="tel" class="form-control" id="Contact" placeholder="Contact"
-									asp-for="Person.Contact" />
-								<label for="Contact">Contact</label>
-								<p class="invalid" id="contactError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Gender -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="Gender" aria-label="Default select example"
-									asp-for="Person.Gender">
-									<option value="-1" selected>Select Gender</option>
-									<option value="1">Male</option>
-									<option value="2">Female</option>
-								</select>
-								<label for="Gender">Gender</label>
-								<p class="invalid" id="genderError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Address -->
-							<div class="form-floating mt-2">
-								<input type="text" class="form-control" id="Address" placeholder="Address"
-									asp-for="Person.StreetAddress" />
-								<label for="Address">Address</label>
-								<p class="invalid" id="addressError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- City -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="City" aria-label="Default select example"
-									asp-for="Person.City">
-									<option value="-1" selected>Select City</option>
-									@foreach (var city in Model.Cities)
-									{
-																<option value="@city">@city</option>
-									}
-								</select>
-								<label for="City">City</label>
-								<p class="invalid" id="cityError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Province -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="Province" aria-label="Default select example"
-									asp-for="Person.Province">
-									<option value="-1" selected>Select Province</option>
-									@foreach (var province in Model.Provinces)
-									{
-																<option value="@province">@province</option>
-									}
-								</select>
-								<label for="Province">Province</label>
-								<p class="invalid" id="provinceError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Country -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="Country" aria-label="Default select example"
-									asp-for="Person.Country">
-									<option value="-1" selected>Select Country</option>
-									<option value="Pakistan">Pakistan</option>
-								</select>
-								<label for="Country">Country</label>
-								<p class="invalid" id="countryError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- IsTrustworthy -->
-							<div class="form-floating mt-2">
-								<select class="form-select" id="trusty" aria-label="Default select example"
-									asp-for="customer.IsTrustworthy">
-									<option value="-1" selected>IsTrustworthy</option>
-									<option value="0">No</option>
-									<option value="1">Yes</option>
-								</select>
-								<label for="trusty">IsTrustworthy</label>
-								<p class="invalid" id="trustyError"></p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<!-- Credit -->
-							<div class="form-floating mt-2">
-								<input type="number" class="form-control" id="credit" placeholder="Credit" min="0"
-									oninput="validity.valid||(value='');" asp-for="customer.Credit" />
-								<label for="credit">Credit</label>
-								<p class="invalid" id="creditError"></p>
-							</div>
-						</div>
-					</div>
-				</div>
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="AddCustomer" id="addCustomerModal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i>Add Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- First Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="FirstName" placeholder="First Name"
+                                       asp-for="Person.FirstName" />
+                                <label for="FirstName">First Name</label>
+                                <p class="invalid" id="firstNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Last Name -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="LastName" placeholder="Last Name"
+                                       asp-for="Person.LastName" />
+                                <label for="LastName">Last Name</label>
+                                <p class="invalid" id="lastNameError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Contact -->
+                            <div class="form-floating mt-2">
+                                <input type="tel" class="form-control" id="Contact" placeholder="Contact"
+                                       asp-for="Person.Contact" />
+                                <label for="Contact">Contact</label>
+                                <p class="invalid" id="contactError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Gender -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Gender" aria-label="Default select example"
+                                        asp-for="Person.Gender">
+                                    <option value="-1" selected>Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="2">Female</option>
+                                </select>
+                                <label for="Gender">Gender</label>
+                                <p class="invalid" id="genderError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Address -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="Address" placeholder="Address"
+                                       asp-for="Person.StreetAddress" />
+                                <label for="Address">Address</label>
+                                <p class="invalid" id="addressError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- City -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="City" aria-label="Default select example"
+                                        asp-for="Person.City">
+                                    <option value="-1" selected>Select City</option>
+                                    @foreach (var city in Model.Cities)
+                                    {
+                                        <option value="@city">@city</option>
+                                    }
+                                </select>
+                                <label for="City">City</label>
+                                <p class="invalid" id="cityError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Province -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Province" aria-label="Default select example"
+                                        asp-for="Person.Province">
+                                    <option value="-1" selected>Select Province</option>
+                                    @foreach (var province in Model.Provinces)
+                                    {
+                                        <option value="@province">@province</option>
+                                    }
+                                </select>
+                                <label for="Province">Province</label>
+                                <p class="invalid" id="provinceError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Country -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="Country" aria-label="Default select example"
+                                        asp-for="Person.Country">
+                                    <option value="-1" selected>Select Country</option>
+                                    <option value="Pakistan">Pakistan</option>
+                                </select>
+                                <label for="Country">Country</label>
+                                <p class="invalid" id="countryError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- IsTrustworthy -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="trusty" aria-label="Default select example"
+                                        asp-for="Customer.IsTrustworthy">
+                                    <option value="-1" selected>IsTrustworthy</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label for="trusty">IsTrustworthy</label>
+                                <p class="invalid" id="trustyError"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Credit -->
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="credit" placeholder="Credit" min="0"
+                                       oninput="validity.valid||(value='');" asp-for="Customer.Credit" />
+                                <label for="credit">Credit</label>
+                                <p class="invalid" id="creditError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- JAVASCRIPT SECTION -->
 @section Scripts {
-							<!-- Sale Table-->
-							<script>
-								$(document).ready(function () {
-									var table = $('#salesTable').DataTable({
-										paging: true,
-										lengthChange: false,
-										searching: true,
-										ordering: true,
-										info: true,
-										autoWidth: false,
-										language: {
-											emptyTable: "No data available",
-											info: "Showing _START_ to _END_ of _TOTAL_ entries",
-											infoEmpty: "Showing 0 to 0 of 0 entries",
-											infoFiltered: "(filtered from _MAX_ total entries)",
-											zeroRecords: "No matching records found",
-											search: "Search:",
-										}
-									});
+    <!-- Sale Table-->
+    <script>
+        $(document).ready(function () {
+            var table = $('#salesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
 
-									$('#searchBar input').on('input', function () {
-										var searchText = this.value.trim();
-										table.search(searchText).draw();
-									});
-								});
-							</script>
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+    </script>
 
-							<!-- Add Sale -->
-							<script>
-								var persons = @Html.Raw(Json.Serialize(Model.Persons));
-								var customers = @Html.Raw(Json.Serialize(Model.Customers));
-								var products = @Html.Raw(Json.Serialize(Model.Products));
-								var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
-								var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
-								var inventories = @Html.Raw(Json.Serialize(Model.Inventories));
-								var saleDetailsList = null;
+    <!-- Add Sale -->
+    <script>
+        var persons = @Html.Raw(Json.Serialize(Model.Persons));
+        var customers = @Html.Raw(Json.Serialize(Model.Customers));
+        var products = @Html.Raw(Json.Serialize(Model.Products));
+        var productCategories = @Html.Raw(Json.Serialize(Model.ProductCategories));
+        var lookups = @Html.Raw(Json.Serialize(Model.Lookups));
+        var inventories = @Html.Raw(Json.Serialize(Model.Inventories));
+        var saleDetailsList = null;
 
 
-								// Load Customer Contact
-								function loadContact() {
-									var customerID = document.getElementById("customerName").value;
-									var person = persons.find(p => p.id == customerID);
-									var customerContact = document.getElementById("customerContact");
-									if (customerID != -1 && person) {
-										customerContact.value = person.contact;
-									} else {
-										customerContact.value = "Select A Customer";
-									}
-								}
+        // Load Customer Contact
+        function loadContact() {
+            var customerID = document.getElementById("customerName").value;
+            var person = persons.find(p => p.id == customerID);
+            var customerContact = document.getElementById("customerContact");
+            if (customerID != -1 && person) {
+                customerContact.value = person.contact;
+            } else {
+                customerContact.value = "Select A Customer";
+            }
+        }
 
         // Load Available Stock
         function loadQuantity() {
@@ -436,217 +438,217 @@
                 return;
             }
 
-									var productStock = document.getElementById("productStock");
-									productStock.value = inventory.stockInShop;
-								}
+            var productStock = document.getElementById("productStock");
+            productStock.value = inventory.stockInShop;
+        }
 
-								//load product Categories
-								function loadQualities() {
-									var productId = document.getElementById("productName").value;
-									var productCategory = document.getElementById("productCategory");
-									var categories = productCategories.filter(pc => pc.productId == productId && !pc.isDeleted);
+        //load product Categories
+        function loadQualities() {
+            var productId = document.getElementById("productName").value;
+            var productCategory = document.getElementById("productCategory");
+            var categories = productCategories.filter(pc => pc.productId == productId && !pc.isDeleted);
 
-									//clear previous options and add default value
-									productCategory.innerHTML = "";
-									var defaultOption = document.createElement("option");
-									defaultOption.value = "-1";
-									defaultOption.text = "Select Product Category";
-									productCategory.add(defaultOption);
+            //clear previous options and add default value
+            productCategory.innerHTML = "";
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "-1";
+            defaultOption.text = "Select Product Category";
+            productCategory.add(defaultOption);
 
 
-									categories.forEach(c => {
-										var categoryType = lookups.find(l => l.id == c.category);
-										var option = document.createElement("option");
-										option.value = categoryType.id;
-										option.text = categoryType.value
-										productCategory.add(option);
-									});
-								}
+            categories.forEach(c => {
+                var categoryType = lookups.find(l => l.id == c.category);
+                var option = document.createElement("option");
+                option.value = categoryType.id;
+                option.text = categoryType.value
+                productCategory.add(option);
+            });
+        }
 
-								//add Product to a list and to the datatable also
-								function addProduct() {
-									document.querySelector("#customerName").disabled = true;
+        //add Product to a list and to the datatable also
+        function addProduct() {
+            document.querySelector("#customerName").disabled = true;
 
-									var customerId = document.getElementById("customerName").value;
-									var productId = document.getElementById("productName").value;
-									var productCategoryId = document.getElementById("productCategory").value;
-									var productQuantity = parseInt(document.getElementById("productQuantity").value);
-									var totalAmountElement = document.getElementById("totalAmount");
+            var customerId = document.getElementById("customerName").value;
+            var productId = document.getElementById("productName").value;
+            var productCategoryId = document.getElementById("productCategory").value;
+            var productQuantity = parseInt(document.getElementById("productQuantity").value);
+            var totalAmountElement = document.getElementById("totalAmount");
 
-									var table = $('#salesTable').DataTable();
+            var table = $('#salesTable').DataTable();
 
-									// find product and product category from the original list
-									var product = products.find(p => p.id == productId);
-									var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
+            // find product and product category from the original list
+            var product = products.find(p => p.id == productId);
+            var category = productCategories.find(pc => pc.productId == productId && pc.category == productCategoryId);
 
-									if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1" || productCategoryId === "-1") {
-										var message = "Please select a product, category, customer and enter a valid quantity."
-										alert(message);
-										return;
-									}
+            if (productName === "-1" || productCategory === "-1" || productQuantity <= 0 || customerId === "-1" || productCategoryId === "-1") {
+                var message = "Please select a product, category, customer and enter a valid quantity."
+                alert(message);
+                return;
+            }
 
-									if (saleDetailsList == null) {
-										saleDetailsList = [];
-									}
-									var categoryType = lookups.find(l => l.id == productCategoryId).value;
-									//add in the datatable and list and also handle existing ones
-									var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
-									if (existingProductIndex !== -1) {
-										// Update the quantity of existing product
-										saleDetailsList[existingProductIndex].quantity += productQuantity;
-										var row = table.row(existingProductIndex).data([
-											existingProductIndex + 1,
-											product.productName,
-											categoryType,
-											category.salePrice.toFixed(2),
-											saleDetailsList[existingProductIndex].quantity,
-											(category.salePrice * saleDetailsList[existingProductIndex].quantity).toFixed(2),
-											'<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
-										]).draw(false).node();
-									} else {
-										// Add the product to the list and table
-										saleDetailsList.push({
-											saleId: -1,
-											productCategoryId: category.id,
-											quantity: productQuantity
-										});
-										var row = table.row.add([
-											table.rows().count() + 1,
-											product.productName,
-											categoryType,
-											category.salePrice.toFixed(2),
-											productQuantity,
-											(category.salePrice * productQuantity).toFixed(2),
-											'<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
-										]).draw(false).node();
-									}
+            if (saleDetailsList == null) {
+                saleDetailsList = [];
+            }
+            var categoryType = lookups.find(l => l.id == productCategoryId).value;
+            //add in the datatable and list and also handle existing ones
+            var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
+            if (existingProductIndex !== -1) {
+                // Update the quantity of existing product
+                saleDetailsList[existingProductIndex].quantity += productQuantity;
+                var row = table.row(existingProductIndex).data([
+                    existingProductIndex + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    saleDetailsList[existingProductIndex].quantity,
+                    (category.salePrice * saleDetailsList[existingProductIndex].quantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            } else {
+                // Add the product to the list and table
+                saleDetailsList.push({
+                    saleId: -1,
+                    productCategoryId: category.id,
+                    quantity: productQuantity
+                });
+                var row = table.row.add([
+                    table.rows().count() + 1,
+                    product.productName,
+                    categoryType,
+                    category.salePrice.toFixed(2),
+                    productQuantity,
+                    (category.salePrice * productQuantity).toFixed(2),
+                    '<a class="btn btn-sm btn-danger" onclick="removeProduct(this)"><i class="bi bi-trash"></i></a>'
+                ]).draw(false).node();
+            }
 
-									// Recalculate total amount
-									var totalAmount = saleDetailsList.reduce((total, item) => {
-										var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
-										return total + item.quantity * category.salePrice;
-									}, 0);
-									totalAmountElement.value = totalAmount.toFixed(2);
-									var tot = document.getElementById("totalValue");
-									tot.value = totalAmount.toFixed(2);
-								}
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            totalAmountElement.value = totalAmount.toFixed(2);
+            var tot = document.getElementById("totalValue");
+            tot.value = totalAmount.toFixed(2);
+        }
 
-								// Remove Product from the list and datatable
-								function removeProduct(element) {
-									var table = $('#salesTable').DataTable();
-									var row = table.row($(element).parents('tr'));
-									var rowIndex = row.index();
-									var rowData = row.data();
+        // Remove Product from the list and datatable
+        function removeProduct(element) {
+            var table = $('#salesTable').DataTable();
+            var row = table.row($(element).parents('tr'));
+            var rowIndex = row.index();
+            var rowData = row.data();
 
-									// Remove the corresponding item from the saleDetailsList
-									saleDetailsList.splice(rowIndex, 1);
+            // Remove the corresponding item from the saleDetailsList
+            saleDetailsList.splice(rowIndex, 1);
 
-									// Redraw the table
-									table.row(rowIndex).remove().draw();
+            // Redraw the table
+            table.row(rowIndex).remove().draw();
 
-									// Update the row numbers in the table
-									table.rows().every(function (index) {
-										var rowData = this.data();
-										rowData[0] = index + 1;
-										this.data(rowData).draw(false);
-									});
+            // Update the row numbers in the table
+            table.rows().every(function (index) {
+                var rowData = this.data();
+                rowData[0] = index + 1;
+                this.data(rowData).draw(false);
+            });
 
-									// Recalculate total amount
-									var totalAmount = saleDetailsList.reduce((total, item) => {
-										var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
-										return total + item.quantity * category.salePrice;
-									}, 0);
-									var totalAmountElement = document.getElementById("totalAmount");
-									totalAmountElement.value = totalAmount.toFixed(2);
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            var totalAmountElement = document.getElementById("totalAmount");
+            totalAmountElement.value = totalAmount.toFixed(2);
 
-									var tot = document.getElementById("totalValue");
-									tot.value = totalAmount.toFixed(2);
-								}
+            var tot = document.getElementById("totalValue");
+            tot.value = totalAmount.toFixed(2);
+        }
 
-								// Adding discount to totalamount
-								function addDiscount() {
-									var discount = parseFloat(document.getElementById("discount").value);
-									var totalAmount = parseFloat(document.getElementById("totalAmount").value);
+        // Adding discount to totalamount
+        function addDiscount() {
+            var discount = parseFloat(document.getElementById("discount").value);
+            var totalAmount = parseFloat(document.getElementById("totalAmount").value);
 
-									if (discount > 0) {
-										totalAmount -= (totalAmount * discount) / 100.0;;
+            if (discount > 0) {
+                totalAmount -= (totalAmount * discount) / 100.0;;
 
-										var totalAmountElement = document.getElementById("totalAmount");
-										totalAmountElement.value = totalAmount.toFixed(2);
+                var totalAmountElement = document.getElementById("totalAmount");
+                totalAmountElement.value = totalAmount.toFixed(2);
 
-										var tot = document.getElementById("totalValue");
-										tot.value = totalAmount.toFixed(2);
-									}
-								}
+                var tot = document.getElementById("totalValue");
+                tot.value = totalAmount.toFixed(2);
+            }
+        }
 
-								// Save Sales
-								function saveSales() {
-									var customer = document.getElementById("customerName").value;
-									var temp = {
-										id: -1,
-										employeeId: -1,
-										customerID: customer,
-										dateOfSale: new Date().toISOString().split('T')[0],
-										paymentId: -1,
-										isDeleted: false
-									};
-									var sales = JSON.stringify(temp);
-									var saleDetails = JSON.stringify(saleDetailsList);
-									document.getElementById("sales").value = sales;
-									document.getElementById("saleDetails").value = saleDetails;
-								}
+        // Save Sales
+        function saveSales() {
+            var customer = document.getElementById("customerName").value;
+            var temp = {
+                id: -1,
+                employeeId: -1,
+                customerID: customer,
+                dateOfSale: new Date().toISOString().split('T')[0],
+                paymentId: -1,
+                isDeleted: false
+            };
+            var sales = JSON.stringify(temp);
+            var saleDetails = JSON.stringify(saleDetailsList);
+            document.getElementById("sales").value = sales;
+            document.getElementById("saleDetails").value = saleDetails;
+        }
 
-								// validate and submit
-								function validateAndSubmit() {
-									if (saleDetailsList && saleDetailsList.length > 0) {
-										saveSales();
-										return true;
-									} else {
-										alert("Please add at least one product to the sale.");
-										return false;
-									}
-								}
-							</script>
+        // validate and submit
+        function validateAndSubmit() {
+            if (saleDetailsList && saleDetailsList.length > 0) {
+                saveSales();
+                return true;
+            } else {
+                alert("Please add at least one product to the sale.");
+                return false;
+            }
+        }
+    </script>
 
-							<!-- Add Customer Modal Settings -->
-							<script>
-								document.addEventListener("DOMContentLoaded", function () {
-									var form = document.querySelector("#createCustomerModal");
-									var submitButton = form.querySelector("#addBtn");
+    <!-- Add Customer Modal Settings -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector("#createCustomerModal");
+            var submitButton = form.querySelector("#addBtn");
 
-									// Define input fields and their corresponding error elements
-									var fields = [
-										{ input: form.querySelector("#FirstName"), error: document.querySelector("#firstNameError"), errorMessage: "First Name is required" },
-										{ input: form.querySelector("#LastName"), error: document.querySelector("#lastNameError"), errorMessage: "Last Name is required" },
-										{ input: form.querySelector("#Contact"), error: document.querySelector("#contactError"), errorMessage: "Contact is required" },
-										{ input: form.querySelector("#Gender"), error: document.querySelector("#genderError"), errorMessage: "Gender is required" },
-										{ input: form.querySelector("#Address"), error: document.querySelector("#addressError"), errorMessage: "Address is required" },
-										{ input: form.querySelector("#City"), error: document.querySelector("#cityError"), errorMessage: "City is required" },
-										{ input: form.querySelector("#Province"), error: document.querySelector("#provinceError"), errorMessage: "Province is required" },
-										{ input: form.querySelector("#Country"), error: document.querySelector("#countryError"), errorMessage: "Country is required" },
-										{ input: form.querySelector("#trusty"), error: document.querySelector("#trustyError"), errorMessage: "IsTrustworthy is required" },
-										{ input: form.querySelector("#discount"), error: document.querySelector("#discountError"), errorMessage: "Discount is required" },
-										{ input: form.querySelector("#credit"), error: document.querySelector("#creditError"), errorMessage: "Credit is required" }
-									];
+            // Define input fields and their corresponding error elements
+            var fields = [
+                { input: form.querySelector("#FirstName"), error: document.querySelector("#firstNameError"), errorMessage: "First Name is required" },
+                { input: form.querySelector("#LastName"), error: document.querySelector("#lastNameError"), errorMessage: "Last Name is required" },
+                { input: form.querySelector("#Contact"), error: document.querySelector("#contactError"), errorMessage: "Contact is required" },
+                { input: form.querySelector("#Gender"), error: document.querySelector("#genderError"), errorMessage: "Gender is required" },
+                { input: form.querySelector("#Address"), error: document.querySelector("#addressError"), errorMessage: "Address is required" },
+                { input: form.querySelector("#City"), error: document.querySelector("#cityError"), errorMessage: "City is required" },
+                { input: form.querySelector("#Province"), error: document.querySelector("#provinceError"), errorMessage: "Province is required" },
+                { input: form.querySelector("#Country"), error: document.querySelector("#countryError"), errorMessage: "Country is required" },
+                { input: form.querySelector("#trusty"), error: document.querySelector("#trustyError"), errorMessage: "IsTrustworthy is required" },
+                { input: form.querySelector("#discount"), error: document.querySelector("#discountError"), errorMessage: "Discount is required" },
+                { input: form.querySelector("#credit"), error: document.querySelector("#creditError"), errorMessage: "Credit is required" }
+            ];
 
-									// Add event listener for input fields
-									form.addEventListener("input", function () {
-										var errors = fields.some(function (field) {
-											if (field.input.value.trim() === "") {
-												field.error.textContent = field.errorMessage;
-												field.error.style = 'display: block; color: red; font-size: 12px';
-												field.input.classList.add("is-invalid");
-												return true;
-											} else {
-												field.error.textContent = "";
-												field.error.style.display = 'none';
-												field.input.classList.remove("is-invalid");
-												return false;
-											}
-										});
+            // Add event listener for input fields
+            form.addEventListener("input", function () {
+                var errors = fields.some(function (field) {
+                    if (field.input.value.trim() === "") {
+                        field.error.textContent = field.errorMessage;
+                        field.error.style = 'display: block; color: red; font-size: 12px';
+                        field.input.classList.add("is-invalid");
+                        return true;
+                    } else {
+                        field.error.textContent = "";
+                        field.error.style.display = 'none';
+                        field.input.classList.remove("is-invalid");
+                        return false;
+                    }
+                });
 
-										submitButton.disabled = errors;
-									});
-								});
-							</script>
+                submitButton.disabled = errors;
+            });
+        });
+    </script>
 }

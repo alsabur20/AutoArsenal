@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace AutoArsenal_App.Pages.Manager
+namespace AutoArsenal_App.Pages.Stock
 {
     [Authorize(Roles = "Manager")]
     public class WarehouseModel : PageModel

@@ -152,5 +152,31 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+        // count of employees
+        public static int GetEmployeeCount()
+        {
+            int count = 0;
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT COUNT(*) FROM Employee";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        count = (int) command.ExecuteScalar();
+                        return count;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 }

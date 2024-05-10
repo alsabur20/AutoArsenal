@@ -124,11 +124,9 @@ namespace AutoArsenal_App.Controllers
                 {
                     connection.Open();
                     string query = "EXEC sp_DeleteWarehouse @Id";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-                        await command.ExecuteNonQueryAsync();
-                    }
+                    using SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@Id", id);
+                    await command.ExecuteNonQueryAsync();
                 }
                 catch (Exception ex)
                 {
