@@ -134,15 +134,10 @@ namespace AutoArsenal_App.Pages.Sales
 
                 // get employee id from session
                 ClaimsPrincipal currentUser = this.User;
-
                 Claim userIdClaim = currentUser.FindFirst("UserId");
-
                 if (userIdClaim != null)
                 {
-                    // Get the value of the UserId claim
                     employeeId = userIdClaim.Value;
-
-                    // Now you can use the userIdValue wherever you need it
                 }
 
                 pay.PaymentID = await PaymentController.AddPaymentAndGetID(total);

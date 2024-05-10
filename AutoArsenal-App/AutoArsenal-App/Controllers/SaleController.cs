@@ -33,7 +33,7 @@ namespace AutoArsenal_App.Controllers
                                     EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                     CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                     DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
-                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID")),
+                                    PaymentID = reader.GetInt32(reader.GetOrdinal("PaymentId")),
                                     IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
                                 };
                                 sales.Add(item);

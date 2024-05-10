@@ -71,7 +71,7 @@ namespace AutoArsenal_App.Pages.Purchases
 
                 purchase.DateOfPurchase = DateTime.Now;
                 purchase.AddedBy = 1;
-                purchase.PaymentID = null;
+                purchase.PaymentID = 0;
 
                 int purchaseID = await PurchaseController.AddPurchaseAndGetId(purchase);
 

@@ -11,6 +11,9 @@ namespace AutoArsenal_App.Pages.Purchases
     {
         [BindProperty]
         public List<Purchase> Purchases { get; set; }
+
+        [BindProperty]
+        public List<PurchaseDetails> purchaseDetails { get; set; }
         
         [BindProperty]
         public List<Person> Persons { get; set; }
@@ -22,6 +25,8 @@ namespace AutoArsenal_App.Pages.Purchases
         [BindProperty]
         public List<PaymentDetails> PaymentDetails { get; set; }
 
+        [BindProperty]
+        public List<double> remainings { get; set; }
 
         public async void OnGet()
         {
@@ -31,6 +36,16 @@ namespace AutoArsenal_App.Pages.Purchases
                 Persons = await PersonController.GetPersons();
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
+                purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
+
+                if (Purchases != null)
+                {
+                    remainings = new List<double>();
+                    foreach (var purchase in Purchases)
+                    {
+                        remainings.Add(await PaymentDetailsController.GetRemaining(purchase.PaymentID));                        
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -51,7 +66,7 @@ namespace AutoArsenal_App.Pages.Purchases
             }
             catch (Exception ex)
             {
-                
+                TempData["ErrorOnServer"] = ex.Message;
             }
             return RedirectToPage("/Purchases/Purchases");
         }
@@ -65,9 +80,9 @@ namespace AutoArsenal_App.Pages.Purchases
             try
             {
                 List<ProductCategory> ProductCategories = await ProductCategoryController.GetProductCategories();
-                List<PurchaseDetails> purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
+                purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
 
-                int type = await LookupController.GetLookupId("Sale", "Type");
+                int type = await LookupController.GetLookupId("Purchase", "Type");
                 int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
                 
                 foreach (var prch in purchaseDetails)
