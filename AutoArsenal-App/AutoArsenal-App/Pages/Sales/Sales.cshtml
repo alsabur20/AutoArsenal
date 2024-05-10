@@ -64,7 +64,7 @@
                     @if (Model.Sales != null && Model.Persons != null)
                     {
                         int count = 1;
-                        @foreach (Models.Sale sale in Model.Sales)
+                        foreach (Models.Sale sale in Model.Sales)
                         {
                             if (!sale.IsDeleted)
                             {
