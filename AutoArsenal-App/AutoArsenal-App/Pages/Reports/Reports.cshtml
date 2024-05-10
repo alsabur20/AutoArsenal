@@ -38,7 +38,7 @@
                             <a class="btn btn-sm btn-primary d-block mb-2">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a class="btn btn-sm btn-success d-block">
+                            <a id="saveSalesPDF" class="btn btn-sm btn-success d-block">
                                 <i class="bi bi-save"></i> Save
                             </a>
                         </div>
@@ -56,7 +56,7 @@
                             <h1 class="text-center" id="totalProducts">@Model.ProductCount</h1>
                         </div>
                         <div class="ms-auto">
-                            <a class="btn btn-sm btn-primary d-block mb-2">
+                            <a class="btn btn-sm btn-primary d-block mb-2" href="/Products/AllProducts">
                                 <i class="bi bi-eye"></i> View
                             </a>
                             <a class="btn btn-sm btn-success d-block">
@@ -78,7 +78,7 @@
                             <h1 class="text-center" id="numberOfEmployees">@Model.EmployeeCount</h1>
                         </div>
                         <div class="ms-auto">
-                            <a class="btn btn-sm btn-primary d-block mb-2">
+                            <a class="btn btn-sm btn-primary d-block mb-2" href="/Users/Employees">
                                 <i class="bi bi-eye"></i> View
                             </a>
                             <a class="btn btn-sm btn-success d-block">
@@ -98,7 +98,7 @@
                             <h1 class="text-center" id="numberOfCustomers">@Model.CustomerCount</h1>
                         </div>
                         <div class="ms-auto">
-                            <a class="btn btn-sm btn-primary d-block mb-2">
+                            <a class="btn btn-sm btn-primary d-block mb-2" href="/Users/Customers">
                                 <i class="bi bi-eye"></i> View
                             </a>
                             <a class="btn btn-sm btn-success d-block">
@@ -166,7 +166,59 @@
     <!-- End Donut Chart -->
 </div>
 
+<!-- Table structure -->
+<table id="salesTable" class="table table-hover table-striped table-bordered text-center" style="display:none;">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Sale ID</th>
+            <th scope="col">Employee</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Date</th>
+            <th scope="col">Paid</th>
+            <th scope="col">Payment ID</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        @if (Model.Sales != null && Model.Persons != null)
+        {
+            int count = 1;
+            @foreach (Models.Sale sale in Model.Sales)
+            {
+                if (!sale.IsDeleted)
+                {
+                    Models.Person employee = Model.Persons.Find(p => p.ID == sale.EmployeeID);
+                    Models.Person customer = Model.Persons.Find(p => p.ID == sale.CustomerID);
+                    <tr>
+                        <td>@count</td>
+                        <td>@sale.ID</td>
+                        <td>@(employee.FirstName + " " + employee.LastName)</td>
+                        <td>@(customer.FirstName + " " + customer.LastName)</td>
+                        <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                        <td>@Model.remainings[count - 1]</td>
+                        <td>@sale.PaymentID</td>
+                        <td>
+                            <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                            <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal" onclick="addPayment('@sale.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
+                            <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
+                        </td>
+                    </tr>
+                    count++;
+                }
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7">No records found</td>
+            </tr>
+        }
+    </tbody>
+</table>
 @section Scripts {
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
         var barChart = null;
         var donutChart = null;
@@ -337,5 +389,53 @@
                 barChart.render();
             }
         }
+
+        document.getElementById("saveSalesPDF").addEventListener("click", function () {
+            // Get the table element
+            var table = document.getElementById("salesTable");
+
+            // Create a new jsPDF instance with A4 size
+            var pdf = new jsPDF('p', 'mm', 'a4');
+
+            // Add title to the PDF
+            pdf.setFontSize(20);
+            pdf.text("Sales Report", pdf.internal.pageSize.getWidth() / 2, 30, 'center'); // Centered title
+
+            // Convert the table to a PDF
+            pdf.autoTable({ html: table });
+
+            // Convert the PDF to a data URL
+            var pdfDataURL = pdf.output('datauristring');
+
+            // Create a download link for the PDF
+            var downloadLink = document.createElement('a');
+            downloadLink.href = pdfDataURL;
+            downloadLink.download = "sales_report.pdf";
+
+            // Trigger a click event on the download link
+            downloadLink.click();
+        });
+
+
+
+        // Add an event listener to the Save button
+        // document.getElementById("saveSalesPDF").addEventListener("click", function () {
+        //     Get the table element
+        //     var table = document.getElementById("salesTable");
+
+        //     Create a new jsPDF instance with A4 size
+        //     var pdf = new jsPDF('p', 'mm', 'a4');
+
+        //     Add title to the PDF
+        //     pdf.setFontSize(20);
+        //     pdf.text("Sales Report", pdf.internal.pageSize.getWidth() / 2, 30, 'center'); Centered title
+
+        //     Convert the table to a PDF
+        //     pdf.autoTable({ html: table });
+
+        //     Save the PDF
+        //     pdf.save("sales_report.pdf");
+        // });
+
     </script>
 }

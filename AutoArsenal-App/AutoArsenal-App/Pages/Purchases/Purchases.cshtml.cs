@@ -3,6 +3,7 @@ using AutoArsenal_App.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Security.Claims;
 
 namespace AutoArsenal_App.Pages.Purchases
 {
@@ -27,6 +28,7 @@ namespace AutoArsenal_App.Pages.Purchases
 
         [BindProperty]
         public List<double> remainings { get; set; }
+        private string employeeId;
 
         public async void OnGet()
         {
@@ -43,7 +45,6 @@ namespace AutoArsenal_App.Pages.Purchases
                     remainings = new List<double>();
                     foreach (var purchase in Purchases)
                     {
-                        remainings.Add(await PaymentDetailsController.GetRemaining(purchase.PaymentID));                        
                     }
                 }
             }
@@ -79,11 +80,28 @@ namespace AutoArsenal_App.Pages.Purchases
         {
             try
             {
+                ClaimsPrincipal currentUser = this.User;
+
+                Claim userIdClaim = currentUser.FindFirst("UserId");
+
+                if (userIdClaim != null)
+                {
+                    // Get the value of the UserId claim
+                    employeeId = userIdClaim.Value;
+
+                    // Now you can use the userIdValue wherever you need it
+                }
                 List<ProductCategory> ProductCategories = await ProductCategoryController.GetProductCategories();
                 purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
 
                 int type = await LookupController.GetLookupId("Purchase", "Type");
-                int id = await ReturnController.AddReturnAndGetId(DateTime.Now, type);
+                Return rtn = new Return
+                {
+                    ReturnType = type,
+                    DateOfReturn = DateTime.Now,
+                    AddedBy = int.Parse(employeeId)
+                };
+                int id = await ReturnController.AddReturnAndGetId(rtn);
                 
                 foreach (var prch in purchaseDetails)
                 {

@@ -283,7 +283,6 @@
             var category = lookups.find(l => l.id === pCategory.category).value
             var inventory = inventories.find(i => i.id === pCategory.inventoryId);
 
-            console.log(inventory)
             document.getElementById('productCategoryId').value = productCategoryId;
             document.getElementById('productName').value = product.productName;
             document.getElementById('productCategory').value = category;
@@ -294,10 +293,11 @@
             var to = document.getElementById('moveStockTo');
 
             // if stock is in shop
-            if (inventory.stockInShop >= 0 && inventory.stockInWarehouse == -1) {
+            if (inventory.stockInShop >= 0 && inventory.stockInWarehouse == 0) {
                 from.innerHTML = '<option value="-1" selected>Select Place</option>';
                 from.innerHTML += '<option value="0">Shop</option>';
                 type = 1;
+
             }
             // if stock is in warehouse
             else if (inventory.stockInShop == -1 && inventory.stockInWarehouse >= 0) {
@@ -321,7 +321,6 @@
             var from = document.getElementById('moveStockFrom');
             var to = document.getElementById('moveStockTo');
 
-            console.log(warehouses)
             var fromValue = from.value;
 
             if (fromValue == -1) {

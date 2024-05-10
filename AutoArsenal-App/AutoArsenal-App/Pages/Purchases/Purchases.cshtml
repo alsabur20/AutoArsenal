@@ -25,7 +25,6 @@
     </div>
 }
 <!-- End Error message -->
-
 <!-- Search Card -->
 <div class="card">
     <div class="card-body">
@@ -37,7 +36,7 @@
             <div class="searchBarButton" style="margin:10px;">
                 <div class="form-floating mt-2">
                     <input type="date" class="form-control" name="purchaseSearchDate" id="purchaseSearchDate"
-                        onchange="dateChange()" style="height:auto;" />
+                           onchange="dateChange()" style="height:auto;" />
                     <label for="purchaseSearchDate">Search by Date</label>
                 </div>
             </div>
@@ -68,31 +67,32 @@
                         @foreach (var purchase in Model.Purchases)
                         {
                             Models.Person employee = Model.Persons.Find(p => p.ID == purchase.AddedBy);
-                                    <tr>
-                                        <td>@count</td>
-                                        <td>@purchase.ID</td>
-                                        <td>@(employee.FirstName + " " + employee.LastName)</td>
-                                        <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                        <td>@purchase.PaymentID</td>
-                                        <td>
-                                            <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
-                                                class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                            <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
-                                                onclick="addPayment('@purchase.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
-                                            <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#returnPurchaseModal"
-                                                onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')"><i
-                                                    class="bi bi-arrow-counterclockwise"></i></a>
-                                        </td>
-                                    </tr>
+                            <tr>
+                                <td>@count</td>
+                                <td>@purchase.ID</td>
+                                <td>@(employee.FirstName + " " + employee.LastName)</td>
+                                <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                                <td>@purchase.PaymentID</td>
+                                <td>
+                                    <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
+                                       class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                    <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+                                       onclick="addPayment('@purchase.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
+                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                       data-bs-target="#returnPurchaseModal"
+                                       onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                </td>
+                            </tr>
                             count++;
                         }
                     }
                     else
                     {
-                            <tr>
-                                <td colspan="7">No records found</td>
-                            </tr>
+                        <tr>
+                            <td colspan="7">No records found</td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -105,7 +105,7 @@
 
 <!-- Add Payment -->
 <div class="modal fade" id="addPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="AddPayment">
@@ -120,7 +120,7 @@
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
-                                        asp-for="PaymentID" disabled />
+                                           asp-for="PaymentID" disabled />
                                     <label for="paymentID">Payment Id</label>
                                 </div>
                             </div>
@@ -130,7 +130,7 @@
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
-                                        disabled />
+                                           disabled />
                                     <label for="totalAmount">Total Amount</label>
                                 </div>
                             </div>
@@ -138,7 +138,7 @@
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
-                                        disabled />
+                                           disabled />
                                     <label for="paidAmount">Paid Amount</label>
                                 </div>
                             </div>
@@ -149,7 +149,7 @@
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="text" class="form-control" id="pendingAmount"
-                                        placeholder="Pending Amount" disabled />
+                                           placeholder="Pending Amount" disabled />
                                     <label for="pendingAmount">Pending Amount</label>
                                 </div>
                             </div>
@@ -157,7 +157,7 @@
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
-                                        value="0" min="1" oninput="validity.valid||(value='');" />
+                                           value="0" min="1" oninput="validity.valid||(value='');" />
                                     <label for="amount">Enter Amount</label>
                                 </div>
                             </div>
@@ -175,7 +175,7 @@
 
 <!-- Return Purchase -->
 <div class="modal fade" id="returnPurchaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="ReturnPurchase">
@@ -194,7 +194,7 @@
                         <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="purchaseID" placeholder="Purchase ID"
-                                    disabled />
+                                       disabled />
                                 <label for="purchaseID">Purchase Id</label>
                             </div>
                         </div>
@@ -204,10 +204,10 @@
                         <div class="col-6">
                             <div class="form-floating mt-2">
                                 <input type="datetime" class="form-control" id="purchaseDate" placeholder="Purchase Date"
-                                    disabled />
+                                       disabled />
                                 <label for="purchaseDate">Purchase Date</label>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -222,65 +222,65 @@
 
 <!-- JAVASCRIPT SECTION -->
 @section Scripts {
-        <script>
-            $(document).ready(function () {
-                var table = $('#PurchasesTable').DataTable({
-                    paging: true,
-                    lengthChange: false,
-                    searching: true,
-                    ordering: true,
-                    info: true,
-                    autoWidth: false,
-                    language: {
-                        emptyTable: "No data available",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "Showing 0 to 0 of 0 entries",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        zeroRecords: "No matching records found",
-                        search: "Search:",
-                    }
-                });
-
-                $('#searchBar input').on('input', function () {
-                    var searchText = this.value.trim();
-                    table.search(searchText).draw();
-                });
+    <script>
+        $(document).ready(function () {
+            var table = $('#PurchasesTable').DataTable({
+                paging: true,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
             });
 
-            function dateChange() {
-                var date = document.getElementById("purchaseSearchDate").value;
-                var table = $('#PurchasesTable').DataTable();
-                table.column(4).search(date).draw();
+            $('#searchBar input').on('input', function () {
+                var searchText = this.value.trim();
+                table.search(searchText).draw();
+            });
+        });
+
+        function dateChange() {
+            var date = document.getElementById("purchaseSearchDate").value;
+            var table = $('#PurchasesTable').DataTable();
+            table.column(4).search(date).draw();
+        }
+    </script>
+
+    <!-- Modal Settings -->
+    <script>
+        var payments = @Html.Raw(Json.Serialize(Model.Payments));
+        var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
+
+        // Add Payment
+        function addPayment(paymentID, remaining) {
+            document.getElementById("paymentID").value = paymentID;
+            document.getElementById("paidAmount").value = remaining;
+
+            var payment = payments.find(pd => pd.id == paymentID);
+
+            if (payment) {
+                document.getElementById("totalAmount").value = payment.totalAmount;
+                document.getElementById("pendingAmount").value = payment.totalAmount - remaining;
+            } else {
+                console.error("Payment details not found for payment ID: " + paymentID);
             }
-        </script>
+        }
 
-        <!-- Modal Settings -->
-        <script>
-            var payments = @Html.Raw(Json.Serialize(Model.Payments));
-            var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
+        // Return Purchase
+        function returnPurchase(purchaseID, date) {
+            document.getElementById("purchaseID").value = purchaseID;
+            document.getElementById("purchaseDate").value = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
 
-            // Add Payment
-            function addPayment(paymentID, remaining) {
-                document.getElementById("paymentID").value = paymentID;
-                document.getElementById("paidAmount").value = remaining;
+            document.getElementById("prchId").value = purchaseID;
+        }
 
-                var payment = payments.find(pd => pd.id == paymentID);
-
-                if (payment) {
-                    document.getElementById("totalAmount").value = payment.totalAmount;
-                    document.getElementById("pendingAmount").value = payment.totalAmount - remaining;
-                } else {
-                    console.error("Payment details not found for payment ID: " + paymentID);
-                }
-            }
-
-            // Return Purchase
-            function returnPurchase(purchaseID, date) {
-                document.getElementById("purchaseID").value = purchaseID;
-                document.getElementById("purchaseDate").value = new Date(date).toISOString().slice(0, 19).replace('T', ' ');
-                
-                document.getElementById("prchId").value = purchaseID;
-            }
-
-        </script>
+    </script>
 }

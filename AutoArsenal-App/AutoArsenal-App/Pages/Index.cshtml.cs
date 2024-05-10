@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AutoArsenal_App.Pages
 {
-    [Authorize(Roles = "Cashier")]
+    [Authorize(Roles = "Manager,Cashier")]
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
@@ -14,9 +14,18 @@ namespace AutoArsenal_App.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGet()
         {
+            if (User.IsInRole("Manager"))
+            {
+                return RedirectToPage("/Dashboards/MDashboard");
+            }
+            else if (User.IsInRole("Cashier"))
+            {
+                return RedirectToPage("/Dashboards/CDashboard");
 
+            }
+            return RedirectToPage("");
         }
     }
 }

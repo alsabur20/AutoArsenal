@@ -467,13 +467,18 @@
 
         //add Product to a list and to the datatable also
         function addProduct() {
-            document.querySelector("#customerName").disabled = true;
-
             var customerId = document.getElementById("customerName").value;
             var productId = document.getElementById("productName").value;
             var productCategoryId = document.getElementById("productCategory").value;
             var productQuantity = parseInt(document.getElementById("productQuantity").value);
-            var totalAmountElement = document.getElementById("totalAmount");
+            var productStock = parseInt(document.getElementById("productStock").value); // Get available stock
+
+            document.getElementById("customerName").disabled = true;
+            //get the 
+            if (productQuantity > productStock) {
+                alert("Quantity exceeds available stock. Please enter a valid quantity.");
+                return;
+            }
 
             var table = $('#salesTable').DataTable();
 
@@ -494,6 +499,9 @@
             //add in the datatable and list and also handle existing ones
             var existingProductIndex = saleDetailsList.findIndex(p => p.productCategoryId == category.id);
             if (existingProductIndex !== -1) {
+                if (saleDetailsList[existingProductIndex].quantity + productQuantity > productStock){
+                    return alert("Quantity exceeds available stock. Please enter a valid quantity.");
+                }
                 // Update the quantity of existing product
                 saleDetailsList[existingProductIndex].quantity += productQuantity;
                 var row = table.row(existingProductIndex).data([
@@ -528,6 +536,7 @@
                 var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
                 return total + item.quantity * category.salePrice;
             }, 0);
+            var totalAmountElement = document.getElementById("totalAmount");
             totalAmountElement.value = totalAmount.toFixed(2);
             var tot = document.getElementById("totalValue");
             tot.value = totalAmount.toFixed(2);
@@ -600,7 +609,10 @@
 
         // validate and submit
         function validateAndSubmit() {
-            if (saleDetailsList && saleDetailsList.length > 0) {
+            if (document.getElementById("methodType").value == "-1") {
+                alert("Please select a payment method");
+                return false;
+            } else if (saleDetailsList && saleDetailsList.length > 0) {
                 saveSales();
                 return true;
             } else {

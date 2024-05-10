@@ -31,6 +31,13 @@ namespace AutoArsenal_App.Pages.Reports
         public List<Customer> Customers { get; set; }
         [BindProperty]
         public List<Person> Persons { get; set; }
+        [BindProperty]
+        public List<double> remainings { get; set; }
+        [BindProperty]
+        public List<Payment> Payments { get; set; }
+
+        [BindProperty]
+        public List<PaymentDetails> PaymentDetails { get; set; }
         public async void OnGet()
         {
             try
@@ -46,6 +53,21 @@ namespace AutoArsenal_App.Pages.Reports
                 ProductCount = ProductCategoryController.GetProductCategoryCount();
                 EmployeeCount = EmployeeController.GetEmployeeCount();
                 CustomerCount = CustomerController.GetCustomerCount();
+                Payments = await PaymentController.GetPayments();
+                PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
+
+                if (Sales.Count > 0)
+                {
+                    remainings = new List<double>();
+                    foreach (var sale in Sales)
+                    {
+                        if (!sale.IsDeleted)
+                        {
+                            List<PaymentDetails> pds = PaymentDetails.FindAll(pd => pd.PaymentID == sale.PaymentID);
+                            remainings.Add(pds.Sum(p => p.PaidAmount));
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

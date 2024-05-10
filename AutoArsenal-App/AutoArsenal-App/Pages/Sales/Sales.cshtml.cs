@@ -11,23 +11,26 @@ namespace AutoArsenal_App.Pages.Sales
     {
         [BindProperty]
         public int DeleteId { get; set; }
-        
+
         [BindProperty]
         public List<Sale> Sales { get; set; }
-        
+
         [BindProperty]
         public List<Person> Persons { get; set; }
-        
+
         [BindProperty]
         public List<double> remainings { get; set; }
-        
+
         [BindProperty]
         public List<Payment> Payments { get; set; }
-        
+
         [BindProperty]
         public List<PaymentDetails> PaymentDetails { get; set; }
 
-
+        [BindProperty]
+        public int PaidAmount { get; set; } = 0;
+        [BindProperty]
+        public int PID { get; set; }
         public async void OnGet()
         {
             try
@@ -36,13 +39,17 @@ namespace AutoArsenal_App.Pages.Sales
                 Persons = await PersonController.GetPersons();
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
-                
+
                 if (Sales.Count > 0)
                 {
                     remainings = new List<double>();
-                    for (int i = 0; i < Sales.Count; i++)
+                    foreach (var sale in Sales)
                     {
-                        remainings.Add(await PaymentDetailsController.GetRemaining(Sales[i].PaymentID));
+                        if (!sale.IsDeleted)
+                        {
+                            List<PaymentDetails> pds = PaymentDetails.FindAll(pd => pd.PaymentID == sale.PaymentID);
+                            remainings.Add(pds.Sum(p => p.PaidAmount));
+                        }
                     }
                 }
             }
@@ -60,7 +67,16 @@ namespace AutoArsenal_App.Pages.Sales
         {
             try
             {
-
+                PaymentDetails p = new PaymentDetails
+                {
+                    PaymentID = PID,
+                    PaidAmount = PaidAmount,
+                    PaymentMethod = 7,
+                    PaymentAccount = "cash",
+                    PaymentType = 13,
+                    DateOfPayment = DateTime.Now
+                };
+                await PaymentDetailsController.AddPaymentDetails(p);
             }
             catch (Exception ex)
             {
