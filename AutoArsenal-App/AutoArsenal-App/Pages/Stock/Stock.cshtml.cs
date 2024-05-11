@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace AutoArsenal_App.Pages.Stock
 {
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "Manager, Cashier")]
     public class StockModel : PageModel
     {
         // for moving stock

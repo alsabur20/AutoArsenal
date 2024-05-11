@@ -7,5 +7,6 @@
         public int ProductCategoryID { get; set; }
         public int ManufacturerID { get; set; }
         public double UnitPrice { get; set; }
+        public int ReceivedQuantity { get; set; }
     }
 }

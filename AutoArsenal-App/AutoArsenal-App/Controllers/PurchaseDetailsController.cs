@@ -33,8 +33,8 @@ namespace AutoArsenal_App.Controllers
                                     Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                     ProductCategoryID = reader.GetInt32(reader.GetOrdinal("ProductCategoryId")),
                                     ManufacturerID = reader.GetInt32(reader.GetOrdinal("ManufacturerId")),
-                                    UnitPrice = reader.GetDouble(reader.GetOrdinal("UnitPrice"))
-
+                                    UnitPrice = reader.GetDouble(reader.GetOrdinal("UnitPrice")),
+                                    ReceivedQuantity = reader.GetInt32(reader.GetOrdinal("ReceivedQuantity"))
                                 };
                                 purchaseDetails.Add(item);
                             }

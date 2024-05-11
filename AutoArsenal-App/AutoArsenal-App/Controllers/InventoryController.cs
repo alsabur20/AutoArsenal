@@ -23,7 +23,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Inventory";
+                    string query = "SELECT * FROM View_Inventory";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())

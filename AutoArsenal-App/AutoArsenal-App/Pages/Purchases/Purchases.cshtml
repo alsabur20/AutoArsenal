@@ -56,7 +56,8 @@
                         <th scope="col">Purchase ID</th>
                         <th scope="col">Added By</th>
                         <th scope="col">Dated</th>
-                        <th scope="col">Payment ID</th>
+                        <th scope="col">Total Amount</th>
+                        <th scope="col">Paid Amount</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -72,7 +73,8 @@
                                 <td>@purchase.ID</td>
                                 <td>@(employee.FirstName + " " + employee.LastName)</td>
                                 <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                <td>@purchase.PaymentID</td>
+                                <td>@Model.totals[count - 1]</td>
+                                <td>@Model.remainings[count - 1]</td>
                                 <td>
                                     <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
                                        class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
@@ -105,64 +107,92 @@
 
 <!-- Add Payment -->
 <div class="modal fade" id="addPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="AddPayment">
+            <form method="post" asp-page-handler="AddPayment" onsubmit="return validatePayment()">
+                <input type="hidden" id="paymentId" asp-for="pay.PaymentID" />
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-plus"></i> Add Payment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <div class="row">
-                            <!-- Payment Id -->
-                            <div class="col-5">
-                                <div class="form-floating mt-2">
-                                    <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
-                                           asp-for="PaymentID" disabled />
-                                    <label for="paymentID">Payment Id</label>
-                                </div>
+                    <div class="row">
+                        <!-- Payment Id -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
+                                    disabled />
+                                <label for="paymentID">Payment Id</label>
                             </div>
                         </div>
-                        <div class="row">
-                            <!-- Total Amount -->
-                            <div class="col-5">
-                                <div class="form-floating mt-2">
-                                    <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
-                                           disabled />
-                                    <label for="totalAmount">Total Amount</label>
-                                </div>
-                            </div>
-                            <!-- Paid Amount -->
-                            <div class="col-5">
-                                <div class="form-floating mt-2">
-                                    <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
-                                           disabled />
-                                    <label for="paidAmount">Paid Amount</label>
-                                </div>
+                    </div>
+                    <div class="row">
+                        <!-- Total Amount -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
+                                    disabled />
+                                <label for="totalAmount">Total Amount</label>
                             </div>
                         </div>
+                        <!-- Paid Amount -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                    disabled />
+                                <label for="paidAmount">Paid Amount</label>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="row">
-                            <!-- Pending amount -->
-                            <div class="col-5">
-                                <div class="form-floating mt-2">
-                                    <input type="text" class="form-control" id="pendingAmount"
-                                           placeholder="Pending Amount" disabled />
-                                    <label for="pendingAmount">Pending Amount</label>
-                                </div>
-                            </div>
-                            <!-- Amount -->
-                            <div class="col-5">
-                                <div class="form-floating mt-2">
-                                    <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
-                                           value="0" min="1" oninput="validity.valid||(value='');" />
-                                    <label for="amount">Enter Amount</label>
-                                </div>
+                    <div class="row">
+                        <!-- Pending amount -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="pendingAmount" placeholder="Pending Amount"
+                                    disabled />
+                                <label for="pendingAmount">Pending Amount</label>
                             </div>
                         </div>
-                    </form>
+                        <!-- Amount -->
+                        <div class="col-5">
+                            <div class="form-floating mt-2">
+                                <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
+                                    value="0" min="1" oninput="validity.valid||(value='');" asp-for="pay.PaidAmount" />
+                                <label for="amount">Enter Amount</label>
+                            </div>
+                        </div>
+                        <!-- Method -->
+                        <div class="col-5">
+                            <!-- Payment Method -->
+                            <div class="form-floating mt-2">
+                                <select class="form-select" id="methodType" aria-label="Default select example"
+                                    asp-for="pay.PaymentMethod" required>
+                                    <option value="-1" selected>Select Method</option>
+                                    @if (Model.Lookups != null)
+                                    {
+                                        foreach (var lk in Model.Lookups)
+                                        {
+                                            if (lk.Category == "Payment_Method")
+                                            {
+                                                            <option value="@lk.ID"> @lk.Value </option>
+                                            }
+                                        }
+                                    }
+                                </select>
+                                <label for="methodType">Payment Method</label>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <!-- Payment Account -->
+                            <div class="form-floating mt-2">
+                                <input type="text" class="form-control" id="account" placeholder="Payment Account"
+                                    asp-for="pay.PaymentAccount" />
+                                <label for="account">Payment Account</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -172,6 +202,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Return Purchase -->
 <div class="modal fade" id="returnPurchaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -259,10 +290,11 @@
         var payments = @Html.Raw(Json.Serialize(Model.Payments));
         var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
 
-        // Add Payment
+            // Add Payment
         function addPayment(paymentID, remaining) {
             document.getElementById("paymentID").value = paymentID;
             document.getElementById("paidAmount").value = remaining;
+            document.getElementById("paymentId").value = paymentID;
 
             var payment = payments.find(pd => pd.id == paymentID);
 
@@ -272,6 +304,15 @@
             } else {
                 console.error("Payment details not found for payment ID: " + paymentID);
             }
+        }
+        function validatePayment() {
+            var amount = document.getElementById("amount").value;
+            var pendingAmount = document.getElementById("pendingAmount").value;
+            if (parseInt(amount) > parseInt(pendingAmount)) {
+                alert("Amount should be less than or equal to pending amount");
+                return false;
+            }
+            return true;
         }
 
         // Return Purchase

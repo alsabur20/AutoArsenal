@@ -61,6 +61,9 @@ namespace AutoArsenal_App.Pages.Purchases
             }
         }
 
+        // Add Payment
+        [BindProperty]
+        public PaymentDetails Pay { get; set; }
 
         public async Task<IActionResult> OnPostSavePurchases()
         {
@@ -71,33 +74,31 @@ namespace AutoArsenal_App.Pages.Purchases
 
                 purchase.DateOfPurchase = DateTime.Now;
                 purchase.AddedBy = 1;
-                purchase.PaymentID = 0;
+                purchase.PaymentID = await PaymentController.AddPaymentAndGetID(purchaseDetails.Sum(pd => pd.Quantity * pd.UnitPrice));
+
+                Pay.PaymentID = purchase.PaymentID;
+                if (Pay.PaymentAccount == null)
+                    Pay.PaymentAccount = "Cash";
+                Pay.PaymentType = await LookupController.GetLookupId("Purchase", "Type");
+                Pay.DateOfPayment = DateTime.Now;
+                await PaymentDetailsController.AddPaymentDetails(Pay);
 
                 int purchaseID = await PurchaseController.AddPurchaseAndGetId(purchase);
+                ProductCategories = await ProductCategoryController.GetProductCategories();
 
-                // Set the purchaseID for all purchase details
+                // Set the purchaseID for all purchase details                
                 foreach (var pd in purchaseDetails)
                 {
                     pd.PurchaseID = purchaseID;
-                    ProductCategory pc = await ProductCategoryController.GetProductCategoryById(pd.ProductCategoryID);
-                    Inventory inventory = await InventoryController.GetInventoryById(pc.InventoryId);
-                    if (inventory != null)
-                    {
-                        if (inventory.StockInShop == -1)
-                            inventory.StockInShop = 0;
-                        if (inventory.StockInWarehouse == -1)
-                            inventory.StockInWarehouse = 0;
-                        if (WarehouseId == 0)
-                        {
-                            inventory.StockInShop += pd.Quantity;
-                        }
-                        else
-                        {
-                            inventory.StockInWarehouse += pd.Quantity;
-                            inventory.WarehouseId = WarehouseId;
-                        }
-                        await InventoryController.UpdateInventory(inventory);
-                    }
+                    pd.ReceivedQuantity = 0;
+
+                    Inventory inv = new Inventory();
+                    inv.StockInShop = 0;
+                    inv.StockInWarehouse = 0;
+                    inv.WarehouseId = WarehouseId;
+                    
+                    ProductCategory p = ProductCategories.Find(pro => pro.ID == pd.ProductCategoryID);
+                    p.InventoryId =  await InventoryController.AddInventory(inv);
                 }
 
                 // Add all purchase details in a batch

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace AutoArsenal_App.Pages.Purchases
 {
@@ -27,7 +28,15 @@ namespace AutoArsenal_App.Pages.Purchases
         public List<PaymentDetails> PaymentDetails { get; set; }
 
         [BindProperty]
+        public List<Lookup> Lookups { get; set; }
+
+
+        [BindProperty]
         public List<double> remainings { get; set; }
+        [BindProperty]
+        public List<double> totals { get; set; }
+        
+        
         private string employeeId;
 
         public async void OnGet()
@@ -39,12 +48,20 @@ namespace AutoArsenal_App.Pages.Purchases
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
                 purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
+                Lookups = await LookupController.GetLookup();
 
                 if (Purchases != null)
                 {
+                    totals = new List<double>();
                     remainings = new List<double>();
                     foreach (var purchase in Purchases)
                     {
+                        if (!purchase.IsDeleted)
+                        {
+                            totals.Add(Payments.Find(p => p.ID == purchase.PaymentID).TotalAmount);
+                            List<PaymentDetails> pds = PaymentDetails.FindAll(pd => pd.PaymentID == purchase.PaymentID);
+                            remainings.Add(pds.Sum(p => p.PaidAmount));
+                        }
                     }
                 }
             }
@@ -57,13 +74,17 @@ namespace AutoArsenal_App.Pages.Purchases
 
         // Add Payment
         [BindProperty]
-        public int PaymentID { get; set; }
-
+        public PaymentDetails pay {  get; set; }
+        
         public async Task<IActionResult> OnPostAddPayment()
         {
             try
             {
-                
+                if (pay.PaymentAccount == null)
+                    pay.PaymentAccount = "Cash";
+                pay.PaymentType = await LookupController.GetLookupId("Purchase", "Type");
+                pay.DateOfPayment = DateTime.Now;
+                await PaymentDetailsController.AddPaymentDetails(pay);
             }
             catch (Exception ex)
             {
@@ -81,16 +102,13 @@ namespace AutoArsenal_App.Pages.Purchases
             try
             {
                 ClaimsPrincipal currentUser = this.User;
-
                 Claim userIdClaim = currentUser.FindFirst("UserId");
-
                 if (userIdClaim != null)
                 {
                     // Get the value of the UserId claim
                     employeeId = userIdClaim.Value;
-
-                    // Now you can use the userIdValue wherever you need it
                 }
+
                 List<ProductCategory> ProductCategories = await ProductCategoryController.GetProductCategories();
                 purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
 
@@ -110,25 +128,25 @@ namespace AutoArsenal_App.Pages.Purchases
                         ReturnDetails rtrn = new ReturnDetails();
                         rtrn.ReturnID = id;
                         rtrn.ProductCategoryID = prch.ProductCategoryID;
-                        rtrn.ReturnQuantity = prch.Quantity;
+                        rtrn.ReturnQuantity = prch.ReceivedQuantity;
                         await ReturnDetailsController.AddReturnDetails(rtrn);                        
 
                         ProductCategory prod = ProductCategories.Find(pc => pc.ID == prch.ProductCategoryID);
                         Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
-                        if(prch.Quantity > inventory.StockInShop + inventory.StockInWarehouse)
+                        if(prch.ReceivedQuantity > inventory.StockInShop + inventory.StockInWarehouse)
                         {
                             TempData["ErrorOnServer"] = "Quantity to return is greater than stock.";
                             return RedirectToPage("/Purchases/Purchases");
                         }
-                        else if(prch.Quantity <= inventory.StockInShop)
+                        else if(prch.ReceivedQuantity <= inventory.StockInShop)
                         {
-                            inventory.StockInShop -= prch.Quantity;
+                            inventory.StockInShop -= prch.ReceivedQuantity;
                         }
-                        else if (prch.Quantity > inventory.StockInShop && prch.Quantity < inventory.StockInShop + inventory.StockInWarehouse)
+                        else if (prch.ReceivedQuantity > inventory.StockInShop && prch.ReceivedQuantity < inventory.StockInShop + inventory.StockInWarehouse)
                         {
                             int shopStock = inventory.StockInShop;
                             inventory.StockInShop = 0;
-                            inventory.StockInWarehouse -= prch.Quantity - shopStock;
+                            inventory.StockInWarehouse -= prch.ReceivedQuantity - shopStock;
                         }
                         await InventoryController.UpdateInventory(inventory);
                     }

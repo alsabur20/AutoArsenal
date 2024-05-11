@@ -33,6 +33,7 @@ namespace AutoArsenal_App.Controllers
                                     DateOfPurchase = reader.GetDateTime(reader.GetOrdinal("DateOfPurchase")),
                                     PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID")),
                                     AddedBy = reader.IsDBNull(reader.GetOrdinal("AddedBy")) ? -1 : reader.GetInt32(reader.GetOrdinal("AddedBy"))
+                                    //IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))  // Enable it after adding the DB and remove false from model
                                 };
                                 purchases.Add(item);
                             }

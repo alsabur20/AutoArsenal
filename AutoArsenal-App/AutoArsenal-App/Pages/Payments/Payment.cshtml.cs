@@ -29,10 +29,10 @@ namespace AutoArsenal_App.Pages.Payments
                 {
                     remain.Add(await PaymentDetailsController.GetRemaining(payments[i].ID));
                     
-                    if (remain[i] == payments[i].TotalAmount)
-                        status.Add("Complete");
-                    else
+                    if (remain[i] < payments[i].TotalAmount)
                         status.Add("InComplete");
+                    else
+                        status.Add("Complete");
                 }
             }
             catch (Exception ex)

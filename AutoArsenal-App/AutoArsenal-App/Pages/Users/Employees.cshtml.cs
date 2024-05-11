@@ -86,17 +86,16 @@ namespace AutoArsenal_App.Pages.Manager
                 }
                 else
                 {
-
-                    TempData["ErrorOnServer"] = "Employee already exists";
+                    TempData["ErrorOnServer"] = "Employee already exists"; 
                     return RedirectToPage("/Manager/Employees");
-                }
+				}
 
-            }
+			}
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Manager/Employees");
+            return RedirectToPage("/GetCredentials/GetCredentials");
         }
 
         //for deleting
@@ -105,13 +104,12 @@ namespace AutoArsenal_App.Pages.Manager
             try
             {
                 await PersonController.DeletePerson(DeleteID);
-                return RedirectToPage("/Manager/Employees");
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Manager/Employees");
             }
+            return RedirectToPage("/Manager/Employees");
         }
 
         //for editing
@@ -123,13 +121,12 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 await PersonController.UpdatePerson(Person);
                 await EmployeeController.UpdateEmployee(Employee);
-                return RedirectToPage("/Manager/Employees");
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
-                return RedirectToPage("/Manager/Employees");
             }
+            return RedirectToPage("/Manager/Employees");
         }
     }
 }

@@ -60,12 +60,38 @@ namespace AutoArsenal_App.Pages.Purchases
             }
         }
 
+        // Add Quantity
+        [BindProperty]
+        public int prod {  get; set; }
+
+        [BindProperty]
+        public int quant { get; set; }
+
+        [BindProperty]
+        public int Warehouse { get; set; }
 
         public async Task<IActionResult> OnPostAddQuantity()
         {
             try
-            {
-
+            { 
+                ProductCategory pc = await ProductCategoryController.GetProductCategoryById(prod);
+                Inventory inventory = await InventoryController.GetInventoryById(pc.InventoryId);
+                if (inventory != null)
+                {
+                    if (inventory.StockInShop == -1)
+                        inventory.StockInShop = 0;
+                    if (inventory.StockInWarehouse == -1)
+                        inventory.StockInWarehouse = 0;
+                    if (Warehouse == 0)
+                    {
+                        inventory.StockInShop += quant;
+                    }
+                    else
+                    {
+                        inventory.StockInWarehouse += quant;
+                    }
+                    await InventoryController.UpdateInventory(inventory);
+                }
             }
             catch (Exception ex)
             {

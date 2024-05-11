@@ -143,7 +143,7 @@
                                 <!-- Payment Method -->
                                 <div class="form-floating mt-2">
                                     <select class="form-select" id="methodType" aria-label="Default select example"
-                                            asp-for="Pay.PaymentMethod">
+                                            asp-for="Pay.PaymentMethod" required>
                                         <option value="-1" selected>Select Payment Method</option>
                                         @if (Model.Lookups != null)
                                         {

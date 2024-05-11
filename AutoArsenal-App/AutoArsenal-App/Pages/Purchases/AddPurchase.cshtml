@@ -156,6 +156,54 @@
                         <div class="col-6"></div>
                     </div>
 
+                    <hr />
+
+                    <!-- Entering payment area -->
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Payment Method -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="methodType" aria-label="Default select example"
+                                            asp-for="Pay.PaymentMethod" required>
+                                        <option value="-1" selected>Select Payment Method</option>
+                                    @if (Model.Lookups != null)
+                                    {
+                                        foreach (var lk in Model.Lookups)
+                                        {
+                                            if (lk.Category == "Payment_Method")
+                                            {
+                                                 <option value="@lk.ID"> @lk.Value </option>
+                                            }
+                                        }
+                                    }
+                                    </select>
+                                    <label for="methodType">Payment Method</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <!-- Payment Account -->
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="account" placeholder="Payment Account"
+                                           asp-for="Pay.PaymentAccount" />
+                                    <label for="account">Payment Account</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Paid Amount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                           value="0.00" min="0" oninput="validity.valid||(value='');"
+                                           asp-for="Pay.PaidAmount" />
+                                    <label for="paidAmount">Paid Amount</label>
+                                </div>
+                            </div>
+
+                        </div>
+
                     <!-- Purchase Tables -->
                     <div class="row mt-4">
                         <div class="col">
