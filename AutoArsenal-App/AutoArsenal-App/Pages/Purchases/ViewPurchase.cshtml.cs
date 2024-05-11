@@ -91,13 +91,18 @@ namespace AutoArsenal_App.Pages.Purchases
                         inventory.StockInWarehouse += quant;
                     }
                     await InventoryController.UpdateInventory(inventory);
+
+                    PurchaseDetails = (await PurchaseDetailsController.GetPurchaseDetails());
+                    PurchaseDetails prch = PurchaseDetails.Find(pd => pd.PurchaseID == PurchaseID && pd.ProductCategoryID == prod);
+                    prch.ReceivedQuantity = quant;
+                    await PurchaseDetailsController.UpdateReceived(prch);
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage();
+            return RedirectToPage("/Purchases/Purchases");
         }
 
     }

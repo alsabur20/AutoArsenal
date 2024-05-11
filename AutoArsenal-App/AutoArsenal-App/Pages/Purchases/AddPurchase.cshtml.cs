@@ -86,19 +86,18 @@ namespace AutoArsenal_App.Pages.Purchases
                 int purchaseID = await PurchaseController.AddPurchaseAndGetId(purchase);
                 ProductCategories = await ProductCategoryController.GetProductCategories();
 
+                Inventory inv = new Inventory();
+                inv.StockInShop = 0;
+                inv.StockInWarehouse = 0;
+                inv.WarehouseId = WarehouseId;
+
                 // Set the purchaseID for all purchase details                
                 foreach (var pd in purchaseDetails)
                 {
                     pd.PurchaseID = purchaseID;
                     pd.ReceivedQuantity = 0;
 
-                    Inventory inv = new Inventory();
-                    inv.StockInShop = 0;
-                    inv.StockInWarehouse = 0;
-                    inv.WarehouseId = WarehouseId;
-                    
-                    ProductCategory p = ProductCategories.Find(pro => pro.ID == pd.ProductCategoryID);
-                    p.InventoryId =  await InventoryController.AddInventory(inv);
+                    ProductCategories.Find(pro => pro.ID == pd.ProductCategoryID).InventoryId = await InventoryController.AddInventory(inv);
                 }
 
                 // Add all purchase details in a batch
@@ -108,7 +107,7 @@ namespace AutoArsenal_App.Pages.Purchases
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/purchases/purchases");
+            return RedirectToPage("/Purchases/Purchases");
         }
 
     }

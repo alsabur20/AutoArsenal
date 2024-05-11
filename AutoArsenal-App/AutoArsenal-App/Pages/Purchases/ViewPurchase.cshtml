@@ -134,15 +134,15 @@
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="AddQuantity">
+            <form method="post" asp-page-handler="AddQuantity" onsubmit="return validatePayment()">
+                <input type="hidden" id="purId" asp-for="PurchaseID" />
                 <input type="hidden" id="category" asp-for="prod" />
-
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Add Quantity</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    
                         <div class="row">
                             <!-- Purchase Id -->
                             <div class="col-5">
@@ -202,7 +202,7 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -248,12 +248,23 @@
         }
 
         function updatePurchase(id, name, category, Quantity, received) {
+            document.getElementById("purId").value = id;
             document.getElementById("purchaseID").value = id;
             document.getElementById("Item").value = name;
+            document.getElementById("category").value = category;
             document.getElementById("orderedQuantity").value = Quantity;
             document.getElementById("receivedQuantity").value = received;
+        }
 
-            // Getting the received quantity from the inventory
+        function validatePayment() {
+            var order = document.getElementById("orderedQuantity").value;
+            var received = document.getElementById("receivedQuantity").value;
+            var current = document.getElementById("Quantity").value;
+            if (parseInt(received) + parseInt(current) > parseInt(order)) {
+                alert("Can not enter more than order quantity");
+                return false;
+            }
+            return true;
         }
 
     </script>

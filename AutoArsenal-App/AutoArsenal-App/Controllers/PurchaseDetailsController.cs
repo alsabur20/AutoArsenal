@@ -62,7 +62,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO PurchaseDetail (PurchaseID, Quantity, ProductCategoryID, UnitPrice, ManufacturerID) VALUES (@purchaseID, @Quantity, @ProductCategoryID, @UnitPrice, @ManufacturerID)";
+                    string query = "INSERT INTO PurchaseDetail (PurchaseID, Quantity, ProductCategoryID, UnitPrice, ManufacturerID, ReceivedQuantity) VALUES (@purchaseID, @Quantity, @ProductCategoryID, @UnitPrice, @ManufacturerID, @received)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         foreach (var prch in purchaseDetails)
@@ -73,6 +73,7 @@ namespace AutoArsenal_App.Controllers
                             command.Parameters.AddWithValue("@ProductCategoryID", prch.ProductCategoryID);
                             command.Parameters.AddWithValue("@UnitPrice", prch.UnitPrice);
                             command.Parameters.AddWithValue("@ManufacturerID", prch.ManufacturerID);
+                            command.Parameters.AddWithValue("@received", prch.ReceivedQuantity);
                             await command.ExecuteNonQueryAsync();
                         }
                     }
@@ -111,7 +112,8 @@ namespace AutoArsenal_App.Controllers
                                     Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                     ProductCategoryID = reader.GetInt32(reader.GetOrdinal("ProductCategoryId")),
                                     ManufacturerID = reader.GetInt32(reader.GetOrdinal("ManufacturerId")),
-                                    UnitPrice = reader.GetDouble(reader.GetOrdinal("UnitPrice"))
+                                    UnitPrice = reader.GetDouble(reader.GetOrdinal("UnitPrice")),
+                                    ReceivedQuantity = reader.GetInt32(reader.GetOrdinal("ReceivedQuantity"))
                                 };
                                 purchaseDetails.Add(item);
                             }
@@ -130,5 +132,35 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
+        // Updating received quantity
+        public async static Task UpdateReceived(PurchaseDetails prch)
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "UPDATE [PurchaseDetail] SET ReceivedQuantity = @received WHERE PurchaseId = @PurchaseID AND ProductCategoryId = @ProductCategoryID";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.Clear();
+                        command.Parameters.AddWithValue("@PurchaseID", prch.PurchaseID);
+                        command.Parameters.AddWithValue("@ProductCategoryID", prch.ProductCategoryID);
+                        command.Parameters.AddWithValue("@received", prch.ReceivedQuantity);
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
     }
 }
