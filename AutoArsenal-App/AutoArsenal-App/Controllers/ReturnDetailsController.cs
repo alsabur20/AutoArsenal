@@ -59,7 +59,7 @@ namespace AutoArsenal_App.Controllers
                     // Ye change krna h db change krne k baad
 
                     connection.Open();
-                    string query = "INSERT INTO ReturnDetails (ReturnID, ProductCategory, ReturnQuantity, ReturnPrice) VALUES (@ReturnID, @ProductCategoryID, @ReturnQuantity, 0)";
+                    string query = "INSERT INTO ReturnDetails (ReturnID, ProductCategory, ReturnQuantity) VALUES (@ReturnID, @ProductCategoryID, @ReturnQuantity)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@ReturnID", returnDetails.ReturnID);

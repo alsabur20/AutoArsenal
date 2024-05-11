@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
-using System.Security.Cryptography;
 
 namespace AutoArsenal_App.Pages.Purchases
 {
@@ -13,14 +12,10 @@ namespace AutoArsenal_App.Pages.Purchases
     {
         [BindProperty]
         public List<Purchase> Purchases { get; set; }
-
         [BindProperty]
-        public List<PurchaseDetails> purchaseDetails { get; set; }
-        
+        public List<PurchaseDetails> PurchaseDetails { get; set; }
         [BindProperty]
         public List<Person> Persons { get; set; }
-
-
         [BindProperty]
         public List<Payment> Payments { get; set; }
 
@@ -35,8 +30,8 @@ namespace AutoArsenal_App.Pages.Purchases
         public List<double> remainings { get; set; }
         [BindProperty]
         public List<double> totals { get; set; }
-        
-        
+
+
         private string employeeId;
 
         public async void OnGet()
@@ -47,23 +42,8 @@ namespace AutoArsenal_App.Pages.Purchases
                 Persons = await PersonController.GetPersons();
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
-                purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
+                PurchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
                 Lookups = await LookupController.GetLookup();
-
-                if (Purchases != null)
-                {
-                    totals = new List<double>();
-                    remainings = new List<double>();
-                    foreach (var purchase in Purchases)
-                    {
-                        if (!purchase.IsDeleted)
-                        {
-                            totals.Add(Payments.Find(p => p.ID == purchase.PaymentID).TotalAmount);
-                            List<PaymentDetails> pds = PaymentDetails.FindAll(pd => pd.PaymentID == purchase.PaymentID);
-                            remainings.Add(pds.Sum(p => p.PaidAmount));
-                        }
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -74,8 +54,8 @@ namespace AutoArsenal_App.Pages.Purchases
 
         // Add Payment
         [BindProperty]
-        public PaymentDetails pay {  get; set; }
-        
+        public PaymentDetails pay { get; set; }
+
         public async Task<IActionResult> OnPostAddPayment()
         {
             try
@@ -110,7 +90,7 @@ namespace AutoArsenal_App.Pages.Purchases
                 }
 
                 List<ProductCategory> ProductCategories = await ProductCategoryController.GetProductCategories();
-                purchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
+                PurchaseDetails = await PurchaseDetailsController.GetPurchaseDetails();
 
                 int type = await LookupController.GetLookupId("Purchase", "Type");
                 Return rtn = new Return
@@ -120,8 +100,8 @@ namespace AutoArsenal_App.Pages.Purchases
                     AddedBy = int.Parse(employeeId)
                 };
                 int id = await ReturnController.AddReturnAndGetId(rtn);
-                
-                foreach (var prch in purchaseDetails)
+
+                foreach (var prch in PurchaseDetails)
                 {
                     if (PurchaseId == prch.PurchaseID)
                     {
@@ -129,16 +109,16 @@ namespace AutoArsenal_App.Pages.Purchases
                         rtrn.ReturnID = id;
                         rtrn.ProductCategoryID = prch.ProductCategoryID;
                         rtrn.ReturnQuantity = prch.ReceivedQuantity;
-                        await ReturnDetailsController.AddReturnDetails(rtrn);                        
+                        await ReturnDetailsController.AddReturnDetails(rtrn);
 
                         ProductCategory prod = ProductCategories.Find(pc => pc.ID == prch.ProductCategoryID);
                         Inventory inventory = await InventoryController.GetInventoryById(prod.InventoryId);
-                        if(prch.ReceivedQuantity > inventory.StockInShop + inventory.StockInWarehouse)
+                        if (prch.ReceivedQuantity > inventory.StockInShop + inventory.StockInWarehouse)
                         {
                             TempData["ErrorOnServer"] = "Quantity to return is greater than stock.";
                             return RedirectToPage("/Purchases/Purchases");
                         }
-                        else if(prch.ReceivedQuantity <= inventory.StockInShop)
+                        else if (prch.ReceivedQuantity <= inventory.StockInShop)
                         {
                             inventory.StockInShop -= prch.ReceivedQuantity;
                         }

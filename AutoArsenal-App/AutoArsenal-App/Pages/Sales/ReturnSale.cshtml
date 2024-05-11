@@ -251,8 +251,7 @@
                 alert("Please enter the quantity to return.");
                 return false;
             }
-
-            if (returnQuantity > originalQuantity) {
+            if (parseInt(returnQuantity) > parseInt(originalQuantity)) {
                 alert("Return quantity cannot be greater than the original quantity.");
                 return false;
             }

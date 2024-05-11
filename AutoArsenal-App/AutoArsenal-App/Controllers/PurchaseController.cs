@@ -32,8 +32,8 @@ namespace AutoArsenal_App.Controllers
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
                                     DateOfPurchase = reader.GetDateTime(reader.GetOrdinal("DateOfPurchase")),
                                     PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentID")) ? -1 : reader.GetInt32(reader.GetOrdinal("PaymentID")),
-                                    AddedBy = reader.IsDBNull(reader.GetOrdinal("AddedBy")) ? -1 : reader.GetInt32(reader.GetOrdinal("AddedBy"))
-                                    //IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))  // Enable it after adding the DB and remove false from model
+                                    AddedBy = reader.IsDBNull(reader.GetOrdinal("AddedBy")) ? -1 : reader.GetInt32(reader.GetOrdinal("AddedBy")),
+                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))  
                                 };
                                 purchases.Add(item);
                             }
@@ -61,12 +61,13 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "INSERT INTO Purchase (DateOfPurchase, PaymentID, AddedBy) OUTPUT INSERTED.Id VALUES (@DateOfPurchase, @PaymentID, @AddedBy)";
+                    string query = "INSERT INTO Purchase (DateOfPurchase, PaymentID, AddedBy, IsDeleted) OUTPUT INSERTED.Id VALUES (@DateOfPurchase, @PaymentID, @AddedBy, @IsDeleted)";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@DateOfPurchase", purchase.DateOfPurchase);
                         command.Parameters.AddWithValue("@PaymentID", (object)purchase.PaymentID ?? DBNull.Value);
                         command.Parameters.AddWithValue("@AddedBy", (object)purchase.AddedBy ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@IsDeleted", purchase.IsDeleted);
 
                         // Execute the command and get the inserted ID
                         int purchaseId = (int)await command.ExecuteScalarAsync();

@@ -77,7 +77,7 @@ namespace AutoArsenal_App.Pages.Sales
                     pay.PaymentAccount = "Cash";
                 pay.PaymentType = await LookupController.GetLookupId("Sale", "Type");
                 pay.DateOfPayment = DateTime.Now;
-                
+                pay.PaymentMethod = await LookupController.GetLookupId("Cash", "Payment_Method");
                 await PaymentDetailsController.AddPaymentDetails(pay);
             }
             catch (Exception ex)

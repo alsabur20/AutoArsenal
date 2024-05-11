@@ -20,7 +20,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM View_AllSales";
+                    string query = "SELECT * FROM View_Sales";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
@@ -30,18 +30,21 @@ namespace AutoArsenal_App.Controllers
                                 Sale item = new Sale
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                                    CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    EmployeeID = reader.IsDBNull(reader.GetOrdinal("EmployeeId")) ?
+                                                (int?)null : reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    CustomerID = reader.IsDBNull(reader.GetOrdinal("CustomerId")) ?
+                                                 (int?)null : reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                     DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
-                                    PaymentID = reader.GetInt32(reader.GetOrdinal("PaymentId")),
-                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
+                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentId")) ?
+                                                (int?)null : reader.GetInt32(reader.GetOrdinal("PaymentId")),
+                                    IsDeleted = reader.IsDBNull(reader.GetOrdinal("IsDeleted")) ?
+                                                false : reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
                                 };
                                 sales.Add(item);
                             }
                             return await Task.FromResult(sales);
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -53,6 +56,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
 
         // Add sale
         public async static Task<int> AddSaleAndGetId(Sale sale)

@@ -75,6 +75,7 @@ namespace AutoArsenal_App.Pages.Purchases
                 purchase.DateOfPurchase = DateTime.Now;
                 purchase.AddedBy = 1;
                 purchase.PaymentID = await PaymentController.AddPaymentAndGetID(purchaseDetails.Sum(pd => pd.Quantity * pd.UnitPrice));
+                purchase.IsDeleted = false;
 
                 Pay.PaymentID = purchase.PaymentID;
                 if (Pay.PaymentAccount == null)

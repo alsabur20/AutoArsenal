@@ -55,39 +55,47 @@
                         <th scope="col">#</th>
                         <th scope="col">Purchase ID</th>
                         <th scope="col">Added By</th>
-                        <th scope="col">Dated</th>
+                        <th scope="col">Date</th>
                         <th scope="col">Total Amount</th>
                         <th scope="col">Paid Amount</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    @if (Model.Purchases != null && Model.Persons != null)
+                    @if (Model.Purchases != null && Model.Persons != null && Model.PaymentDetails != null)
                     {
                         int count = 1;
                         @foreach (var purchase in Model.Purchases)
                         {
-                            Models.Person employee = Model.Persons.Find(p => p.ID == purchase.AddedBy);
-                            <tr>
-                                <td>@count</td>
-                                <td>@purchase.ID</td>
-                                <td>@(employee.FirstName + " " + employee.LastName)</td>
-                                <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                                <td>@Model.totals[count - 1]</td>
-                                <td>@Model.remainings[count - 1]</td>
-                                <td>
-                                    <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
-                                       class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                                    <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
-                                       onclick="addPayment('@purchase.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
-                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                       data-bs-target="#returnPurchaseModal"
-                                       onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')">
-                                        <i class="bi bi-arrow-counterclockwise"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            count++;
+                            if (!purchase.IsDeleted)
+                            {
+                                List<Models.PurchaseDetails> purchaseDetails = Model.PurchaseDetails.FindAll(pd => pd.PurchaseID == purchase.ID);
+                                List<Models.PaymentDetails> pds = Model.PaymentDetails.FindAll(pd => pd.PaymentID == purchase.PaymentID);
+                                Models.Person employee = Model.Persons.Find(p => p.ID == purchase.AddedBy);
+
+                                double totalAmount = purchaseDetails.Sum(pd => pd.Quantity * pd.UnitPrice);
+                                double paidAmount = pds.Sum(payment => payment.PaidAmount);
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@purchase.ID</td>
+                                    <td>@(employee.FirstName + " " + employee.LastName)</td>
+                                    <td>@purchase.DateOfPurchase.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                                    <td>@(totalAmount)</td>
+                                    <td>@(paidAmount)</td>
+                                    <td>
+                                        <a asp-page="/Purchases/ViewPurchase" asp-route-id="@purchase.ID"
+                                           class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
+                                        <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+                                           onclick="addPayment('@purchase.PaymentID', '@paidAmount')"><i class="bi bi-wallet"></i></a>
+                                        <a class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                           data-bs-target="#returnPurchaseModal"
+                                           onclick="returnPurchase('@purchase.ID','@purchase.DateOfPurchase','@purchase.PaymentID')">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                count++;
+                            }
                         }
                     }
                     else
@@ -107,7 +115,7 @@
 
 <!-- Add Payment -->
 <div class="modal fade" id="addPaymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="AddPayment" onsubmit="return validatePayment()">
@@ -122,7 +130,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="paymentID" placeholder="Payment ID"
-                                    disabled />
+                                       disabled />
                                 <label for="paymentID">Payment Id</label>
                             </div>
                         </div>
@@ -132,7 +140,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="totalAmount" placeholder="Total Amount"
-                                    disabled />
+                                       disabled />
                                 <label for="totalAmount">Total Amount</label>
                             </div>
                         </div>
@@ -140,7 +148,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="paidAmount" placeholder="Paid Amount"
-                                    disabled />
+                                       disabled />
                                 <label for="paidAmount">Paid Amount</label>
                             </div>
                         </div>
@@ -151,7 +159,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="pendingAmount" placeholder="Pending Amount"
-                                    disabled />
+                                       disabled />
                                 <label for="pendingAmount">Pending Amount</label>
                             </div>
                         </div>
@@ -159,7 +167,7 @@
                         <div class="col-5">
                             <div class="form-floating mt-2">
                                 <input type="number" class="form-control" id="amount" placeholder="Enter Amount"
-                                    value="0" min="1" oninput="validity.valid||(value='');" asp-for="pay.PaidAmount" />
+                                       value="0" min="1" oninput="validity.valid||(value='');" asp-for="pay.PaidAmount" />
                                 <label for="amount">Enter Amount</label>
                             </div>
                         </div>
@@ -168,7 +176,7 @@
                             <!-- Payment Method -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="methodType" aria-label="Default select example"
-                                    asp-for="pay.PaymentMethod" required>
+                                        asp-for="pay.PaymentMethod" required>
                                     <option value="-1" selected>Select Method</option>
                                     @if (Model.Lookups != null)
                                     {
@@ -176,7 +184,7 @@
                                         {
                                             if (lk.Category == "Payment_Method")
                                             {
-                                                            <option value="@lk.ID"> @lk.Value </option>
+                                                <option value="@lk.ID"> @lk.Value </option>
                                             }
                                         }
                                     }
@@ -188,7 +196,7 @@
                             <!-- Payment Account -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="account" placeholder="Payment Account"
-                                    asp-for="pay.PaymentAccount" />
+                                       asp-for="pay.PaymentAccount" />
                                 <label for="account">Payment Account</label>
                             </div>
                         </div>
@@ -210,7 +218,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="ReturnPurchase">
-                <input type="hidden" id="prchId" asp-for"PurchaseId" />
+                <input type="hidden" id="prchId" asp-for="PurchaseId" />
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">
@@ -290,7 +298,7 @@
         var payments = @Html.Raw(Json.Serialize(Model.Payments));
         var paymentDetails = @Html.Raw(Json.Serialize(Model.PaymentDetails));
 
-            // Add Payment
+        // Add Payment
         function addPayment(paymentID, remaining) {
             document.getElementById("paymentID").value = paymentID;
             document.getElementById("paidAmount").value = remaining;
