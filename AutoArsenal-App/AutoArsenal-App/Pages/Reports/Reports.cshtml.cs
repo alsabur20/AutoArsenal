@@ -26,6 +26,14 @@ namespace AutoArsenal_App.Pages.Reports
         [BindProperty]
         public List<ProductCategory> ProductCategories { get; set; }
         [BindProperty]
+        public List<Lookup> Lookups { get; set; }
+
+        [BindProperty]
+        public List<Manufacturer> Manufacturers { get; set; }
+        [BindProperty]
+        public List<Inventory> Inventories { get; set; }
+
+        [BindProperty]
         public List<Employee> Employees { get; set; }
         [BindProperty]
         public List<Customer> Customers { get; set; }
@@ -42,6 +50,7 @@ namespace AutoArsenal_App.Pages.Reports
         {
             try
             {
+                Lookups = await LookupController.GetLookup();
                 Sales = await SaleController.GetSales();
                 SaleDetails = await SaleDetailsController.GetSaleDetails();
                 Products = await ProductController.GetProducts();
@@ -55,6 +64,8 @@ namespace AutoArsenal_App.Pages.Reports
                 CustomerCount = CustomerController.GetCustomerCount();
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
+                Manufacturers = await ManufacturerController.GetManufacturers();
+                Inventories = await InventoryController.GetInventory();
 
                 if (Sales.Count > 0)
                 {

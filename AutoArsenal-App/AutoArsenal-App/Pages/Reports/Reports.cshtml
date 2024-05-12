@@ -38,7 +38,7 @@
                             <a class="btn btn-sm btn-primary d-block mb-2">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a id="saveSalesPDF" class="btn btn-sm btn-success d-block">
+                            <a id="downloadSalesReportButton" class="btn btn-sm btn-success d-block">
                                 <i class="bi bi-save"></i> Save
                             </a>
                         </div>
@@ -59,7 +59,7 @@
                             <a class="btn btn-sm btn-primary d-block mb-2" href="/Products/AllProducts">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a class="btn btn-sm btn-success d-block">
+                            <a id="downloadProductsReportButton" class="btn btn-sm btn-success d-block">
                                 <i class="bi bi-save"></i> Save
                             </a>
                         </div>
@@ -81,7 +81,7 @@
                             <a class="btn btn-sm btn-primary d-block mb-2" href="/Users/Employees">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a class="btn btn-sm btn-success d-block">
+                            <a id="downloadEmployeesReportButton" class="btn btn-sm btn-success d-block">
                                 <i class="bi bi-save"></i> Save
                             </a>
                         </div>
@@ -101,7 +101,7 @@
                             <a class="btn btn-sm btn-primary d-block mb-2" href="/Users/Customers">
                                 <i class="bi bi-eye"></i> View
                             </a>
-                            <a class="btn btn-sm btn-success d-block">
+                            <a id="downloadCustomersReportButton" class="btn btn-sm btn-success d-block">
                                 <i class="bi bi-save"></i> Save
                             </a>
                         </div>
@@ -166,59 +166,360 @@
     <!-- End Donut Chart -->
 </div>
 
-<!-- Table structure -->
-<table id="salesTable" class="table table-hover table-striped table-bordered text-center" style="display:none;">
-    <thead class="table-dark">
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Sale ID</th>
-            <th scope="col">Employee</th>
-            <th scope="col">Customer</th>
-            <th scope="col">Date</th>
-            <th scope="col">Paid</th>
-            <th scope="col">Payment ID</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody class="table-group-divider">
-        @if (Model.Sales != null && Model.Persons != null)
-        {
-            int count = 1;
-            @foreach (Models.Sale sale in Model.Sales)
+<div id="salesReport" style="display:none;">
+    <h1 id="reportTitle" class="text-center">Sales Report</h1>
+    <!-- Table structure -->
+    <table id="salesTable" class="table table-hover table-striped table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Sale ID</th>
+                <th scope="col">Employee</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Date</th>
+                <th scope="col">Paid</th>
+                <th scope="col">Payment ID</th>
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            @if (Model.Sales != null && Model.Persons != null)
             {
-                if (!sale.IsDeleted)
+                int count = 1;
+                @foreach (Models.Sale sale in Model.Sales)
                 {
-                    Models.Person employee = Model.Persons.Find(p => p.ID == sale.EmployeeID);
-                    Models.Person customer = Model.Persons.Find(p => p.ID == sale.CustomerID);
-                    <tr>
-                        <td>@count</td>
-                        <td>@sale.ID</td>
-                        <td>@(employee.FirstName + " " + employee.LastName)</td>
-                        <td>@(customer.FirstName + " " + customer.LastName)</td>
-                        <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
-                        <td>@Model.remainings[count - 1]</td>
-                        <td>@sale.PaymentID</td>
-                        <td>
-                            <a asp-page="/Sales/ViewSale" asp-route-id="@sale.ID" class="btn btn-sm btn-primary"><i class="bi bi-eye"></i></a>
-                            <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addPaymentModal" onclick="addPayment('@sale.PaymentID', '@Model.remainings[count - 1]')"><i class="bi bi-wallet"></i></a>
-                            <a asp-page="/Sales/ReturnSale" asp-route-id="@sale.ID" class="btn btn-sm btn-warning"><i class="bi bi-arrow-counterclockwise"></i></a>
-                        </td>
-                    </tr>
-                    count++;
+                    if (!sale.IsDeleted)
+                    {
+                        Models.Person employee = Model.Persons.Find(p => p.ID == sale.EmployeeID);
+                        Models.Person customer = Model.Persons.Find(p => p.ID == sale.CustomerID);
+                        <tr>
+                            <td>@count</td>
+                            <td>@sale.ID</td>
+                            <td>@(employee.FirstName + " " + employee.LastName)</td>
+                            <td>@(customer.FirstName + " " + customer.LastName)</td>
+                            <td>@sale.DateOfSale.ToString("yyyy-MM-dd hh:mm:ss")</td>
+                            <td>@Model.remainings[count - 1]</td>
+                            <td>@sale.PaymentID</td>
+                        </tr>
+                        count++;
+                    }
                 }
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="7">No records found</td>
-            </tr>
-        }
-    </tbody>
-</table>
-@section Scripts {
+            else
+            {
+                <tr>
+                    <td colspan="7">No records found</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div id="productsReport" style="display:none;">
+    <h1 id="reportTitle" class="text-center">Products Report</h1>
+    <!-- Table structure -->
+    <div class="table-responsive">
+        <table id="productsTable" class="table table-hover table-striped table-bordered text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Sale Price</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @if (Model.Products != null && Model.ProductCategories != null && Model.Lookups != null && Model.Inventories != null)
+                {
+                    int count = 1;
+                    @foreach (var productCategory in Model.ProductCategories)
+                    {
+                        if (!productCategory.IsDeleted)
+                        {
+                            Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
+                            Models.Inventory inventory = Model.Inventories.Find(i => i.ID == productCategory.InventoryId);
+                            string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
+                            string manufacturer = Model.Manufacturers.Find(m => m.ID == productCategory.ManufacturerId).Name;
+                            <tr>
+                                <td>@(count++)</td>
+                                <td>@product.ProductName</td>
+                                <td>@category</td>
+                                <td>@product.ProductDescription</td>
+                                <td>@productCategory.SalePrice.ToString()</td>
+                                @if (inventory.StockInShop <= 10 || inventory.StockInShop == null)
+                                {
+                                    <td>Out of Stock</td>
+                                }
+                                else if (inventory.StockInShop > 10 && inventory.StockInShop <= 35)
+                                {
+                                    <td>Low Stock</td>
+                                }
+                                else
+                                {
+                                    <td>In Stock</td>
+                                }
+                            </tr>
+                        }
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="employeesReport" style="display:none;">
+    <h1 id="reportTitle" class="text-center">Employees Report</h1>
+    <div class="table-responsive">
+        <!-- Table with stripped rows -->
+        <table id="empTable" class="table table-hover table-striped table-bordered text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Designation</th>
+                    <th scope="col">Salary</th>
+                    <th scope="col">Joining Date</th>
+                    <th scope="col">Contact</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @if (Model.Employees != null && Model.Persons != null && Model.Lookups != null)
+                {
+                    int count = 1;
+                    @foreach (var employee in Model.Employees)
+                    {
+                        Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
+                        if (person.Status == 8)
+                        {
+                            string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
+                            string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPF2mSznTQsxqPgnpkI4DNTlrdUmTzrDgektczlKNRRhy5X5AAOnx5S09ydFYWWNSfcEqDTTHgtNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                            <tr>
+                                <td>@(count++)</td>
+                                <td>@(person.FirstName + " " + person.LastName)</td>
+                                <td>@designation</td>
+                                <td>@employee.Salary</td>
+                                <td>@employee.JoiningDate.ToString("dd MMMM, yyyy")</td>
+                                <td>@person.Contact</td>
+                            </tr>
+                        }
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5">No records found</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <!-- End Table with stripped rows -->
+    </div>
+</div>
+<div id="customersReport" style="display:none;">
+    <h1 id="reportTitle" class="text-center">Customers Report</h1>
+    <div class="table-responsive">
+        <!-- Table with stripped rows -->
+        <table id="custTable" class="table table-hover table-striped table-bordered text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Trustworthy</th>
+                    <th scope="col">Credit</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @if (Model.Customers != null && Model.Persons != null && Model.Lookups != null)
+                {
+                    int count = 1;
+                    @foreach (var customer in Model.Customers)
+                    {
+                        Models.Person person = Model.Persons.Find(p => p.ID == customer.ID);
+                        if (person.Status == 8)
+                        {
+                            <tr>
+                                <td>@(count++)</td>
+                                <td>@(person.FirstName + " " + person.LastName)</td>
+                                <td>@Model.Lookups.Find(l => l.ID == person.Gender).Value</td>
+                                <td>@person.Contact</td>
+                                <td>@(person.StreetAddress + ", " + person.City + ", " + person.Province + ", " + person.Country)</td>
+                                <td>@(customer.IsTrustworthy ? "Yes" : "No")</td>
+                                <td>@customer.Credit</td>
+                                <td>@Model.Lookups.Find(l => l.ID == person.Status).Value</td>
+                            </tr>
+                        }
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8">No records found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var table = $('#custTable').DataTable({
+                paging: false,
+                lengthChange: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                autoWidth: true,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+            // Download PDF function for sales table
+            $('#downloadCustomersReportButton').on('click', function () {
+                // Show the table
+                $('#customersReport').css('display', 'block');
+
+                // Generate PDF
+                var element = document.getElementById('customersReport');
+                html2pdf(element, {
+                    margin: 1,
+                    filename: 'customers_report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                }).then(function (pdf) {
+                    console.log('PDF generated successfully');
+                    $('#customersReport').css('display', 'none');
+                });
+            });
+        });
+        $(document).ready(function () {
+            var table = $('#empTable').DataTable({
+                paging: false,
+                lengthChange: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                autoWidth: true,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+            // Download PDF function for sales table
+            $('#downloadEmployeesReportButton').on('click', function () {
+                // Show the table
+                $('#employeesReport').css('display', 'block');
+
+                // Generate PDF
+                var element = document.getElementById('employeesReport');
+                html2pdf(element, {
+                    margin: 1,
+                    filename: 'employees_report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                }).then(function (pdf) {
+                    console.log('PDF generated successfully');
+                    $('#employeesReport').css('display', 'none');
+                });
+            });
+        });
+        $(document).ready(function () {
+            var table = $('#productsTable').DataTable({
+                paging: false,
+                lengthChange: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                autoWidth: true,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+            // Download PDF function for sales table
+            $('#downloadProductsReportButton').on('click', function () {
+                // Show the table
+                $('#productsReport').css('display', 'block');
+
+                // Generate PDF
+                var element = document.getElementById('productsReport');
+                html2pdf(element, {
+                    margin: 1,
+                    filename: 'products_report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                }).then(function (pdf) {
+                    console.log('PDF generated successfully');
+                    $('#productsReport').css('display', 'none');
+                });
+            });
+        });
+        $(document).ready(function () {
+            var table = $('#salesTable').DataTable({
+                paging: false,
+                lengthChange: false,
+                searching: false,
+                ordering: false,
+                info: false,
+                autoWidth: true,
+                language: {
+                    emptyTable: "No data available",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No matching records found",
+                    search: "Search:",
+                }
+            });
+            // Download PDF function for sales table
+            $('#downloadSalesReportButton').on('click', function () {
+                // Show the table
+                $('#salesReport').css('display', 'block');
+
+                // Generate PDF
+                var element = document.getElementById('salesReport');
+                html2pdf(element, {
+                    margin: 1,
+                    filename: 'sales_report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                }).then(function (pdf) {
+                    console.log('PDF generated successfully');
+                    $('#salesReport').css('display', 'none');
+                });
+            });
+        });
+    </script>
     <script>
         var barChart = null;
         var donutChart = null;
@@ -389,53 +690,5 @@
                 barChart.render();
             }
         }
-
-        document.getElementById("saveSalesPDF").addEventListener("click", function () {
-            // Get the table element
-            var table = document.getElementById("salesTable");
-
-            // Create a new jsPDF instance with A4 size
-            var pdf = new jsPDF('p', 'mm', 'a4');
-
-            // Add title to the PDF
-            pdf.setFontSize(20);
-            pdf.text("Sales Report", pdf.internal.pageSize.getWidth() / 2, 30, 'center'); // Centered title
-
-            // Convert the table to a PDF
-            pdf.autoTable({ html: table });
-
-            // Convert the PDF to a data URL
-            var pdfDataURL = pdf.output('datauristring');
-
-            // Create a download link for the PDF
-            var downloadLink = document.createElement('a');
-            downloadLink.href = pdfDataURL;
-            downloadLink.download = "sales_report.pdf";
-
-            // Trigger a click event on the download link
-            downloadLink.click();
-        });
-
-
-
-        // Add an event listener to the Save button
-        // document.getElementById("saveSalesPDF").addEventListener("click", function () {
-        //     Get the table element
-        //     var table = document.getElementById("salesTable");
-
-        //     Create a new jsPDF instance with A4 size
-        //     var pdf = new jsPDF('p', 'mm', 'a4');
-
-        //     Add title to the PDF
-        //     pdf.setFontSize(20);
-        //     pdf.text("Sales Report", pdf.internal.pageSize.getWidth() / 2, 30, 'center'); Centered title
-
-        //     Convert the table to a PDF
-        //     pdf.autoTable({ html: table });
-
-        //     Save the PDF
-        //     pdf.save("sales_report.pdf");
-        // });
-
     </script>
 }
