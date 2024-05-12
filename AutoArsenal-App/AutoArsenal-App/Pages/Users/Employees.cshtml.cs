@@ -26,7 +26,8 @@ namespace AutoArsenal_App.Pages.Manager
         public List<Person> Persons { get; set; }
         [BindProperty]
         public List<Employee> Employees { get; set; }
-
+        [BindProperty]
+        public List<Credentials> Credentials { get; set; }
         [BindProperty]
         public List<string> Cities { get; set; }
         [BindProperty]
@@ -67,6 +68,7 @@ namespace AutoArsenal_App.Pages.Manager
                 Lookups = await LookupController.GetLookup();
                 Persons = await PersonController.GetPersons();
                 Employees = await EmployeeController.GetEmployee();
+                Credentials = await CredentialController.GetCredentials();
             }
             catch (Exception ex)
             {

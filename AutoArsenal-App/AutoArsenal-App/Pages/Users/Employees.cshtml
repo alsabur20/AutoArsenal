@@ -66,6 +66,7 @@
                             Models.Person person = Model.Persons.Find(p => p.ID == employee.ID);
                             if (person.Status == 8)
                             {
+                                Models.Credentials credentials = Model.Credentials.Find(c => c.ID == employee.CredentialsId);
                                 string gender = Model.Lookups.Find(l => l.ID == person.Gender).Value;
                                 string designation = Model.Lookups.Find(l => l.ID == employee.Role).Value;
 
@@ -77,11 +78,17 @@
                                     <td>@employee.JoiningDate.ToString("dd MMMM, yyyy")</td>
                                     <td>@person.Contact</td>
                                     <td>
-                                        <a class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        <a class="btn btn-sm btn-primary" 
+                                           data-bs-toggle="modal"
                                            data-bs-target="#viewEmployeeModal"
                                            onclick="viewEmployee('@person.FirstName','@person.LastName','@person.Contact', '@gender','@employee.JoiningDate.ToString("MMM dd, yyyy")','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@designation')">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        <a class="btn btn-sm btn-secondary"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editCredentialsModal"
+                                            onclick="editCredentials('@credentials.ID','@credentials.Username','@credentials.Password','@credentials.Email')">
+                                            <i class="fa-solid fa-key fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i></a>
                                         <a class="btn btn-sm btn-success" data-bs-toggle="modal"
                                            data-bs-target="#editEmployeeModal"
                                            onclick="editEmployee('@employee.ID','@person.FirstName','@person.LastName','@person.Contact', '@person.Gender','@employee.JoiningDate','@person.StreetAddress','@person.City','@person.Province','@person.Country','@employee.Salary','@employee.Role')">
@@ -111,6 +118,43 @@
     </div>
 </div>
 <!-- End Table -->
+<!-- Edit Credentials modal -->
+<div class="modal fade" id="editCredentialsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"
+                <h5 class="modal-title" id="staticBackdropLabel"><i class="fa-solid fa-key fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i>  Edit Credentials</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="assignCredentialsFor">
+                <div class="modal-body">
+                    <input type="hidden" id="credentialsId">
+                    <!-- Username -->
+                    <div class="form-floating mt-2">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+                        <label for="username">Username</label>
+                    </div>
+                    <!-- Password -->
+                    <div class="form-floating mt-2">          
+                        <input type="text" class="form-control" id="password" name="password" placeholder="Enter password">
+                        <label for="password">Password</label>
+                    </div>
+                    <!-- Email -->
+                    <div class="form-floating mt-2">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                         <label for="email">Email</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAssignCredentialsForm()">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Edit Credentials modal -->
 <!-- Add employee modal -->
 <div class="modal fade" id="createEmployeeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
      aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -258,7 +302,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                    <button type="submit" class="btn btn-primary" id="addBtn"  disabled>Add</button
                 </div>
             </form>
         </div>
@@ -551,6 +595,12 @@
             document.getElementById("vRole").textContent = role;
         }
 
+        function editCredentials(id,username,password,email){
+            document.getElementById("credentialsId").value = id;
+            document.getElementById("username").value = username;
+            document.getElementById("password").value = password;
+            document.getElementById("email").value = email;
+        }
 
         //Deleting
         function deleteEmployee(id, firstName, lastName) {

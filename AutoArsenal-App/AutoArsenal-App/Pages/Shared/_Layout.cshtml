@@ -59,6 +59,28 @@
                                 <a class="nav-link" href="/Dashboards/CDashboard">Dashboard</a>
                             }
                         </li>
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Users
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/Users/Customers">Customers</a></li>
+                                    <li><a class="dropdown-item" href="/Users/Employees">Employees</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Purchases/Purchases">Purchases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Payments/Payment">Payments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Reports/Reports">Reports</a>
+                            </li>
+                        }
                         @if (User.IsInRole("Manager") || User.IsInRole("Cashier"))
                         {
                             <li class="nav-item">
@@ -69,18 +91,6 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link" href="/Sales/Sales">Sales</a>
-                            </li>
-                        }
-                        @if (User.IsInRole("Manager"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Purchases/Purchases">Purchases</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Payments/Payment">Payments</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/Reports/Reports">Reports</a>
                             </li>
                         }
                         <li class="nav-item dropdown">
@@ -106,27 +116,18 @@
                             <ul class="dropdown-menu">
                                 @if (User.IsInRole("Cashier") || User.IsInRole("Manager"))
                                 {
-                                        <li><a class="dropdown-item" href="">Change Password</a></li>
+                                    <li><a class="dropdown-item" href="">Change Password</a></li>
                                     <li><a class="dropdown-item" href="/Account/Logout">Logout</a> </li>
                                 }
                             </ul>
-                        </li>                        
+                        </li>
                     </ul>
 
                     @* <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                     <a class="nav-link" href="/Manager/Dashboard">Dashboard</a>
                     </li>
-                    <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Users
-                    </a>
-                    <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/Users/Customers">Customers</a></li>
-                    <li><a class="dropdown-item" href="/Users/Employees">Employees</a></li>
 
-                    </ul>
-                    </li>
                     <li class="nav-item">
                     <a class="nav-link" href="/Sales/Sales">Sales</a>
                     </li>
