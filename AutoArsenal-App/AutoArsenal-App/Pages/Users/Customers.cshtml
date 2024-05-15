@@ -187,6 +187,7 @@
                                         <td>${customer.isTrustworthy ? '<span class="badge bg-success text-white" style="font-weight:bolder; font-size:14px;padding:6px;">Yes</span>' : '<span class="badge bg-danger text-white" style="font-weight:bolder; font-size:14px;padding:6px;">No</span>'}</td>
                                         <td>${customer.credit}</td>
                                         <td>
+                                                                    ${customer.isTrustworthy ? '<button class= "btn btn-warning btn-sm" > <i class="bi bi-hand-thumbs-down-fill"></i></button >' : '<button class= "btn btn-success btn-sm" > <i class="bi bi-hand-thumbs-up-fill"></i></button >'}
                                             <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCustomerModal" onclick="deleteCustomer('${customer.id}','${person.firstName}','${person.lastName}')"><i class="bi bi-trash"></i></button>
                                         </td>
                                     `;
