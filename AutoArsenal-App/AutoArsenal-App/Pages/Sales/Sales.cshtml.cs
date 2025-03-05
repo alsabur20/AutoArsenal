@@ -13,6 +13,7 @@ namespace AutoArsenal_App.Pages.Sales
         [BindProperty]
         public int DeleteId { get; set; }
 
+
         [BindProperty]
         public List<Sale> Sales { get; set; }
 
@@ -23,12 +24,18 @@ namespace AutoArsenal_App.Pages.Sales
         public List<double> remainings { get; set; }
 
         [BindProperty]
+        public List<double> totals { get; set; }
+
+        [BindProperty]
         public List<Payment> Payments { get; set; }
 
         [BindProperty]
         public List<PaymentDetails> PaymentDetails { get; set; }
 
+        [BindProperty]
+        public List<Lookup> Lookups { get; set; }
 
+        
         public async void OnGet()
         {
             try
@@ -37,13 +44,20 @@ namespace AutoArsenal_App.Pages.Sales
                 Persons = await PersonController.GetPersons();
                 Payments = await PaymentController.GetPayments();
                 PaymentDetails = await PaymentDetailsController.GetPaymentDetails();
+                Lookups = await LookupController.GetLookup();
 
                 if (Sales.Count > 0)
                 {
+                    totals = new List<double>();
                     remainings = new List<double>();
-                    for (int i = 0; i < Sales.Count; i++)
+                    foreach (var sale in Sales)
                     {
-                        remainings.Add(await PaymentDetailsController.GetRemaining(Sales[i].PaymentID));
+                        if (!sale.IsDeleted)
+                        {
+                            totals.Add(Payments.Find(p => p.ID == sale.PaymentID).TotalAmount);
+                            List<PaymentDetails> pds = PaymentDetails.FindAll(pd => pd.PaymentID == sale.PaymentID);
+                            remainings.Add(pds.Sum(p => p.PaidAmount));
+                        }
                     }
                 }
             }
@@ -53,15 +67,20 @@ namespace AutoArsenal_App.Pages.Sales
             }
         }
 
-        // Add Quantity in payments
+        // Add Payments
         [BindProperty]
-        public int SaleID { get; set; }
-
+        public PaymentDetails pay { get; set; }
+        
         public async Task<IActionResult> OnPostAddPayment()
         {
             try
             {
-
+                if (pay.PaymentAccount == null)
+                    pay.PaymentAccount = "Cash";
+                pay.PaymentType = await LookupController.GetLookupId("Sale", "Type");
+                pay.DateOfPayment = DateTime.Now;
+                pay.PaymentMethod = await LookupController.GetLookupId("Cash", "Payment_Method");
+                await PaymentDetailsController.AddPaymentDetails(pay);
             }
             catch (Exception ex)
             {

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace AutoArsenal_App.Pages.Manager
+namespace AutoArsenal_App.Pages.Stock
 {
     [Authorize(Roles = "Manager")]
     public class ManufacturersModel : PageModel
@@ -18,11 +18,11 @@ namespace AutoArsenal_App.Pages.Manager
 
         //for creating and editing
         [BindProperty]
-        public Manufacturer manufacturer { get; set; }
+        public Manufacturer Manufacturer { get; set; }
 
         //for viewing
         [BindProperty]
-        public List<Manufacturer> manufacturers { get; set; }
+        public List<Manufacturer> Manufacturers { get; set; }
 
         [BindProperty]
         public List<string> Cities { get; set; }
@@ -63,7 +63,7 @@ namespace AutoArsenal_App.Pages.Manager
 
             try
             {
-                manufacturers = await ManufacturerController.GetManufacturers();
+                Manufacturers = await ManufacturerController.GetManufacturers();
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace AutoArsenal_App.Pages.Manager
         {
             try
             {
-                await ManufacturerController.AddManufacturer(manufacturer);
+                await ManufacturerController.AddManufacturer(Manufacturer);
 
                 TempData["Success"] = "Manufacturer added successfully";
             }
@@ -83,21 +83,21 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Manager/Manufactorers");
+            return RedirectToPage("/Manager/Manufacturers");
         }
-        
+
         // For editing
         public async Task<IActionResult> OnPostEditManufacturer()
         {
             try
             {
-                await ManufacturerController.UpdateManufacturer(manufacturer);
+                await ManufacturerController.UpdateManufacturer(Manufacturer);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Manager/Manufactorers");
+            return RedirectToPage("/Stock/Manufacturers");
         }
 
         // For deleting
@@ -111,7 +111,7 @@ namespace AutoArsenal_App.Pages.Manager
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage("/Manager/Manufactorers");
+            return RedirectToPage("/Stock/Manufacturers");
         }
 
     }

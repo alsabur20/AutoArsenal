@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AutoArsenal_App.Pages.Products
 {
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "Manager,Cashier")]
     public class ProductsModel : PageModel
     {
         // for editing

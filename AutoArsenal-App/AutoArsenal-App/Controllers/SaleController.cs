@@ -20,7 +20,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Sale";
+                    string query = "SELECT * FROM View_Sales";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
@@ -30,18 +30,21 @@ namespace AutoArsenal_App.Controllers
                                 Sale item = new Sale
                                 {
                                     ID = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    EmployeeID = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                                    CustomerID = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    EmployeeID = reader.IsDBNull(reader.GetOrdinal("EmployeeId")) ?
+                                                (int?)null : reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    CustomerID = reader.IsDBNull(reader.GetOrdinal("CustomerId")) ?
+                                                 (int?)null : reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                     DateOfSale = reader.GetDateTime(reader.GetOrdinal("DateOfSale")),
-                                    PaymentID = reader.GetInt32(reader.GetOrdinal("PaymentId")),
-                                    IsDeleted = reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
+                                    PaymentID = reader.IsDBNull(reader.GetOrdinal("PaymentId")) ?
+                                                (int?)null : reader.GetInt32(reader.GetOrdinal("PaymentId")),
+                                    IsDeleted = reader.IsDBNull(reader.GetOrdinal("IsDeleted")) ?
+                                                false : reader.GetBoolean(reader.GetOrdinal("IsDeleted"))
                                 };
                                 sales.Add(item);
                             }
                             return await Task.FromResult(sales);
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -53,6 +56,7 @@ namespace AutoArsenal_App.Controllers
                 }
             }
         }
+
 
         // Add sale
         public async static Task<int> AddSaleAndGetId(Sale sale)
@@ -173,6 +177,53 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@SaleId", id);
                         command.Parameters.AddWithValue("@categoryID", category);
                         await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        public async static Task UpdateSaleStatus()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    await connection.OpenAsync();
+                    using (SqlCommand command = new SqlCommand("dbo.UpdateSaleStatus", connection))
+                    {
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        // get total sales
+        public static double GetTotalSales()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT SUM(SD.Quantity*PC.SalePrice) FROM Sale S JOIN SaleDetails SD ON S.Id = SD.SaleId JOIN ProductCategory PC ON SD.ProductCategoryId = PC.Id JOIN Product P ON PC.ProductId = P.Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        return (double)command.ExecuteScalar();
                     }
                 }
                 catch (Exception ex)

@@ -156,6 +156,63 @@
                         <div class="col-6"></div>
                     </div>
 
+                    <hr />
+
+                    <!-- Entering payment area -->
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Payment Method -->
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="methodType" aria-label="Default select example"
+                                            asp-for="Pay.PaymentMethod" required>
+                                        <option value="-1" selected>Select Payment Method</option>
+                                    @if (Model.Lookups != null)
+                                    {
+                                        foreach (var lk in Model.Lookups)
+                                        {
+                                            if (lk.Category == "Payment_Method")
+                                            {
+                                                 <option value="@lk.ID"> @lk.Value </option>
+                                            }
+                                        }
+                                    }
+                                    </select>
+                                    <label for="methodType">Payment Method</label>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <!-- Payment Account -->
+                                <div class="form-floating mt-2">
+                                    <input type="text" class="form-control" id="account" placeholder="Payment Account"
+                                           asp-for="Pay.PaymentAccount" />
+                                    <label for="account">Payment Account</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-5">
+                                <!-- Total Amount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="totalAmount2" placeholder="Total Amount"
+                                           value="0.00" min="1" oninput="validity.valid||(value='');" disabled />
+                                    <label for="totalAmount2">Total Amount</label>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <!-- Paid Amount -->
+                                <div class="form-floating mt-2">
+                                    <input type="number" class="form-control" id="paidAmount" placeholder="Paid Amount"
+                                           value="0.00" min="0" oninput="validity.valid||(value='');"
+                                           asp-for="Pay.PaidAmount" />
+                                    <label for="paidAmount">Paid Amount</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-end d-flex align-items-center" style="height: 100%"></div>
+                        </div>
+
                     <!-- Purchase Tables -->
                     <div class="row mt-4">
                         <div class="col">
@@ -292,6 +349,7 @@
                 ]).draw(false);
             }
             console.log(purchaseDetailsList)
+
             // Clear the fields
             document.getElementById("productName").value = "-1";
             document.getElementById("productCategory").value = "-1";
@@ -299,6 +357,14 @@
             document.getElementById("costPrice").value = "0";
             document.getElementById("productQuantity").value = "0";
             document.getElementById("totalAmount").value = "0.00";
+
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            var totalAmountElement = document.getElementById("totalAmount2");
+            totalAmountElement.value = totalAmount.toFixed(2);
         }
 
         // Remove Product from the list and datatable
@@ -317,6 +383,14 @@
                 rowData[0] = index + 1;
                 this.data(rowData).draw(false);
             });
+
+            // Recalculate total amount
+            var totalAmount = saleDetailsList.reduce((total, item) => {
+                var category = productCategories.find(pc => pc.productId == productId && pc.id == item.productCategoryId);
+                return total + item.quantity * category.salePrice;
+            }, 0);
+            var totalAmountElement = document.getElementById("totalAmount2");
+            totalAmountElement.value = totalAmount.toFixed(2);
         }
 
         // Load Manufacturer based on selected product and category

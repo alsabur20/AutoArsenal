@@ -7,18 +7,27 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace AutoArsenal_App.Pages.Manager
 {
     [Authorize(Roles = "Manager")]
-    public class WarehouseModel : PageModel
+    public class EmplyeesModel : PageModel
     {
-        // for deleting warehouse
+        //for deleting
         [BindProperty]
         public int DeleteID { get; set; }
-        // for displaying warehouses
-        [BindProperty]
-        public List<Warehouse> Warehouses { get; set; }
-        // for adding or editing warehouse
-        [BindProperty]
-        public Warehouse Warehouse { get; set; }
 
+        //for creating and editing
+        [BindProperty]
+        public Person Person { get; set; }
+        [BindProperty]
+        public Employee Employee { get; set; }
+
+        //for viewing
+        [BindProperty]
+        public List<Lookup> Lookups { get; set; }
+        [BindProperty]
+        public List<Person> Persons { get; set; }
+        [BindProperty]
+        public List<Employee> Employees { get; set; }
+        [BindProperty]
+        public List<Credentials> Credentials { get; set; }
         [BindProperty]
         public List<string> Cities { get; set; }
         [BindProperty]
@@ -53,51 +62,73 @@ namespace AutoArsenal_App.Pages.Manager
             "Khyber Pakhtunkhwa",
             "Balochistan",
             "Gilgit-Baltistan" };
+
             try
             {
-                Warehouses = await WarehouseController.GetWarehouses();
+                Lookups = await LookupController.GetLookup();
+                Persons = await PersonController.GetPersons();
+                Employees = await EmployeeController.GetEmployee();
+                Credentials = await CredentialController.GetCredentials();
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
         }
-        public async Task<IActionResult> OnPostAddWarehouse()
+
+        public async Task<IActionResult> OnPostAddEmployee()
         {
             try
             {
-                Warehouse.Status = 8;
-                await WarehouseController.AddWarehouse(Warehouse);
-            }
+                Person.Status = 8;
+                if (await PersonController.GetPersonId(Person) == -1)
+                {
+                    await EmployeeController.AddEmployee(Person, Employee);
+                    TempData["Success"] = "Employee added successfully";
+                }
+                else
+                {
+                    TempData["ErrorOnServer"] = "Employee already exists"; 
+                    return RedirectToPage("/Manager/Employees");
+				}
+
+			}
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage();
+            return RedirectToPage("/GetCredentials/GetCredentials");
         }
-        public async Task<IActionResult> OnPostUpdateWarehouse()
+
+        //for deleting
+        public async Task<IActionResult> OnPostDeleteEmployee()
         {
             try
             {
-                await WarehouseController.UpdateWarehouse(Warehouse);
+                await PersonController.DeletePerson(DeleteID);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage();
+            return RedirectToPage("/Manager/Employees");
         }
-        public async Task<IActionResult> OnPostDeleteWarehouse()
+
+        //for editing
+        public async Task<IActionResult> OnPostEditEmployee()
         {
+            Employee.ID = Person.ID;
+            Person.Status = 8;
             try
             {
-                await WarehouseController.DeleteWarehouse(DeleteID);
+                await PersonController.UpdatePerson(Person);
+                await EmployeeController.UpdateEmployee(Employee);
             }
             catch (Exception ex)
             {
                 TempData["ErrorOnServer"] = ex.Message;
             }
-            return RedirectToPage();
+            return RedirectToPage("/Manager/Employees");
         }
     }
 }

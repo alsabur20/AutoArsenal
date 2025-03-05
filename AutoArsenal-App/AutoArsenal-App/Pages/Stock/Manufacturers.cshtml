@@ -1,5 +1,5 @@
 ﻿@page
-@model AutoArsenal_App.Pages.Manager.ManufacturersModel
+@model AutoArsenal_App.Pages.Stock.ManufacturersModel
 @{
     ViewData["Title"] = "Manufacturers";
 }
@@ -61,10 +61,10 @@
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    @if (Model.manufacturers != null)
+                    @if (Model.Manufacturers != null)
                     {
                         int count = 1;
-                        @foreach (var manu in Model.manufacturers)
+                        @foreach (var manu in Model.Manufacturers)
                         {
                             if (!manu.IsDeleted)
                             {
@@ -76,7 +76,7 @@
                                     <td>
                                         <button class="btn btn-sm btn-success" data-bs-toggle="modal"
                                             data-bs-target="#editManufacturerModal"
-                                            onclick="editManufacturer('@manu.Name','@manu.Contact','@manu.StreetAddress','@manu.City','@manu.Province','@manu.Country')">
+                                                onclick="editManufacturer('@manu.ID','@manu.Name','@manu.Contact','@manu.StreetAddress','@manu.City','@manu.Province','@manu.Country')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
@@ -123,7 +123,7 @@
                             <!-- Name -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="name" placeholder="Name"
-                                    asp-for="manufacturer.Name" />
+                                    asp-for="Manufacturer.Name" />
                                 <label for="name">Name</label>
                                 <p class="invalid" id="nameError"></p>
                             </div>
@@ -132,7 +132,7 @@
                             <!-- Contact -->
                             <div class="form-floating mt-2">
                                 <input type="tel" class="form-control" id="Contact" placeholder="Contact"
-                                    asp-for="manufacturer.Contact" />
+                                    asp-for="Manufacturer.Contact" />
                                 <label for="Contact">Contact</label>
                                 <p class="invalid" id="contactError"></p>
                             </div>
@@ -141,7 +141,7 @@
                             <!-- Address -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="Address" placeholder="Address"
-                                    asp-for="manufacturer.StreetAddress" />
+                                    asp-for="Manufacturer.StreetAddress" />
                                 <label for="Address">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -150,7 +150,7 @@
                             <!-- City -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="City" aria-label="Default select example"
-                                    asp-for="manufacturer.City">
+                                    asp-for="Manufacturer.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -165,7 +165,7 @@
                             <!-- Province -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Province" aria-label="Default select example"
-                                    asp-for="manufacturer.Province">
+                                    asp-for="Manufacturer.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -180,7 +180,7 @@
                             <!-- Country -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="Country" aria-label="Default select example"
-                                    asp-for="manufacturer.Country">
+                                    asp-for="Manufacturer.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -207,10 +207,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="post" asp-page-handler="EditManufacturer">
-                <input type="hidden" id="editId" asp-for="manufacturer.ID" />
-
+                <input type="hidden" id="editId" asp-for="Manufacturer.ID" />
+                <input type="hidden" id="editName" asp-for="Manufacturer.Name" />
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i>Edit Manufacturer</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-pencil"></i> Edit Manufacturer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -219,7 +219,7 @@
                         <div class="col-md-6">
                             <!-- Name -->
                             <div class="form-floating mt-2">
-                                <input type="text" class="form-control" id="editName" placeholder="Name" disabled />
+                                <input type="text" class="form-control" id="editName1" placeholder="Name" disabled />
                                 <label for="editName">Name</label>
                                 <p class="invalid" id="nameError"></p>
                             </div>
@@ -228,7 +228,7 @@
                             <!-- Contact -->
                             <div class="form-floating mt-2">
                                 <input type="tel" class="form-control" id="editContact" placeholder="Contact"
-                                    asp-for="manufacturer.Contact" />
+                                    asp-for="Manufacturer.Contact" />
                                 <label for="editContact">Contact</label>
                                 <p class="invalid" id="contactError"></p>
                             </div>
@@ -237,7 +237,7 @@
                             <!-- Address -->
                             <div class="form-floating mt-2">
                                 <input type="text" class="form-control" id="editAddress" placeholder="Address"
-                                    asp-for="manufacturer.StreetAddress" />
+                                    asp-for="Manufacturer.StreetAddress" />
                                 <label for="editAddress">Address</label>
                                 <p class="invalid" id="addressError"></p>
                             </div>
@@ -246,7 +246,7 @@
                             <!-- City -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editCity" aria-label="Default select example"
-                                    asp-for="manufacturer.City">
+                                    asp-for="Manufacturer.City">
                                     <option value="-1" selected>Select City</option>
                                     @foreach (var city in Model.Cities)
                                     {
@@ -261,7 +261,7 @@
                             <!-- Province -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editProvince" aria-label="Default select example"
-                                    asp-for="manufacturer.Province">
+                                    asp-for="Manufacturer.Province">
                                     <option value="-1" selected>Select Province</option>
                                     @foreach (var province in Model.Provinces)
                                     {
@@ -276,7 +276,7 @@
                             <!-- Country -->
                             <div class="form-floating mt-2">
                                 <select class="form-select" id="editCountry" aria-label="Default select example"
-                                    asp-for="manufacturer.Country">
+                                    asp-for="Manufacturer.Country">
                                     <option value="-1" selected>Select Country</option>
                                     <option value="Pakistan">Pakistan</option>
                                 </select>
@@ -289,7 +289,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" id="addBtn" disabled>Add</button>
+                    <button type="submit" class="btn btn-primary" id="editBtn" >Save</button>
                 </div>
             </form>
         </div>
@@ -337,8 +337,10 @@
         }
 
         //Editing
-        function editManufacturer(name, contact, address, city, province, country) {
+        function editManufacturer(id,name, contact, address, city, province, country) {
+            document.getElementById("editId").value = id;
             document.getElementById("editName").value = name;
+            document.getElementById("editName1").value = name;
             document.getElementById("editContact").value = contact;
             document.getElementById("editAddress").value = address;
             document.getElementById("editCity").value = city;

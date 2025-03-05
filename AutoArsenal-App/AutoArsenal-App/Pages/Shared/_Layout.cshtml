@@ -50,80 +50,120 @@
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/Manager/Dashboard">Dashboard</a>
+                            @if (User.IsInRole("Manager"))
+                            {
+                                <a class="nav-link" href="/Dashboards/MDashboard">Dashboard</a>
+                            }
+                            @if (User.IsInRole("Cashier"))
+                            {
+                                <a class="nav-link" href="/Dashboards/CDashboard">Dashboard</a>
+                            }
                         </li>
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Users
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/Users/Customers">Customers</a></li>
+                                    <li><a class="dropdown-item" href="/Users/Employees">Employees</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Purchases/Purchases">Purchases</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Payments/Payment">Payments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Reports/Reports">Reports</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Manager") || User.IsInRole("Cashier"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Products/AllProducts">Products</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Cashier") || User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Sales/Sales">Sales</a>
+                            </li>
+                        }
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Manager
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Manager/Customers">Customers</a></li>
-                                <li><a class="dropdown-item" href="/Manager/Employees">Employees</a></li>
-                                <li><a class="dropdown-item" href="/Manager/Warehouse">Warehouse</a></li>
-                                <li><a class="dropdown-item" href="/Manager/Manufactorers">Manufacturer</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle"
-                               href="#"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                Sales
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Sales/Sales">All Sales</a></li>
-                                <li><a class="dropdown-item" href="/Sales/AddSale">Add Sales</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle"
-                               href="#"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                Products
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Products/AllProducts">All Products</a></li>
-                                <li><a class="dropdown-item" href="/Products/AddProduct">Add Product</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle"
-                               href="#"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
                                 Inventory
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Stock/Stock">Stock</a></li>
+                                @if (User.IsInRole("Cashier") || User.IsInRole("Manager"))
+                                {
+                                    <li><a class="dropdown-item" href="/Stock/Stock">Stock</a></li>
+                                }
+                                @if (User.IsInRole("Manager"))
+                                {
+                                    <li><a class="dropdown-item" href="/Stock/Warehouse">Warehouse</a></li>
+                                    <li><a class="dropdown-item" href="/Stock/Manufacturers">Manufacturer</a></li>
+                                }
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle"
-                               href="#"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                Purchases
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                My Account
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/Purchases/Purchases">All Purchases</a></li>
-                                <li><a class="dropdown-item" href="/Purchases/AddPurchase">Add Purchase</a></li>
+                                @if (User.IsInRole("Cashier") || User.IsInRole("Manager"))
+                                {
+                                    <li><a class="dropdown-item" href="">Change Password</a></li>
+                                    <li><a class="dropdown-item" href="/Account/Logout">Logout</a> </li>
+                                }
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Returns/ReturnPage">Returns</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Reports/Reports">Reports</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Account/Logout">Logout</a>
-                        </li>
                     </ul>
+
+                    @* <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Manager/Dashboard">Dashboard</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Sales/Sales">Sales</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Products/AllProducts">Products</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Inventory
+                    </a>
+                    <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/Stock/Stock">Stock</a></li>
+
+                    </ul>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Purchases/Purchases">All Purchases</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Returns/ReturnPage">Returns</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Returns/ReturnPage">Returns</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Reports/Reports">Reports</a>
+                    </li>
+
+                    <li class="nav-item">
+                    <a class="nav-link" href="/Account/Logout">Logout</a>
+                    </li>
+                    </ul> *@
                 </div>
             </div>
         </nav>
@@ -142,6 +182,7 @@
         </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <!-- ApexCharts -->
     <script src="~/lib/apexcharts/apexcharts.min.js"></script>

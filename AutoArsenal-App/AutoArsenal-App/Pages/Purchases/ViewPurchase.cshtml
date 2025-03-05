@@ -74,8 +74,9 @@
                                             <th scope="col">Category</th>
                                             <th scope="col">Manufacturer</th>
                                             <th scope="col">Unit Price</th>
-                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Ordered Quantity</th>
                                             <th scope="col">Amount</th>
+                                            <th scope="col">Received Quantity</th>
                                             <th scope="col">Actions</th>
                                         </tr>
                                     </thead>
@@ -91,6 +92,7 @@
                                                     Models.Product product = Model.Products.Find(p => p.ID == productCategory.ProductId);
                                                     string category = Model.Lookups.Find(l => l.ID == productCategory.Category).Value;
                                                     string manu = Model.People.Find(m => m.ID == productCategory.ManufacturerId).Name;
+                                                    
                                                     <tr>
                                                         <td>@(count++)</td>
                                                         <td>@product.ProductName</td>
@@ -99,10 +101,10 @@
                                                         <td>@purchaseDetail.UnitPrice</td>
                                                         <td>@purchaseDetail.Quantity</td>
                                                         <td>@(purchaseDetail.UnitPrice * purchaseDetail.Quantity)</td>
+                                                        <td>@purchaseDetail.ReceivedQuantity</td>
                                                         <td>
-                                                            <a class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                                                data-bs-target="#addQuantityModal"
-                                                                onclick="updatePurchase('@Model.PurchaseID', '@product.ProductName', '@category', '@purchaseDetail.Quantity')">
+                                                            <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addQuantityModal"
+                                                               onclick="updatePurchase('@Model.PurchaseID', '@product.ProductName', '@productCategory.ID', '@purchaseDetail.Quantity', '@purchaseDetail.ReceivedQuantity')">
                                                                 <i class="bi bi-pencil"></i>
                                                             </a>
                                                         </td>
@@ -132,13 +134,15 @@
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" asp-page-handler="AddQuantity">
+            <form method="post" asp-page-handler="AddQuantity" onsubmit="return validatePayment()">
+                <input type="hidden" id="purId" asp-for="PurchaseID" />
+                <input type="hidden" id="category" asp-for="prod" />
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel"><i class="bi bi-trash"></i> Add Quantity</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    
                         <div class="row">
                             <!-- Purchase Id -->
                             <div class="col-5">
@@ -162,7 +166,7 @@
                             <!-- Ordered Quantity -->
                             <div class="col-5">
                                 <div class="form-floating mt-2">
-                                    <input type="number" class="form-control" id="paidQuantity"
+                                    <input type="number" class="form-control" id="orderedQuantity"
                                         placeholder="Ordered Quantity" disabled />
                                     <label for="orderedQuantity">Ordered Quantity</label>
                                 </div>
@@ -177,17 +181,28 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
+                            <!-- Delivering -->
+                            <div class="col-5">
+                                <div class="form-floating mt-2">
+                                    <select class="form-select" id="deliverOption" aria-label="Default select example" asp-for="Warehouse">
+                                        <option value="0" selected>Shop</option>
+                                        <option value="1">Warehouse</option> 
+                                    </select>
+                                    <label for="deliverOption">Deliver To</label>
+                                </div>
+                            </div>
                             <!-- Quantity -->
                             <div class="col-5">
                                 <div class="form-floating mt-2">
                                     <input type="number" class="form-control" id="Quantity" placeholder="Enter Quantity"
-                                        value="0" min="1" oninput="validity.valid||(value='');" />
+                                        value="0" min="1" oninput="validity.valid||(value='');" asp-for="quant" />
                                     <label for="Quantity">Enter Quantity</label>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -232,12 +247,24 @@
             window.history.back();
         }
 
-        function updatePurchase(id, name, category, Quantity) {
+        function updatePurchase(id, name, category, Quantity, received) {
+            document.getElementById("purId").value = id;
             document.getElementById("purchaseID").value = id;
             document.getElementById("Item").value = name;
+            document.getElementById("category").value = category;
             document.getElementById("orderedQuantity").value = Quantity;
+            document.getElementById("receivedQuantity").value = received;
+        }
 
-            // Getting the received quantity from the inventory
+        function validatePayment() {
+            var order = document.getElementById("orderedQuantity").value;
+            var received = document.getElementById("receivedQuantity").value;
+            var current = document.getElementById("Quantity").value;
+            if (parseInt(received) + parseInt(current) > parseInt(order)) {
+                alert("Can not enter more than order quantity");
+                return false;
+            }
+            return true;
         }
 
     </script>

@@ -21,7 +21,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = @"SELECT * FROM Product";
+                    string query = @"SELECT * FROM View_Products";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())

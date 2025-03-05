@@ -19,7 +19,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Customer";
+                    string query = "SELECT * FROM View_Customers";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
@@ -70,6 +70,30 @@ namespace AutoArsenal_App.Controllers
                         command.Parameters.AddWithValue("@IsTrustworthy", customer.IsTrustworthy);
                         command.Parameters.AddWithValue("@Credit", customer.Credit);
                         await command.ExecuteNonQueryAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+        // ount customers
+        public static int GetCustomerCount()
+        {
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT COUNT(*) FROM Customer";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        return (int)command.ExecuteScalar();
                     }
                 }
                 catch (Exception ex)

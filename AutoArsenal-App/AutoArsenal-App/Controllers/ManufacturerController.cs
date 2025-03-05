@@ -91,7 +91,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "Update Manufacturer SET Contact = @Contact, StreetAddress = @Street, Country = @Country, @City = City, @Province = Province WHERE Id = @Id";
+                    string query = "Update Manufacturer SET Contact = @Contact, StreetAddress = @Street, Country = @Country, City = @City, Province = @Province WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Id", manu.ID);

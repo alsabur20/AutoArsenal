@@ -11,8 +11,8 @@ namespace AutoArsenal_App.Pages.Account
     public class LoginModel : PageModel
     {
         [BindProperty]
-        public Credentials credentials { get; set; }
-        private Employee employee { get; set; }
+        public Credentials Credentials { get; set; }
+        private Employee Employee { get; set; }
 
         private string Role { get; set; }
         public void OnGet()
@@ -24,21 +24,21 @@ namespace AutoArsenal_App.Pages.Account
             try
             {
 
-                bool isValid = await ValidateUser(credentials.Username, credentials.Password);
+                bool isValid = await ValidateUser(Credentials.Username, Credentials.Password);
                 if (isValid)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim("UserId", employee.ID.ToString()),
-                    new Claim(ClaimTypes.Name, credentials.Username.ToString()),
-                    new Claim(ClaimTypes.Role, Role)
-                };
+                    {
+                        new Claim("UserId", Employee.ID.ToString()),
+                        new Claim(ClaimTypes.Name, Credentials.Username.ToString()),
+                        new Claim(ClaimTypes.Role, Role)
+                    };
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                     if (Role == "Manager")
                     {
-                        return RedirectToPage("../Manager/Dashboard");
+                        return RedirectToPage("../Dashboards/MDashboard");
                     }
                     else if (Role == "Cashier")
                     {
@@ -46,7 +46,7 @@ namespace AutoArsenal_App.Pages.Account
                     }
                     else
                     {
-                        TempData["ErrorOnServer"] += "Invalid Role..!!";
+                        TempData["ErrorOnServer"] = "Invalid Role..!!";
                         return RedirectToPage("../Account/Login");
                     }
                 }
@@ -65,13 +65,13 @@ namespace AutoArsenal_App.Pages.Account
         {
             try
             {
-                credentials = await CredentialController.GetCredential(username, password);
-                if (credentials.ID > 0)
+                Credentials = await CredentialController.GetCredential(username, password);
+                if (Credentials.ID > 0)
                 {
-                    employee = await EmployeeController.GetEmployeeByCredential(credentials.ID);
-                    if (employee.ID > 0)
+                    Employee = await EmployeeController.GetEmployeeByCredential(Credentials.ID);
+                    if (Employee.ID > 0)
                     {
-                        Role = await LookupController.GetLookupValue(employee.Role);
+                        Role = await LookupController.GetLookupValue(Employee.Role);
                         return true;
                     }
                     else

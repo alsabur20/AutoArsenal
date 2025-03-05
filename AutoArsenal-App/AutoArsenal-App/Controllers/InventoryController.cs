@@ -23,7 +23,7 @@ namespace AutoArsenal_App.Controllers
                 try
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Inventory";
+                    string query = "SELECT * FROM View_Inventory";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         using (SqlDataReader reader = command.ExecuteReader())
@@ -69,7 +69,7 @@ namespace AutoArsenal_App.Controllers
                         // Set parameter values from the provided inventory object
                         command.Parameters.AddWithValue("@StockInShop", inventory.StockInShop);
                         command.Parameters.AddWithValue("@StockInWarehouse", inventory.StockInWarehouse);
-                        command.Parameters.AddWithValue("@WarehouseId", inventory.WarehouseId);
+                        command.Parameters.AddWithValue("@WarehouseId", inventory.WarehouseId == 0 ? DBNull.Value : inventory.WarehouseId);
 
                         // Declare an OUTPUT parameter to capture the inserted ID
                         SqlParameter outputParam = new SqlParameter("@Id", SqlDbType.Int);

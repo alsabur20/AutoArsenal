@@ -11,6 +11,44 @@ namespace AutoArsenal_App.Controllers
         {
             Configuration = configuration;
         }
+        public async static Task<List<Credentials>> GetCredentials()
+        {
+            List<Credentials> credentials = new List<Credentials>();
+            using (SqlConnection connection = new SqlConnection(Configuration.GetConnectionString("Default")))
+            {
+                try
+                {
+                    connection.Open();
+                    string query = "SELECT * FROM Credentials";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                credentials.Add(new Credentials
+                                {
+                                    ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Username = reader.GetString(reader.GetOrdinal("Username")),
+                                    Password = reader.GetString(reader.GetOrdinal("Password")),
+                                    Email = reader.GetString(reader.GetOrdinal("Email"))
+                                });
+                            }
+                            return await Task.FromResult(credentials);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message + ex.StackTrace);
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
         public async static Task<Credentials> GetCredential(string username, string password)
         {
             Credentials credentials = new Credentials();
