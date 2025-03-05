@@ -94,7 +94,7 @@ namespace AutoArsenal_App.Pages.Purchases
 
                     PurchaseDetails = (await PurchaseDetailsController.GetPurchaseDetails());
                     PurchaseDetails prch = PurchaseDetails.Find(pd => pd.PurchaseID == PurchaseID && pd.ProductCategoryID == prod);
-                    prch.ReceivedQuantity = quant;
+                    prch.ReceivedQuantity += quant;
                     await PurchaseDetailsController.UpdateReceived(prch);
                 }
             }
