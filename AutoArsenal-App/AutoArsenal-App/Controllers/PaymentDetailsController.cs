@@ -66,7 +66,15 @@ namespace AutoArsenal_App.Controllers
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@id", id);
-                        return await Task.FromResult(Convert.ToDouble(command.ExecuteScalar()));
+                        var result = await command.ExecuteScalarAsync();
+
+                        // If result is DBNull or null, no payment exists for the id
+                        if (result == DBNull.Value || result == null)
+                        {
+                            return 0.0;
+                        }
+
+                        return Convert.ToDouble(result);
                     }
                 }
                 catch (Exception ex)
